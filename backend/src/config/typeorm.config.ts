@@ -1,9 +1,9 @@
 import type { ConfigService } from '@nestjs/config';
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity.js';
-import { LieuDeCulte } from '../lieux-de-culte/entities/lieu-de-culte.entity.js';
-import { UserLieuDeCulte } from '../user-lieu-de-culte/entities/user-lieu-de-culte.entity.js';
-import { ModuleActif } from '../modules-actifs/entities/module-actif.entity.js';
+import { Poi } from '../pois/entities/poi.entity.js';
+import { UserPoi } from '../user-pois/entities/user-poi.entity.js';
+import { ActiveModule } from '../active-modules/entities/active-module.entity.js';
 
 export function buildTypeOrmConfig(
   configService: ConfigService,
@@ -15,9 +15,9 @@ export function buildTypeOrmConfig(
     username: configService.get<string>('DB_USERNAME', 'mychurch'),
     password: configService.get<string>('DB_PASSWORD', 'mychurch'),
     database: configService.get<string>('DB_NAME', 'mychurch'),
-    entities: [User, LieuDeCulte, UserLieuDeCulte, ModuleActif],
-    // Pratique pour la démo locale : les tables sont créées/mises à jour automatiquement.
-    // À désactiver au profit de vraies migrations avant tout usage en production.
+    entities: [User, Poi, UserPoi, ActiveModule],
+    // Convenient for the local demo: tables are created/updated automatically.
+    // Switch to real migrations before any production use.
     synchronize: configService.get<string>('NODE_ENV', 'development') !== 'production',
   };
 }

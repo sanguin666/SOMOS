@@ -1,10 +1,10 @@
 /**
- * Thème d'accessibilité de l'application.
+ * App-wide accessibility theme.
  *
- * Le public cible est majoritairement âgé : les tailles de texte et de
- * zones tactiles ci-dessous sont volontairement bien au-dessus des minimums
- * habituels, et les contrastes respectent (ou dépassent) le niveau AA du
- * WCAG. Ne pas descendre en dessous de ces valeurs sans raison forte.
+ * The target audience is mostly elderly: the text sizes and touch targets
+ * below are deliberately well above the usual minimums, and the contrasts
+ * meet (or exceed) WCAG level AA. Don't go below these values without a
+ * strong reason.
  */
 
 export const colors = {
@@ -20,9 +20,9 @@ export const colors = {
   focus: '#1A4D8F',
 } as const;
 
-// Échelle de tailles volontairement large. React Native met à l'échelle ces
-// valeurs selon le réglage "taille de police" du système par défaut
-// (Text.allowFontScaling n'est jamais désactivé dans nos composants).
+// Deliberately large size scale. React Native scales these values
+// according to the device's system font size setting by default
+// (Text.allowFontScaling is never disabled in our components).
 export const fontSizes = {
   body: 20,
   bodyLarge: 24,
@@ -39,8 +39,8 @@ export const spacing = {
   xl: 32,
 } as const;
 
-// Taille tactile minimale recommandée pour un public peu à l'aise avec le
-// tactile précis (bien au-dessus des 44-48px habituellement recommandés).
+// Minimum recommended touch target for an audience not comfortable with
+// precise tapping (well above the usual 44-48px recommendation).
 export const minTouchTarget = 64;
 
 export const radii = {

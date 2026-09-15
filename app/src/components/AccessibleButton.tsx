@@ -7,15 +7,15 @@ type Variant = 'primary' | 'secondary' | 'danger';
 type Props = Omit<PressableProps, 'style'> & {
   label: string;
   variant?: Variant;
-  // Réservé aux ajustements de mise en page (marges, largeur) : les styles
-  // d'accessibilité (taille, contraste) ne sont volontairement pas surchargeables.
+  // Reserved for layout tweaks (margins, width): accessibility-related
+  // styles (size, contrast) are deliberately not overridable.
   style?: ViewStyle;
 };
 
 /**
- * Bouton unique pour toute l'app : grande zone tactile, texte large,
- * contraste fort. Toujours utiliser ce composant plutôt qu'un TouchableOpacity
- * ad hoc, pour garder une expérience homogène et accessible.
+ * Single button component for the whole app: large touch target, large
+ * text, strong contrast. Always use this instead of an ad hoc
+ * TouchableOpacity, to keep the experience consistent and accessible.
  */
 export function AccessibleButton({
   label,

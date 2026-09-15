@@ -9,8 +9,8 @@ type Props = TextProps & {
 };
 
 /**
- * Texte accessible par défaut : ne jamais mettre `allowFontScaling={false}`
- * ici, pour que le texte suive le réglage de taille de police du téléphone.
+ * Default accessible text: never set `allowFontScaling={false}` here, so
+ * the text follows the phone's font size setting.
  */
 export function AccessibleText({
   variant = 'body',

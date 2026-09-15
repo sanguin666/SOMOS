@@ -5,9 +5,9 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { buildTypeOrmConfig } from './config/typeorm.config.js';
 import { UsersModule } from './users/users.module.js';
-import { LieuxDeCulteModule } from './lieux-de-culte/lieux-de-culte.module.js';
-import { UserLieuDeCulteModule } from './user-lieu-de-culte/user-lieu-de-culte.module.js';
-import { ModulesActifsModule } from './modules-actifs/modules-actifs.module.js';
+import { PoisModule } from './pois/pois.module.js';
+import { UserPoisModule } from './user-pois/user-pois.module.js';
+import { ActiveModulesModule } from './active-modules/active-modules.module.js';
 
 @Module({
   imports: [
@@ -18,9 +18,9 @@ import { ModulesActifsModule } from './modules-actifs/modules-actifs.module.js';
       useFactory: buildTypeOrmConfig,
     }),
     UsersModule,
-    LieuxDeCulteModule,
-    UserLieuDeCulteModule,
-    ModulesActifsModule,
+    PoisModule,
+    UserPoisModule,
+    ActiveModulesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

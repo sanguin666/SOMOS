@@ -24,13 +24,13 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`Utilisateur ${id} introuvable`);
+      throw new NotFoundException(`User ${id} not found`);
     }
     return user;
   }
 
-  findByTelephone(telephone: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { telephone } });
+  findByPhone(phone: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { phone } });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {

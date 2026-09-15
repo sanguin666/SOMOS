@@ -5,26 +5,26 @@ import { AccessibleButton } from '../components/AccessibleButton';
 import { spacing } from '../theme/theme';
 
 /**
- * Écran de démonstration des fondations d'accessibilité.
- * À remplacer par le vrai flux d'onboarding (scan du QR code, etc.).
+ * Demo screen for the accessibility foundations.
+ * To be replaced by the real onboarding flow (QR code scan, etc.).
  */
 export function HomeScreen() {
   return (
     <Screen>
       <AccessibleText variant="title">myChurch</AccessibleText>
       <AccessibleText variant="bodyLarge">
-        Bienvenue. Choisissez une action ci-dessous.
+        Welcome. Choose an action below.
       </AccessibleText>
 
       <AccessibleButton
-        label="Scanner le QR code d'un lieu de culte"
-        onPress={() => Alert.alert('À venir', 'Scan du QR code')}
+        label="Scan a place's QR code"
+        onPress={() => Alert.alert('Coming soon', 'QR code scan')}
         style={{ marginTop: spacing.lg }}
       />
       <AccessibleButton
-        label="Mes lieux de culte"
+        label="My places"
         variant="secondary"
-        onPress={() => Alert.alert('À venir', 'Liste des lieux de culte')}
+        onPress={() => Alert.alert('Coming soon', 'List of places')}
       />
     </Screen>
   );

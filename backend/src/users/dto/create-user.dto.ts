@@ -2,13 +2,13 @@ import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsPhoneNumber()
-  telephone!: string;
+  phone!: string;
 
   @IsOptional()
   @IsString()
-  prenom?: string;
+  firstName?: string;
 
   @IsOptional()
   @IsString()
-  nom?: string;
+  lastName?: string;
 }

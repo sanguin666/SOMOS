@@ -1,19 +1,19 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateLieuDeCulteDto {
+export class CreatePoiDto {
   @IsString()
   @IsNotEmpty()
-  nom!: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
-  adresse?: string;
+  address?: string;
 
   @IsOptional()
   @IsString()
-  ville?: string;
+  city?: string;
 
   @IsOptional()
   @IsString()
-  codePostal?: string;
+  postalCode?: string;
 }

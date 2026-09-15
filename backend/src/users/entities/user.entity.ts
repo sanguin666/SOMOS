@@ -7,29 +7,29 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
-import { UserLieuDeCulte } from '../../user-lieu-de-culte/entities/user-lieu-de-culte.entity.js';
+import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Identifiant de connexion : numéro de téléphone + code SMS (pas de mot de passe).
+  // Login identifier: phone number + SMS code (no password).
   @Column({ unique: true })
-  telephone!: string;
+  phone!: string;
 
-  @Column({ nullable: true })
-  prenom?: string;
+  @Column({ name: 'first_name', nullable: true })
+  firstName?: string;
 
-  @Column({ nullable: true })
-  nom?: string;
+  @Column({ name: 'last_name', nullable: true })
+  lastName?: string;
 
-  @OneToMany(() => UserLieuDeCulte, (liaison) => liaison.user)
-  lieuxDeCulte!: Relation<UserLieuDeCulte>[];
+  @OneToMany(() => UserPoi, (membership) => membership.user)
+  pois!: Relation<UserPoi>[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 }

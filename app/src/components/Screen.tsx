@@ -8,8 +8,8 @@ type Props = {
 };
 
 /**
- * Enveloppe standard de chaque écran : fond à fort contraste, marges
- * généreuses et zone sûre (encoche/barre système) respectée.
+ * Standard wrapper for every screen: high-contrast background, generous
+ * margins, and respects the safe area (notch/system bars).
  */
 export function Screen({ children, scroll = false }: Props) {
   const Content = scroll ? ScrollView : View;
