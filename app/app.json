@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myChurch",
-    "slug": "mychurch",
+    "name": "myPeople",
+    "slug": "mypeople",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

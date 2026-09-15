@@ -1,12 +1,12 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: mychurch-postgres
+    container_name: mypeople-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: mychurch
-      POSTGRES_PASSWORD: mychurch
-      POSTGRES_DB: mychurch
+      POSTGRES_USER: mypeople
+      POSTGRES_PASSWORD: mypeople
+      POSTGRES_DB: mypeople
     ports:
       - "5432:5432"
     volumes:

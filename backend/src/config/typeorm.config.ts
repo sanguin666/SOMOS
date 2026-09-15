@@ -12,9 +12,9 @@ export function buildTypeOrmConfig(
     type: 'postgres',
     host: configService.get<string>('DB_HOST', 'localhost'),
     port: configService.get<number>('DB_PORT', 5432),
-    username: configService.get<string>('DB_USERNAME', 'mychurch'),
-    password: configService.get<string>('DB_PASSWORD', 'mychurch'),
-    database: configService.get<string>('DB_NAME', 'mychurch'),
+    username: configService.get<string>('DB_USERNAME', 'mypeople'),
+    password: configService.get<string>('DB_PASSWORD', 'mypeople'),
+    database: configService.get<string>('DB_NAME', 'mypeople'),
     entities: [User, Poi, UserPoi, ActiveModule],
     // Convenient for the local demo: tables are created/updated automatically.
     // Switch to real migrations before any production use.

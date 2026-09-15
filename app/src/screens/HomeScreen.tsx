@@ -11,7 +11,7 @@ import { spacing } from '../theme/theme';
 export function HomeScreen() {
   return (
     <Screen>
-      <AccessibleText variant="title">myChurch</AccessibleText>
+      <AccessibleText variant="title">myPeople</AccessibleText>
       <AccessibleText variant="bodyLarge">
         Welcome. Choose an action below.
       </AccessibleText>

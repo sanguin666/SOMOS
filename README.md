@@ -1,4 +1,4 @@
-# myChurch
+# myPeople
 
 Mobile + web app for churches and other points of interest: donations, events, and future modules, with a strong focus on accessibility for a mostly elderly audience.
 
@@ -27,9 +27,9 @@ With Docker (recommended):
 docker compose up -d
 ```
 
-This starts a local Postgres on `localhost:5432` (database `mychurch`, user `mychurch` / password `mychurch`).
+This starts a local Postgres on `localhost:5432` (database `mypeople`, user `mypeople` / password `mypeople`).
 
-> No Docker handy? A local PostgreSQL install (`apt install postgresql`) also works: create a `mychurch` user and database matching `backend/.env.example`.
+> No Docker handy? A local PostgreSQL install (`apt install postgresql`) also works: create a `mypeople` user and database matching `backend/.env.example`.
 
 ### 2. Backend (NestJS)
 
