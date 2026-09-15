@@ -42,10 +42,19 @@ npm run start:dev
 
 The API starts on `http://localhost:3000`. In development, tables are created/synced automatically from the entities (`synchronize: true`) — no migration to run for the demo.
 
+Seed a demo POI (with donations and events active) so the app has something real to show:
+
+```bash
+npm run seed
+```
+
+Safe to re-run — it only creates what's missing. This gives you a fixed, known place ("St. Mary's Parish") that the app's demo flow fetches by QR token.
+
 ### 3. Mobile app (Expo Go)
 
 ```bash
 cd app
+cp .env.example .env
 npm install
 npm run start
 ```
@@ -54,15 +63,19 @@ Scan the QR code shown in the terminal with the **Expo Go** app (Android/iOS) to
 
 To test in a browser: `npm run web`.
 
+From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations and Events screens.
+
 ### 4. Access from a physical phone remotely
 
-If the test phone isn't on the same network as the dev machine, temporarily expose the backend with a tunnel (e.g. [ngrok](https://ngrok.com/)):
+The app needs to reach the backend's API. On the same Wi-Fi network, edit `app/.env` and set `EXPO_PUBLIC_API_URL` to your dev machine's LAN IP (e.g. `http://192.168.1.23:3000`) — a phone can't resolve `localhost` as your computer. See the comments in `app/.env.example` for how to find your IP.
+
+If the phone isn't on the same network at all, temporarily expose the backend with a tunnel (e.g. [ngrok](https://ngrok.com/)):
 
 ```bash
 ngrok http 3000
 ```
 
-Then point the app at the URL ngrok provides (to be configured in the app's config once the API calls are wired up).
+Then set `EXPO_PUBLIC_API_URL` in `app/.env` to the URL ngrok provides.
 
 ## Accessibility (app)
 
