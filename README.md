@@ -63,7 +63,7 @@ Scan the QR code shown in the terminal with the **Expo Go** app (Android/iOS) to
 
 To test in a browser: `npm run web`.
 
-From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens.
+From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens. From Announcements, the **+** button opens a compose screen where you can type a message and/or record a voice message (tap the microphone, speak, tap Stop, then Post) — works in `npm run web` too, with a normal browser microphone permission prompt.
 
 ### 4. Access from a physical phone remotely
 
@@ -94,7 +94,7 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 
 - **Donations** — in-app donations (Stripe integration still to come), with a demo confirmation flow
 - **Events** — event notifications (baptisms, weddings, funerals, communions, etc.) — currently demo content in the app, no backend table yet
-- **Announcements** — bulletin/newsletter-style posts (`src/announcements`)
+- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed (staff-only in a real deployment — there's no auth/role system yet to gate the compose screen behind, so it's open in the demo)
 - **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`)
 - **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`)
 

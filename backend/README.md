@@ -18,9 +18,13 @@ Requires a PostgreSQL database reachable with the credentials in `.env` (see the
 - `src/pois` — points of interest a user can join (churches today, other kinds of venues/organizations later)
 - `src/user-pois` — many-to-many membership between a user and a POI (via QR code)
 - `src/active-modules` — product modules subscribed to by a POI and their subscription status
-- `src/announcements` — bulletin/newsletter-style posts for a POI
+- `src/announcements` — bulletin/newsletter-style posts for a POI, optionally with a recorded voice message (see `src/common/upload`)
 - `src/prayer-requests` — community prayer requests, with a "praying" counter
 - `src/livestreams` — links out to livestreamed/recorded services (no video hosting — just title, URL, schedule)
+
+## Voice messages
+
+Announcements can carry an optional recorded voice message instead of (or alongside) typed text. Files are stored on local disk under `backend/uploads/` (gitignored) and served statically at `/uploads/...` — see `src/common/upload/multer-storage.ts`. Swap for a real object store (S3, Cloudinary, ...) before any production use, same as `synchronize: true` stands in for real migrations.
 
 ## Useful scripts
 

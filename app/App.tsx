@@ -6,6 +6,7 @@ import { PoiHubScreen } from './src/screens/PoiHubScreen';
 import { DonateScreen } from './src/screens/DonateScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
 import { AnnouncementsScreen } from './src/screens/AnnouncementsScreen';
+import { ComposeAnnouncementScreen } from './src/screens/ComposeAnnouncementScreen';
 import { PrayerRequestsScreen } from './src/screens/PrayerRequestsScreen';
 import { LivestreamScreen } from './src/screens/LivestreamScreen';
 import type { Poi } from './src/api/types';
@@ -17,6 +18,7 @@ type Route =
   | { name: 'donate'; poi: Poi }
   | { name: 'events'; poi: Poi }
   | { name: 'announcements'; poi: Poi }
+  | { name: 'compose-announcement'; poi: Poi }
   | { name: 'prayer-requests'; poi: Poi }
   | { name: 'livestream'; poi: Poi };
 
@@ -63,7 +65,17 @@ export default function App() {
 
       {current.name === 'events' && <EventsScreen poi={current.poi} onBack={pop} />}
 
-      {current.name === 'announcements' && <AnnouncementsScreen poi={current.poi} onBack={pop} />}
+      {current.name === 'announcements' && (
+        <AnnouncementsScreen
+          poi={current.poi}
+          onBack={pop}
+          onCompose={() => push({ name: 'compose-announcement', poi: current.poi })}
+        />
+      )}
+
+      {current.name === 'compose-announcement' && (
+        <ComposeAnnouncementScreen poi={current.poi} onBack={pop} onCreated={pop} />
+      )}
 
       {current.name === 'prayer-requests' && <PrayerRequestsScreen poi={current.poi} onBack={pop} />}
 

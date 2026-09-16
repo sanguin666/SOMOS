@@ -26,8 +26,14 @@ export class Announcement {
   @Column()
   title!: string;
 
-  @Column('text')
-  body!: string;
+  @Column('text', { nullable: true })
+  body?: string;
+
+  // Relative path (e.g. /uploads/announcements/<file>.m4a) to an optional
+  // voice message recorded in the app, e.g. by church staff instead of
+  // typing. Served statically; the app prefixes it with its API base URL.
+  @Column({ name: 'audio_url', nullable: true })
+  audioUrl?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

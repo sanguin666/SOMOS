@@ -27,7 +27,10 @@ export type ActiveModule = {
 export type Announcement = {
   id: string;
   title: string;
-  body: string;
+  body: string | null;
+  // Relative path (e.g. /uploads/announcements/<file>.m4a) — prefix with
+  // API_BASE_URL (see api/client.ts) to get a playable URL.
+  audioUrl: string | null;
   createdAt: string;
 };
 
