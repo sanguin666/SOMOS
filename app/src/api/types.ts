@@ -17,7 +17,8 @@ export type ModuleType =
   | 'events'
   | 'announcements'
   | 'prayer_requests'
-  | 'livestreams';
+  | 'livestreams'
+  | 'community';
 
 export type ActiveModule = {
   id: string;
@@ -53,4 +54,19 @@ export type Livestream = {
   url: string;
   scheduledAt: string;
   status: LivestreamStatus;
+};
+
+export type CommunityPost = {
+  id: string;
+  authorName: string | null;
+  message: string;
+  createdAt: string;
+  commentCount: number;
+};
+
+export type CommunityComment = {
+  id: string;
+  authorName: string | null;
+  message: string;
+  createdAt: string;
 };

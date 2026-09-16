@@ -210,6 +210,22 @@ export function PlayIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
   );
 }
 
+export function ChatBubbleIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H5a2 2 0 0 1-2-2V5Z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Line x1={7} y1={8} x2={17} y2={8} stroke={color} strokeWidth={1.6} strokeLinecap="round" />
+      <Line x1={7} y1={12} x2={13} y2={12} stroke={color} strokeWidth={1.6} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export function PinIcon({ size = 24, color = '#111111' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
