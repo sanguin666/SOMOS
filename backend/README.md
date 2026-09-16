@@ -23,5 +23,6 @@ Requires a PostgreSQL database reachable with the credentials in `.env` (see the
 
 - `npm run start:dev` — dev server with hot reload
 - `npm run build` — production build (`dist/`)
+- `npm run seed` — creates a demo POI ("St. Mary's Parish", QR token `DEMO-STMARYS`) with donations and events active, for the app's demo flow. Safe to re-run.
 - `npm run test` / `npm run test:e2e` — tests (vitest)
 - `npm run lint` — lint (oxlint)
