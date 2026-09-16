@@ -74,6 +74,72 @@ export function HeartIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
   );
 }
 
+export function CandleIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2c1.2 1.8 2.2 3 2.2 4.3a2.2 2.2 0 0 1-4.4 0C9.8 5 10.8 3.8 12 2Z"
+        fill={color}
+      />
+      <Rect x={9} y={9} width={6} height={12} rx={1} stroke={color} strokeWidth={2} />
+    </Svg>
+  );
+}
+
+export function MicIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"
+        stroke={color}
+        strokeWidth={2}
+      />
+      <Path
+        d="M19 10v2a7 7 0 0 1-14 0v-2"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+      <Line x1={12} y1={19} x2={12} y2={23} stroke={color} strokeWidth={2} strokeLinecap="round" />
+      <Line x1={8} y1={23} x2={16} y2={23} stroke={color} strokeWidth={2} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function PlusIcon({ size = 20, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Line x1={12} y1={5} x2={12} y2={19} stroke={color} strokeWidth={2.5} strokeLinecap="round" />
+      <Line x1={5} y1={12} x2={19} y2={12} stroke={color} strokeWidth={2.5} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+// Decorative mark used on POI hero banners — a simple roof/place glyph,
+// the same one used in the myPeople splash screen. Not tied to any single
+// POI type; kept generic on purpose.
+export function PlaceGlyphIcon({ size = 64, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Path
+        d="M17 33 L32 19 L47 33"
+        stroke={color}
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M22 31 V47 H42 V31"
+        stroke={color}
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Line x1={32} y1={37} x2={32} y2={47} stroke={color} strokeWidth={4} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export function CloseIcon({ size = 20, color = '#111111' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -103,6 +169,43 @@ export function QrIcon({ size = 26, color = '#FFFFFF' }: IconProps) {
       <Rect x={46} y={46} width={10} height={10} rx={2} fill={color} />
       <Rect x={46} y={6} width={10} height={10} rx={2} fill={color} />
       <Rect x={6} y={46} width={10} height={10} rx={2} fill={color} />
+    </Svg>
+  );
+}
+
+export function MegaphoneIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3 10v4a1 1 0 0 0 1 1h2l4 4V5L6 9H4a1 1 0 0 0-1 1Z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M17 8a5 5 0 0 1 0 8"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M20 5a9 9 0 0 1 0 14"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function PlayIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={12} r={10} stroke={color} strokeWidth={2} />
+      <Path d="M10 8.5v7l6-3.5-6-3.5Z" fill={color} stroke={color} strokeWidth={1.2} strokeLinejoin="round" />
     </Svg>
   );
 }

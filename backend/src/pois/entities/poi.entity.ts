@@ -9,6 +9,7 @@ import {
 import type { Relation } from 'typeorm';
 import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from '../../active-modules/entities/active-module.entity.js';
+import { PoiType } from '../../common/enums/poi-type.enum.js';
 
 /**
  * A point of interest a user can join: a church today, potentially other
@@ -22,6 +23,10 @@ export class Poi {
 
   @Column()
   name!: string;
+
+  // Drives the app's visual theme (accent color, imagery, wording).
+  @Column({ type: 'enum', enum: PoiType, default: PoiType.CHURCH })
+  type!: PoiType;
 
   @Column({ nullable: true })
   address?: string;

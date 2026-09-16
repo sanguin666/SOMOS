@@ -13,7 +13,7 @@ docker-compose.yml   Local PostgreSQL for development
 ## Base data model
 
 - `users` — a user, identified by their phone number
-- `pois` — a point of interest a user can join (a church today; the name stays generic since other kinds of venues/organizations may be supported later), with a name, address, and the QR code token used for onboarding
+- `pois` — a point of interest a user can join, with a name, `type` (only `church` for now — the name stays generic since other kinds of venues/organizations may be supported later), address, and the QR code token used for onboarding
 - `user_pois` — many-to-many join table: a user can belong to several POIs
 - `active_modules` — the product modules subscribed to by a POI (e.g. `donations`, `events`), with subscription status and expiration date
 
@@ -42,7 +42,7 @@ npm run start:dev
 
 The API starts on `http://localhost:3000`. In development, tables are created/synced automatically from the entities (`synchronize: true`) — no migration to run for the demo.
 
-Seed a demo POI (with donations and events active) so the app has something real to show:
+Seed a demo POI (with all modules active and sample content) so the app has something real to show:
 
 ```bash
 npm run seed
@@ -63,7 +63,7 @@ Scan the QR code shown in the terminal with the **Expo Go** app (Android/iOS) to
 
 To test in a browser: `npm run web`.
 
-From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations and Events screens.
+From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens. From Announcements, the **+** button opens a compose screen where you can type a message and/or record a voice message (tap the microphone, speak, tap Stop, then Post) — works in `npm run web` too, with a normal browser microphone permission prompt.
 
 ### 4. Access from a physical phone remotely
 
@@ -88,11 +88,16 @@ The accessibility foundations live in `app/src/theme` and `app/src/components`:
 
 Every new screen should reuse these components instead of raw `Text`/`Pressable`.
 
+`app/src/theme/poiThemes.ts` layers a per-POI-`type` accent color and wording on top of that base theme (e.g. for the hub screen's hero banner) — it only ever changes brand color/imagery, never text size, contrast, or touch target sizing, which stay fixed regardless of POI type.
+
 ## Product modules
 
-Each POI activates modules à la carte (`active_modules`). Planned to start with:
+Each POI activates modules à la carte (`active_modules`). Currently built:
 
-- **Donations** — in-app donations (Stripe), with receipts
-- **Events** — event notifications (baptisms, weddings, funerals, communions, etc.)
+- **Donations** — in-app donations (Stripe integration still to come), with a demo confirmation flow
+- **Events** — event notifications (baptisms, weddings, funerals, communions, etc.) — currently demo content in the app, no backend table yet
+- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed (staff-only in a real deployment — there's no auth/role system yet to gate the compose screen behind, so it's open in the demo)
+- **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`)
+- **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`)
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).

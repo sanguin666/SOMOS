@@ -1,6 +1,9 @@
+export type PoiType = 'church';
+
 export type Poi = {
   id: string;
   name: string;
+  type: PoiType;
   address: string | null;
   city: string | null;
   postalCode: string | null;
@@ -9,7 +12,12 @@ export type Poi = {
   updatedAt: string;
 };
 
-export type ModuleType = 'donations' | 'events';
+export type ModuleType =
+  | 'donations'
+  | 'events'
+  | 'announcements'
+  | 'prayer_requests'
+  | 'livestreams';
 
 export type ActiveModule = {
   id: string;
@@ -17,4 +25,32 @@ export type ActiveModule = {
   status: 'trial' | 'active' | 'expired' | 'cancelled';
   startDate: string;
   expirationDate: string | null;
+};
+
+export type Announcement = {
+  id: string;
+  title: string;
+  body: string | null;
+  // Relative path (e.g. /uploads/announcements/<file>.m4a) — prefix with
+  // API_BASE_URL (see api/client.ts) to get a playable URL.
+  audioUrl: string | null;
+  createdAt: string;
+};
+
+export type PrayerRequest = {
+  id: string;
+  authorName: string | null;
+  message: string;
+  prayerCount: number;
+  createdAt: string;
+};
+
+export type LivestreamStatus = 'upcoming' | 'live' | 'ended';
+
+export type Livestream = {
+  id: string;
+  title: string;
+  url: string;
+  scheduledAt: string;
+  status: LivestreamStatus;
 };
