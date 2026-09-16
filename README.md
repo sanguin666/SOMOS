@@ -42,7 +42,7 @@ npm run start:dev
 
 The API starts on `http://localhost:3000`. In development, tables are created/synced automatically from the entities (`synchronize: true`) — no migration to run for the demo.
 
-Seed a demo POI (with donations and events active) so the app has something real to show:
+Seed a demo POI (with all modules active and sample content) so the app has something real to show:
 
 ```bash
 npm run seed
@@ -63,7 +63,7 @@ Scan the QR code shown in the terminal with the **Expo Go** app (Android/iOS) to
 
 To test in a browser: `npm run web`.
 
-From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations and Events screens.
+From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens.
 
 ### 4. Access from a physical phone remotely
 
@@ -90,9 +90,12 @@ Every new screen should reuse these components instead of raw `Text`/`Pressable`
 
 ## Product modules
 
-Each POI activates modules à la carte (`active_modules`). Planned to start with:
+Each POI activates modules à la carte (`active_modules`). Currently built:
 
-- **Donations** — in-app donations (Stripe), with receipts
-- **Events** — event notifications (baptisms, weddings, funerals, communions, etc.)
+- **Donations** — in-app donations (Stripe integration still to come), with a demo confirmation flow
+- **Events** — event notifications (baptisms, weddings, funerals, communions, etc.) — currently demo content in the app, no backend table yet
+- **Announcements** — bulletin/newsletter-style posts (`src/announcements`)
+- **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`)
+- **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`)
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).

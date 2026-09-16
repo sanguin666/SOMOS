@@ -5,6 +5,9 @@ import { ScanQRScreen } from './src/screens/ScanQRScreen';
 import { PoiHubScreen } from './src/screens/PoiHubScreen';
 import { DonateScreen } from './src/screens/DonateScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
+import { AnnouncementsScreen } from './src/screens/AnnouncementsScreen';
+import { PrayerRequestsScreen } from './src/screens/PrayerRequestsScreen';
+import { LivestreamScreen } from './src/screens/LivestreamScreen';
 import type { Poi } from './src/api/types';
 
 type Route =
@@ -12,7 +15,10 @@ type Route =
   | { name: 'scan' }
   | { name: 'hub'; poi: Poi }
   | { name: 'donate'; poi: Poi }
-  | { name: 'events'; poi: Poi };
+  | { name: 'events'; poi: Poi }
+  | { name: 'announcements'; poi: Poi }
+  | { name: 'prayer-requests'; poi: Poi }
+  | { name: 'livestream'; poi: Poi };
 
 /**
  * Small hand-rolled navigation stack instead of react-navigation: the app
@@ -47,12 +53,21 @@ export default function App() {
           onBack={pop}
           onOpenDonate={() => push({ name: 'donate', poi: current.poi })}
           onOpenEvents={() => push({ name: 'events', poi: current.poi })}
+          onOpenAnnouncements={() => push({ name: 'announcements', poi: current.poi })}
+          onOpenPrayerRequests={() => push({ name: 'prayer-requests', poi: current.poi })}
+          onOpenLivestream={() => push({ name: 'livestream', poi: current.poi })}
         />
       )}
 
       {current.name === 'donate' && <DonateScreen poi={current.poi} onBack={pop} />}
 
       {current.name === 'events' && <EventsScreen poi={current.poi} onBack={pop} />}
+
+      {current.name === 'announcements' && <AnnouncementsScreen poi={current.poi} onBack={pop} />}
+
+      {current.name === 'prayer-requests' && <PrayerRequestsScreen poi={current.poi} onBack={pop} />}
+
+      {current.name === 'livestream' && <LivestreamScreen poi={current.poi} onBack={pop} />}
 
       <StatusBar style="auto" />
     </>

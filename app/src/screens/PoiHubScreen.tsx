@@ -2,7 +2,16 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
-import { BackChevronIcon, BellIcon, CalendarIcon, ChevronRightIcon, HeartIcon } from '../components/icons';
+import {
+  BackChevronIcon,
+  BellIcon,
+  CalendarIcon,
+  CandleIcon,
+  ChevronRightIcon,
+  HeartIcon,
+  MegaphoneIcon,
+  PlayIcon,
+} from '../components/icons';
 import { getActiveModules } from '../api/pois';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
@@ -12,9 +21,28 @@ type Props = {
   onBack: () => void;
   onOpenDonate: () => void;
   onOpenEvents: () => void;
+  onOpenAnnouncements: () => void;
+  onOpenPrayerRequests: () => void;
+  onOpenLivestream: () => void;
 };
 
-export function PoiHubScreen({ poi, onBack, onOpenDonate, onOpenEvents }: Props) {
+const ALL_MODULE_TYPES: ModuleType[] = [
+  'donations',
+  'events',
+  'announcements',
+  'prayer_requests',
+  'livestreams',
+];
+
+export function PoiHubScreen({
+  poi,
+  onBack,
+  onOpenDonate,
+  onOpenEvents,
+  onOpenAnnouncements,
+  onOpenPrayerRequests,
+  onOpenLivestream,
+}: Props) {
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -35,8 +63,10 @@ export function PoiHubScreen({ poi, onBack, onOpenDonate, onOpenEvents }: Props)
   const hasModule = (type: ModuleType) =>
     modules?.some((m) => m.moduleType === type && m.status !== 'expired' && m.status !== 'cancelled') ?? false;
 
+  const noModulesActive = modules !== null && !ALL_MODULE_TYPES.some(hasModule);
+
   return (
-    <Screen>
+    <Screen scroll>
       <View style={styles.headerRow}>
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
           <BackChevronIcon size={20} color={colors.text} />
@@ -69,7 +99,7 @@ export function PoiHubScreen({ poi, onBack, onOpenDonate, onOpenEvents }: Props)
         </AccessibleText>
       )}
 
-      {modules !== null && !hasModule('donations') && !hasModule('events') && (
+      {noModulesActive && (
         <AccessibleText variant="body" color={colors.textMuted}>
           No modules are active for this place yet.
         </AccessibleText>
@@ -90,6 +120,33 @@ export function PoiHubScreen({ poi, onBack, onOpenDonate, onOpenEvents }: Props)
           title="Events"
           subtitle="See what's coming up"
           onPress={onOpenEvents}
+        />
+      )}
+
+      {hasModule('announcements') && (
+        <ModuleCard
+          icon={<MegaphoneIcon size={24} />}
+          title="Announcements"
+          subtitle="Read the latest bulletin"
+          onPress={onOpenAnnouncements}
+        />
+      )}
+
+      {hasModule('prayer_requests') && (
+        <ModuleCard
+          icon={<CandleIcon size={24} />}
+          title="Prayer Requests"
+          subtitle="Share or pray for a request"
+          onPress={onOpenPrayerRequests}
+        />
+      )}
+
+      {hasModule('livestreams') && (
+        <ModuleCard
+          icon={<PlayIcon size={24} />}
+          title="Livestream"
+          subtitle="Watch live or catch a replay"
+          onPress={onOpenLivestream}
         />
       )}
     </Screen>

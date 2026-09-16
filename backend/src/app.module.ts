@@ -8,6 +8,9 @@ import { UsersModule } from './users/users.module.js';
 import { PoisModule } from './pois/pois.module.js';
 import { UserPoisModule } from './user-pois/user-pois.module.js';
 import { ActiveModulesModule } from './active-modules/active-modules.module.js';
+import { AnnouncementsModule } from './announcements/announcements.module.js';
+import { PrayerRequestsModule } from './prayer-requests/prayer-requests.module.js';
+import { LivestreamsModule } from './livestreams/livestreams.module.js';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { ActiveModulesModule } from './active-modules/active-modules.module.js';
     PoisModule,
     UserPoisModule,
     ActiveModulesModule,
+    AnnouncementsModule,
+    PrayerRequestsModule,
+    LivestreamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

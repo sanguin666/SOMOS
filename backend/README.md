@@ -17,12 +17,15 @@ Requires a PostgreSQL database reachable with the credentials in `.env` (see the
 - `src/users` — user accounts (identified by phone number)
 - `src/pois` — points of interest a user can join (churches today, other kinds of venues/organizations later)
 - `src/user-pois` — many-to-many membership between a user and a POI (via QR code)
-- `src/active-modules` — product modules subscribed to by a POI (donations, events, ...) and their subscription status
+- `src/active-modules` — product modules subscribed to by a POI and their subscription status
+- `src/announcements` — bulletin/newsletter-style posts for a POI
+- `src/prayer-requests` — community prayer requests, with a "praying" counter
+- `src/livestreams` — links out to livestreamed/recorded services (no video hosting — just title, URL, schedule)
 
 ## Useful scripts
 
 - `npm run start:dev` — dev server with hot reload
 - `npm run build` — production build (`dist/`)
-- `npm run seed` — creates a demo POI ("St. Mary's Parish", QR token `DEMO-STMARYS`) with donations and events active, for the app's demo flow. Safe to re-run.
+- `npm run seed` — creates a demo POI ("St. Mary's Parish", QR token `DEMO-STMARYS`) with all modules active and sample content (announcements, prayer requests, livestreams), for the app's demo flow. Safe to re-run.
 - `npm run test` / `npm run test:e2e` — tests (vitest)
 - `npm run lint` — lint (oxlint)

@@ -74,6 +74,18 @@ export function HeartIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
   );
 }
 
+export function CandleIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2c1.2 1.8 2.2 3 2.2 4.3a2.2 2.2 0 0 1-4.4 0C9.8 5 10.8 3.8 12 2Z"
+        fill={color}
+      />
+      <Rect x={9} y={9} width={6} height={12} rx={1} stroke={color} strokeWidth={2} />
+    </Svg>
+  );
+}
+
 export function CloseIcon({ size = 20, color = '#111111' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -103,6 +115,43 @@ export function QrIcon({ size = 26, color = '#FFFFFF' }: IconProps) {
       <Rect x={46} y={46} width={10} height={10} rx={2} fill={color} />
       <Rect x={46} y={6} width={10} height={10} rx={2} fill={color} />
       <Rect x={6} y={46} width={10} height={10} rx={2} fill={color} />
+    </Svg>
+  );
+}
+
+export function MegaphoneIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3 10v4a1 1 0 0 0 1 1h2l4 4V5L6 9H4a1 1 0 0 0-1 1Z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M17 8a5 5 0 0 1 0 8"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M20 5a9 9 0 0 1 0 14"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function PlayIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={12} r={10} stroke={color} strokeWidth={2} />
+      <Path d="M10 8.5v7l6-3.5-6-3.5Z" fill={color} stroke={color} strokeWidth={1.2} strokeLinejoin="round" />
     </Svg>
   );
 }

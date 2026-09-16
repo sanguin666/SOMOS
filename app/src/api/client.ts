@@ -14,20 +14,32 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`);
+    response = await fetch(`${API_BASE_URL}${path}`, init);
   } catch (error) {
     throw new ApiError("Couldn't reach the server. Check your connection.", error);
   }
 
   if (!response.ok) {
     if (response.status === 404) {
-      throw new ApiError("We couldn't find that place.");
+      throw new ApiError("We couldn't find that.");
     }
     throw new ApiError('Something went wrong. Please try again.');
   }
 
   return response.json() as Promise<T>;
+}
+
+export function apiGet<T>(path: string): Promise<T> {
+  return request<T>(path);
+}
+
+export function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
 }
