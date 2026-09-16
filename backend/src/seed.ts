@@ -6,6 +6,8 @@ import { ActiveModule } from './active-modules/entities/active-module.entity.js'
 import { Announcement } from './announcements/entities/announcement.entity.js';
 import { PrayerRequest } from './prayer-requests/entities/prayer-request.entity.js';
 import { Livestream } from './livestreams/entities/livestream.entity.js';
+import { CommunityPost } from './community/entities/community-post.entity.js';
+import { CommunityComment } from './community/entities/community-comment.entity.js';
 import { ModuleType } from './common/enums/module-type.enum.js';
 import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
@@ -25,7 +27,17 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME ?? 'mypeople',
   password: process.env.DB_PASSWORD ?? 'mypeople',
   database: process.env.DB_NAME ?? 'mypeople',
-  entities: [User, Poi, UserPoi, ActiveModule, Announcement, PrayerRequest, Livestream],
+  entities: [
+    User,
+    Poi,
+    UserPoi,
+    ActiveModule,
+    Announcement,
+    PrayerRequest,
+    Livestream,
+    CommunityPost,
+    CommunityComment,
+  ],
   synchronize: true,
 });
 
@@ -37,6 +49,8 @@ async function seed() {
   const announcementRepository = dataSource.getRepository(Announcement);
   const prayerRequestRepository = dataSource.getRepository(PrayerRequest);
   const livestreamRepository = dataSource.getRepository(Livestream);
+  const communityPostRepository = dataSource.getRepository(CommunityPost);
+  const communityCommentRepository = dataSource.getRepository(CommunityComment);
 
   let poi = await poiRepository.findOne({
     where: { qrCodeToken: DEMO_QR_TOKEN },
@@ -61,6 +75,7 @@ async function seed() {
     ModuleType.ANNOUNCEMENTS,
     ModuleType.PRAYER_REQUESTS,
     ModuleType.LIVESTREAMS,
+    ModuleType.COMMUNITY,
   ]) {
     const existing = await activeModuleRepository.findOne({
       where: { poi: { id: poi.id }, moduleType },
@@ -147,6 +162,43 @@ async function seed() {
       }),
     ]);
     console.log('Seeded demo livestreams');
+  }
+
+  const communityPostCount = await communityPostRepository.count({
+    where: { poi: { id: poi.id } },
+  });
+  if (communityPostCount === 0) {
+    const [carpoolPost, potluckPost] = await communityPostRepository.save([
+      communityPostRepository.create({
+        poi,
+        authorName: 'Linda',
+        message: 'Does anyone have room for a carpool to the Saturday retreat? I can help with gas money!',
+      }),
+      communityPostRepository.create({
+        poi,
+        authorName: 'Tom',
+        message: "Thank you all for the meals and cards during my recovery — this community means so much to us.",
+      }),
+    ]);
+
+    await communityCommentRepository.save([
+      communityCommentRepository.create({
+        post: carpoolPost,
+        authorName: 'Robert',
+        message: 'I have two seats free, happy to pick you up on the way!',
+      }),
+      communityCommentRepository.create({
+        post: carpoolPost,
+        authorName: 'Margaret',
+        message: 'Same here, I leave from the parish hall around 8am.',
+      }),
+      communityCommentRepository.create({
+        post: potluckPost,
+        authorName: 'Margaret',
+        message: 'So glad to hear you are doing better, Tom!',
+      }),
+    ]);
+    console.log('Seeded demo community posts');
   }
 
   console.log('\nDemo POI ready:');

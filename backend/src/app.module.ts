@@ -11,6 +11,7 @@ import { ActiveModulesModule } from './active-modules/active-modules.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { PrayerRequestsModule } from './prayer-requests/prayer-requests.module.js';
 import { LivestreamsModule } from './livestreams/livestreams.module.js';
+import { CommunityModule } from './community/community.module.js';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LivestreamsModule } from './livestreams/livestreams.module.js';
     AnnouncementsModule,
     PrayerRequestsModule,
     LivestreamsModule,
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

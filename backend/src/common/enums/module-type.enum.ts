@@ -8,4 +8,5 @@ export enum ModuleType {
   ANNOUNCEMENTS = 'announcements',
   PRAYER_REQUESTS = 'prayer_requests',
   LIVESTREAMS = 'livestreams',
+  COMMUNITY = 'community',
 }

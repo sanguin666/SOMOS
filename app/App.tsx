@@ -9,7 +9,9 @@ import { AnnouncementsScreen } from './src/screens/AnnouncementsScreen';
 import { ComposeAnnouncementScreen } from './src/screens/ComposeAnnouncementScreen';
 import { PrayerRequestsScreen } from './src/screens/PrayerRequestsScreen';
 import { LivestreamScreen } from './src/screens/LivestreamScreen';
-import type { Poi } from './src/api/types';
+import { CommunityScreen } from './src/screens/CommunityScreen';
+import { CommunityThreadScreen } from './src/screens/CommunityThreadScreen';
+import type { CommunityPost, Poi } from './src/api/types';
 
 type Route =
   | { name: 'home' }
@@ -20,7 +22,9 @@ type Route =
   | { name: 'announcements'; poi: Poi }
   | { name: 'compose-announcement'; poi: Poi }
   | { name: 'prayer-requests'; poi: Poi }
-  | { name: 'livestream'; poi: Poi };
+  | { name: 'livestream'; poi: Poi }
+  | { name: 'community'; poi: Poi }
+  | { name: 'community-thread'; poi: Poi; post: CommunityPost };
 
 /**
  * Small hand-rolled navigation stack instead of react-navigation: the app
@@ -58,6 +62,7 @@ export default function App() {
           onOpenAnnouncements={() => push({ name: 'announcements', poi: current.poi })}
           onOpenPrayerRequests={() => push({ name: 'prayer-requests', poi: current.poi })}
           onOpenLivestream={() => push({ name: 'livestream', poi: current.poi })}
+          onOpenCommunity={() => push({ name: 'community', poi: current.poi })}
         />
       )}
 
@@ -80,6 +85,18 @@ export default function App() {
       {current.name === 'prayer-requests' && <PrayerRequestsScreen poi={current.poi} onBack={pop} />}
 
       {current.name === 'livestream' && <LivestreamScreen poi={current.poi} onBack={pop} />}
+
+      {current.name === 'community' && (
+        <CommunityScreen
+          poi={current.poi}
+          onBack={pop}
+          onOpenPost={(post) => push({ name: 'community-thread', poi: current.poi, post })}
+        />
+      )}
+
+      {current.name === 'community-thread' && (
+        <CommunityThreadScreen poi={current.poi} post={current.post} onBack={pop} />
+      )}
 
       <StatusBar style="auto" />
     </>

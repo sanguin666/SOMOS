@@ -7,6 +7,7 @@ import {
   BellIcon,
   CalendarIcon,
   CandleIcon,
+  ChatBubbleIcon,
   ChevronRightIcon,
   HeartIcon,
   MegaphoneIcon,
@@ -26,6 +27,7 @@ type Props = {
   onOpenAnnouncements: () => void;
   onOpenPrayerRequests: () => void;
   onOpenLivestream: () => void;
+  onOpenCommunity: () => void;
 };
 
 const ALL_MODULE_TYPES: ModuleType[] = [
@@ -34,6 +36,7 @@ const ALL_MODULE_TYPES: ModuleType[] = [
   'announcements',
   'prayer_requests',
   'livestreams',
+  'community',
 ];
 
 export function PoiHubScreen({
@@ -44,6 +47,7 @@ export function PoiHubScreen({
   onOpenAnnouncements,
   onOpenPrayerRequests,
   onOpenLivestream,
+  onOpenCommunity,
 }: Props) {
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState(false);
@@ -168,6 +172,16 @@ export function PoiHubScreen({
           title="Livestream"
           subtitle="Watch live or catch a replay"
           onPress={onOpenLivestream}
+        />
+      )}
+
+      {hasModule('community') && (
+        <ModuleCard
+          icon={<ChatBubbleIcon size={24} />}
+          accent={poiTheme.accent}
+          title="Community"
+          subtitle="Discuss together"
+          onPress={onOpenCommunity}
         />
       )}
     </Screen>
