@@ -13,7 +13,7 @@ docker-compose.yml   Local PostgreSQL for development
 ## Base data model
 
 - `users` — a user, identified by their phone number
-- `pois` — a point of interest a user can join (a church today; the name stays generic since other kinds of venues/organizations may be supported later), with a name, address, and the QR code token used for onboarding
+- `pois` — a point of interest a user can join, with a name, `type` (only `church` for now — the name stays generic since other kinds of venues/organizations may be supported later), address, and the QR code token used for onboarding
 - `user_pois` — many-to-many join table: a user can belong to several POIs
 - `active_modules` — the product modules subscribed to by a POI (e.g. `donations`, `events`), with subscription status and expiration date
 
@@ -87,6 +87,8 @@ The accessibility foundations live in `app/src/theme` and `app/src/components`:
 - `Screen` — layout with generous margins and safe area (notch/system bars) support
 
 Every new screen should reuse these components instead of raw `Text`/`Pressable`.
+
+`app/src/theme/poiThemes.ts` layers a per-POI-`type` accent color and wording on top of that base theme (e.g. for the hub screen's hero banner) — it only ever changes brand color/imagery, never text size, contrast, or touch target sizing, which stay fixed regardless of POI type.
 
 ## Product modules
 

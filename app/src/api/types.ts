@@ -1,6 +1,9 @@
+export type PoiType = 'church';
+
 export type Poi = {
   id: string;
   name: string;
+  type: PoiType;
   address: string | null;
   city: string | null;
   postalCode: string | null;

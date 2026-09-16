@@ -9,6 +9,7 @@ import { Livestream } from './livestreams/entities/livestream.entity.js';
 import { ModuleType } from './common/enums/module-type.enum.js';
 import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
+import { PoiType } from './common/enums/poi-type.enum.js';
 
 /**
  * Seeds one demo POI with a fixed QR token, so the app has something real
@@ -44,6 +45,7 @@ async function seed() {
     poi = await poiRepository.save(
       poiRepository.create({
         name: "St. Mary's Parish",
+        type: PoiType.CHURCH,
         city: 'Springfield',
         qrCodeToken: DEMO_QR_TOKEN,
       }),

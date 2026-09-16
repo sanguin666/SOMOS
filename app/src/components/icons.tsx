@@ -115,6 +115,31 @@ export function PlusIcon({ size = 20, color = '#111111' }: IconProps) {
   );
 }
 
+// Decorative mark used on POI hero banners — a simple roof/place glyph,
+// the same one used in the myPeople splash screen. Not tied to any single
+// POI type; kept generic on purpose.
+export function PlaceGlyphIcon({ size = 64, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Path
+        d="M17 33 L32 19 L47 33"
+        stroke={color}
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M22 31 V47 H42 V31"
+        stroke={color}
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Line x1={32} y1={37} x2={32} y2={47} stroke={color} strokeWidth={4} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export function CloseIcon({ size = 20, color = '#111111' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

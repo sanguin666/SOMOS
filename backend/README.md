@@ -15,7 +15,7 @@ Requires a PostgreSQL database reachable with the credentials in `.env` (see the
 ## Structure
 
 - `src/users` — user accounts (identified by phone number)
-- `src/pois` — points of interest a user can join (churches today, other kinds of venues/organizations later)
+- `src/pois` — points of interest a user can join, each with a `type` (`PoiType`, only `church` so far) that the app uses to pick a visual theme (see `app/src/theme/poiThemes.ts`) — other kinds of venues/organizations later
 - `src/user-pois` — many-to-many membership between a user and a POI (via QR code)
 - `src/active-modules` — product modules subscribed to by a POI and their subscription status
 - `src/announcements` — bulletin/newsletter-style posts for a POI, optionally with a recorded voice message (see `src/common/upload`)
