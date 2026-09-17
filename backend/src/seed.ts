@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import { User } from './users/entities/user.entity.js';
 import { Poi } from './pois/entities/poi.entity.js';
 import { UserPoi } from './user-pois/entities/user-poi.entity.js';
@@ -12,13 +13,19 @@ import { ModuleType } from './common/enums/module-type.enum.js';
 import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
 import { PoiType } from './common/enums/poi-type.enum.js';
+import { MemberRole } from './common/enums/member-role.enum.js';
 
 /**
- * Seeds one demo POI with a fixed QR token, so the app has something real
- * to fetch without needing a working camera scanner or auth flow yet.
+ * Seeds two demo POIs with fixed QR tokens, so the app has something real
+ * to fetch without needing a working camera scanner yet, and a demo admin
+ * account (email/password) managing both — showing what the admin
+ * dashboard looks like for someone responsible for several churches.
  * Safe to re-run: it only creates what's missing.
  */
 const DEMO_QR_TOKEN = 'DEMO-STMARYS';
+const DEMO_QR_TOKEN_2 = 'DEMO-HOLYTRINITY';
+const DEMO_ADMIN_EMAIL = 'admin@stmarys.example';
+const DEMO_ADMIN_PASSWORD = 'demo1234';
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -44,13 +51,40 @@ const dataSource = new DataSource({
 async function seed() {
   await dataSource.initialize();
 
+  const userRepository = dataSource.getRepository(User);
   const poiRepository = dataSource.getRepository(Poi);
+  const userPoiRepository = dataSource.getRepository(UserPoi);
   const activeModuleRepository = dataSource.getRepository(ActiveModule);
   const announcementRepository = dataSource.getRepository(Announcement);
   const prayerRequestRepository = dataSource.getRepository(PrayerRequest);
   const livestreamRepository = dataSource.getRepository(Livestream);
   const communityPostRepository = dataSource.getRepository(CommunityPost);
   const communityCommentRepository = dataSource.getRepository(CommunityComment);
+
+  async function activateAllModules(target: Poi) {
+    for (const moduleType of [
+      ModuleType.DONATIONS,
+      ModuleType.EVENTS,
+      ModuleType.ANNOUNCEMENTS,
+      ModuleType.PRAYER_REQUESTS,
+      ModuleType.LIVESTREAMS,
+      ModuleType.COMMUNITY,
+    ]) {
+      const existing = await activeModuleRepository.findOne({
+        where: { poi: { id: target.id }, moduleType },
+      });
+      if (!existing) {
+        await activeModuleRepository.save(
+          activeModuleRepository.create({
+            poi: target,
+            moduleType,
+            status: ModuleStatus.ACTIVE,
+          }),
+        );
+        console.log(`Activated ${moduleType} for ${target.name}`);
+      }
+    }
+  }
 
   let poi = await poiRepository.findOne({
     where: { qrCodeToken: DEMO_QR_TOKEN },
@@ -68,27 +102,70 @@ async function seed() {
   } else {
     console.log(`Demo POI already exists: ${poi.id}`);
   }
+  await activateAllModules(poi);
 
-  for (const moduleType of [
-    ModuleType.DONATIONS,
-    ModuleType.EVENTS,
-    ModuleType.ANNOUNCEMENTS,
-    ModuleType.PRAYER_REQUESTS,
-    ModuleType.LIVESTREAMS,
-    ModuleType.COMMUNITY,
-  ]) {
-    const existing = await activeModuleRepository.findOne({
-      where: { poi: { id: poi.id }, moduleType },
+  // A second POI under the same admin's responsibility, to demo the
+  // admin dashboard's POI switcher for someone managing several churches.
+  let poi2 = await poiRepository.findOne({
+    where: { qrCodeToken: DEMO_QR_TOKEN_2 },
+  });
+  if (!poi2) {
+    poi2 = await poiRepository.save(
+      poiRepository.create({
+        name: 'Holy Trinity Chapel',
+        type: PoiType.CHURCH,
+        city: 'Springfield',
+        qrCodeToken: DEMO_QR_TOKEN_2,
+      }),
+    );
+    console.log(`Created demo POI ${poi2.id}`);
+  } else {
+    console.log(`Demo POI already exists: ${poi2.id}`);
+  }
+  await activateAllModules(poi2);
+
+  const poi2AnnouncementCount = await announcementRepository.count({
+    where: { poi: { id: poi2.id } },
+  });
+  if (poi2AnnouncementCount === 0) {
+    await announcementRepository.save(
+      announcementRepository.create({
+        poi: poi2,
+        title: 'Welcome to Holy Trinity Chapel',
+        body: 'This is a demo announcement for our second parish, used to show off the admin dashboard.',
+      }),
+    );
+    console.log('Seeded demo announcement for Holy Trinity Chapel');
+  }
+
+  let adminUser = await userRepository.findOne({
+    where: { email: DEMO_ADMIN_EMAIL },
+  });
+  if (!adminUser) {
+    adminUser = await userRepository.save(
+      userRepository.create({
+        email: DEMO_ADMIN_EMAIL,
+        passwordHash: await bcrypt.hash(DEMO_ADMIN_PASSWORD, 10),
+        firstName: 'Demo',
+        lastName: 'Admin',
+      }),
+    );
+    console.log(`Created demo admin user ${adminUser.id}`);
+  }
+
+  for (const target of [poi, poi2]) {
+    const existingMembership = await userPoiRepository.findOne({
+      where: { user: { id: adminUser.id }, poi: { id: target.id } },
     });
-    if (!existing) {
-      await activeModuleRepository.save(
-        activeModuleRepository.create({
-          poi,
-          moduleType,
-          status: ModuleStatus.ACTIVE,
+    if (!existingMembership) {
+      await userPoiRepository.save(
+        userPoiRepository.create({
+          user: adminUser,
+          poi: target,
+          role: MemberRole.ADMIN,
         }),
       );
-      console.log(`Activated ${moduleType} for the demo POI`);
+      console.log(`Made demo admin an ADMIN of ${target.name}`);
     }
   }
 
@@ -204,6 +281,10 @@ async function seed() {
   console.log('\nDemo POI ready:');
   console.log(`  id:       ${poi.id}`);
   console.log(`  QR token: ${poi.qrCodeToken}`);
+  console.log(`\nSecond demo POI: ${poi2.name} (QR token: ${poi2.qrCodeToken})`);
+  console.log('\nDemo admin dashboard login:');
+  console.log(`  email:    ${DEMO_ADMIN_EMAIL}`);
+  console.log(`  password: ${DEMO_ADMIN_PASSWORD}`);
 
   await dataSource.destroy();
 }

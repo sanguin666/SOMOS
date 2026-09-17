@@ -12,6 +12,7 @@ import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { PrayerRequestsModule } from './prayer-requests/prayer-requests.module.js';
 import { LivestreamsModule } from './livestreams/livestreams.module.js';
 import { CommunityModule } from './community/community.module.js';
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CommunityModule } from './community/community.module.js';
     PrayerRequestsModule,
     LivestreamsModule,
     CommunityModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

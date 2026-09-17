@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommunityComment } from './entities/community-comment.entity.js';
@@ -27,5 +27,16 @@ export class CommunityCommentsService {
       where: { post: { id: postId } },
       order: { createdAt: 'ASC' },
     });
+  }
+
+  // Moderation: an admin removing a single comment.
+  async remove(postId: string, id: string): Promise<void> {
+    const comment = await this.commentsRepository.findOne({
+      where: { id, post: { id: postId } },
+    });
+    if (!comment) {
+      throw new NotFoundException(`Comment ${id} not found`);
+    }
+    await this.commentsRepository.remove(comment);
   }
 }

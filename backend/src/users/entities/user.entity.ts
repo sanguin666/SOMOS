@@ -14,9 +14,19 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Login identifier: phone number + SMS code (no password).
-  @Column({ unique: true })
-  phone!: string;
+  // Login identifier for congregants: phone number + SMS code (not built
+  // yet). Nullable because admin users (see below) don't have one.
+  @Column({ unique: true, nullable: true })
+  phone?: string;
+
+  // Login identifier for POI admins (email + password), used by the
+  // separate admin dashboard. Nullable because congregant users don't
+  // have one.
+  @Column({ unique: true, nullable: true })
+  email?: string;
+
+  @Column({ name: 'password_hash', nullable: true })
+  passwordHash?: string;
 
   @Column({ name: 'first_name', nullable: true })
   firstName?: string;

@@ -4,9 +4,10 @@ import { PrayerRequest } from './entities/prayer-request.entity.js';
 import { PrayerRequestsService } from './prayer-requests.service.js';
 import { PrayerRequestsController } from './prayer-requests.controller.js';
 import { PoisModule } from '../pois/pois.module.js';
+import { AuthModule } from '../auth/auth.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PrayerRequest]), PoisModule],
+  imports: [TypeOrmModule.forFeature([PrayerRequest]), PoisModule, AuthModule],
   controllers: [PrayerRequestsController],
   providers: [PrayerRequestsService],
   exports: [PrayerRequestsService],
