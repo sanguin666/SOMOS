@@ -4,6 +4,7 @@ import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { BackChevronIcon, PlayIcon } from '../components/icons';
 import { getLivestreams } from '../api/livestreams';
+import { useI18n } from '../i18n/I18nContext';
 import type { Livestream, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 
@@ -18,6 +19,7 @@ function formatDateTime(iso: string) {
 }
 
 export function LivestreamScreen({ poi, onBack }: Props) {
+  const { t } = useI18n();
   const [livestreams, setLivestreams] = useState<Livestream[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -37,12 +39,12 @@ export function LivestreamScreen({ poi, onBack }: Props) {
 
   return (
     <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
-        <AccessibleText variant="title">Livestream</AccessibleText>
+        <AccessibleText variant="title">{t('livestream.title')}</AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
           {poi.name}
         </AccessibleText>
@@ -50,13 +52,13 @@ export function LivestreamScreen({ poi, onBack }: Props) {
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
-          Couldn't load livestreams. Pull up the app again to retry.
+          {t('livestream.error')}
         </AccessibleText>
       )}
 
       {!error && livestreams === null && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          Loading…
+          {t('livestream.loading')}
         </AccessibleText>
       )}
 
@@ -68,7 +70,7 @@ export function LivestreamScreen({ poi, onBack }: Props) {
             <View style={[styles.badge, isLive ? styles.badgeLive : isEnded ? styles.badgeEnded : styles.badgeUpcoming]}>
               {isLive ? (
                 <AccessibleText variant="caption" color="#FFFFFF" style={styles.liveLabel}>
-                  LIVE
+                  {t('livestream.live')}
                 </AccessibleText>
               ) : (
                 <>
@@ -91,13 +93,15 @@ export function LivestreamScreen({ poi, onBack }: Props) {
 
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={isEnded ? `Replay ${item.title}` : `Watch ${item.title}`}
+              accessibilityLabel={
+                isEnded ? t('livestream.replayAria', { title: item.title }) : t('livestream.watchAria', { title: item.title })
+              }
               onPress={() => Linking.openURL(item.url)}
               style={styles.watchButton}
             >
               <PlayIcon size={16} color={colors.primaryText} />
               <AccessibleText variant="caption" color={colors.primaryText} style={styles.watchLabel}>
-                {isEnded ? 'Replay' : 'Watch'}
+                {isEnded ? t('livestream.replay') : t('livestream.watch')}
               </AccessibleText>
             </Pressable>
           </View>

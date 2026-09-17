@@ -1,9 +1,12 @@
 export type PoiType = 'church';
 
+export type SupportedLanguage = 'en' | 'es' | 'fr';
+
 export type Poi = {
   id: string;
   name: string;
   type: PoiType;
+  language: SupportedLanguage;
   address: string | null;
   city: string | null;
   postalCode: string | null;
@@ -15,6 +18,7 @@ export type CurrentUser = {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  language: SupportedLanguage;
   adminPois: Poi[];
 };
 

@@ -18,6 +18,7 @@ import { getActiveModules } from '../api/pois';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
+import { useI18n } from '../i18n/I18nContext';
 
 type Props = {
   poi: Poi;
@@ -49,6 +50,7 @@ export function PoiHubScreen({
   onOpenLivestream,
   onOpenCommunity,
 }: Props) {
+  const { t } = useI18n();
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState(false);
   const poiTheme = getPoiTheme(poi.type);
@@ -82,7 +84,7 @@ export function PoiHubScreen({
         <View style={styles.headerRow}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Back"
+            accessibilityLabel={t('common.back')}
             onPress={onBack}
             style={styles.iconButton}
           >
@@ -98,30 +100,30 @@ export function PoiHubScreen({
             {poi.name}
           </AccessibleText>
           <AccessibleText variant="body" color="rgba(255,255,255,0.85)">
-            {poi.city ?? 'Location not set'}
+            {poi.city ?? t('hub.locationNotSet')}
           </AccessibleText>
         </View>
       </View>
 
       <AccessibleText variant="caption" style={styles.sectionLabel}>
-        AVAILABLE HERE
+        {t('hub.availableHere')}
       </AccessibleText>
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
-          Couldn't load what's available here. Pull up the app again to retry.
+          {t('hub.errorLoad')}
         </AccessibleText>
       )}
 
       {!error && modules === null && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          Loading…
+          {t('common.loading')}
         </AccessibleText>
       )}
 
       {noModulesActive && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          No modules are active for this place yet.
+          {t('hub.noModules')}
         </AccessibleText>
       )}
 
@@ -129,8 +131,8 @@ export function PoiHubScreen({
         <ModuleCard
           icon={<HeartIcon size={24} />}
           accent={poiTheme.accent}
-          title="Donations"
-          subtitle="Give safely online"
+          title={t('hub.donationsTitle')}
+          subtitle={t('hub.donationsSubtitle')}
           onPress={onOpenDonate}
         />
       )}
@@ -139,8 +141,8 @@ export function PoiHubScreen({
         <ModuleCard
           icon={<CalendarIcon size={24} />}
           accent={poiTheme.accent}
-          title="Events"
-          subtitle="See what's coming up"
+          title={t('hub.eventsTitle')}
+          subtitle={t('hub.eventsSubtitle')}
           onPress={onOpenEvents}
         />
       )}
@@ -149,8 +151,8 @@ export function PoiHubScreen({
         <ModuleCard
           icon={<MegaphoneIcon size={24} />}
           accent={poiTheme.accent}
-          title="Announcements"
-          subtitle="Read the latest bulletin"
+          title={t('hub.announcementsTitle')}
+          subtitle={t('hub.announcementsSubtitle')}
           onPress={onOpenAnnouncements}
         />
       )}
@@ -159,8 +161,8 @@ export function PoiHubScreen({
         <ModuleCard
           icon={<CandleIcon size={24} />}
           accent={poiTheme.accent}
-          title="Prayer Requests"
-          subtitle="Share or pray for a request"
+          title={t('hub.prayerRequestsTitle')}
+          subtitle={t('hub.prayerRequestsSubtitle')}
           onPress={onOpenPrayerRequests}
         />
       )}
@@ -169,8 +171,8 @@ export function PoiHubScreen({
         <ModuleCard
           icon={<PlayIcon size={24} />}
           accent={poiTheme.accent}
-          title="Livestream"
-          subtitle="Watch live or catch a replay"
+          title={t('hub.livestreamTitle')}
+          subtitle={t('hub.livestreamSubtitle')}
           onPress={onOpenLivestream}
         />
       )}
@@ -179,8 +181,8 @@ export function PoiHubScreen({
         <ModuleCard
           icon={<ChatBubbleIcon size={24} />}
           accent={poiTheme.accent}
-          title="Community"
-          subtitle="Discuss together"
+          title={t('hub.communityTitle')}
+          subtitle={t('hub.communitySubtitle')}
           onPress={onOpenCommunity}
         />
       )}

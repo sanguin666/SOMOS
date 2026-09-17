@@ -1,12 +1,20 @@
 import { useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { getPoiByQrCode } from '../api/pois';
 import { DEMO_QR_TOKEN } from '../demo';
+import { useI18n } from '../i18n/I18nContext';
+import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import type { Poi } from '../api/types';
-import { colors, spacing } from '../theme/theme';
+import { colors, radii, spacing } from '../theme/theme';
+
+const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
+  en: 'EN',
+  es: 'ES',
+  fr: 'FR',
+};
 
 type Props = {
   onScanQR: () => void;
@@ -14,6 +22,7 @@ type Props = {
 };
 
 export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
+  const { t, language, setLanguage } = useI18n();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -33,18 +42,16 @@ export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
   return (
     <Screen>
       <AccessibleText variant="title">myPeople</AccessibleText>
-      <AccessibleText variant="bodyLarge">
-        Welcome. Choose an action below.
-      </AccessibleText>
+      <AccessibleText variant="bodyLarge">{t('home.welcome')}</AccessibleText>
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
-          Couldn't reach the server. Check that the backend is running and try again.
+          {t('home.error')}
         </AccessibleText>
       )}
 
       <AccessibleButton
-        label="Scan a place's QR code"
+        label={t('home.scanButton')}
         onPress={onScanQR}
         style={{ marginTop: spacing.lg }}
       />
@@ -54,8 +61,42 @@ export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
           <ActivityIndicator color={colors.primary} size="large" />
         </View>
       ) : (
-        <AccessibleButton label="My places" variant="secondary" onPress={openMyPlaces} />
+        <AccessibleButton label={t('home.myPlacesButton')} variant="secondary" onPress={openMyPlaces} />
       )}
+
+      <View style={{ marginTop: spacing.xl, alignItems: 'center', gap: spacing.sm }}>
+        <AccessibleText variant="caption" color={colors.textMuted}>
+          {t('home.languageLabel')}
+        </AccessibleText>
+        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+          {SUPPORTED_LANGUAGES.map((code) => {
+            const isSelected = code === language;
+            return (
+              <Pressable
+                key={code}
+                accessibilityRole="button"
+                accessibilityLabel={LANGUAGE_LABELS[code]}
+                onPress={() => setLanguage(code)}
+                style={{
+                  minWidth: 64,
+                  minHeight: 44,
+                  paddingHorizontal: spacing.md,
+                  borderRadius: radii.md,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 2,
+                  borderColor: isSelected ? colors.primary : colors.border,
+                  backgroundColor: isSelected ? colors.primary : colors.background,
+                }}
+              >
+                <AccessibleText variant="body" color={isSelected ? colors.primaryText : colors.text}>
+                  {LANGUAGE_LABELS[code]}
+                </AccessibleText>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
     </Screen>
   );
 }

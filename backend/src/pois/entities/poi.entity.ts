@@ -10,6 +10,7 @@ import type { Relation } from 'typeorm';
 import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from '../../active-modules/entities/active-module.entity.js';
 import { PoiType } from '../../common/enums/poi-type.enum.js';
+import { Language } from '../../common/enums/language.enum.js';
 
 /**
  * A point of interest a user can join: a church today, potentially other
@@ -27,6 +28,13 @@ export class Poi {
   // Drives the app's visual theme (accent color, imagery, wording).
   @Column({ type: 'enum', enum: PoiType, default: PoiType.CHURCH })
   type!: PoiType;
+
+  // The language this POI publishes content in (announcements, events,
+  // etc.) — not translated for readers yet, just tagged, since there's no
+  // translation service wired up. The app's own menus translate separately
+  // based on the reader's own language (see the `language` column on User).
+  @Column({ type: 'enum', enum: Language, default: Language.EN })
+  language!: Language;
 
   @Column({ nullable: true })
   address?: string;

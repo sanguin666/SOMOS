@@ -1,10 +1,19 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { useI18n } from '../i18n/I18nContext';
+import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import { ApiError } from '../api/client';
+
+const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
+  en: 'EN',
+  es: 'ES',
+  fr: 'FR',
+};
 
 export function LoginPage() {
   const { login } = useAuth();
+  const { t, language, setLanguage } = useI18n();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +28,7 @@ export function LoginPage() {
       await login(email, password);
       navigate('/', { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong. Try again.');
+      setError(err instanceof ApiError ? err.message : t('login.genericError'));
     } finally {
       setSubmitting(false);
     }
@@ -28,13 +37,13 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <h1>myPeople Admin</h1>
+        <h1>{t('login.heading')}</h1>
         <p className="muted" style={{ marginBottom: 20 }}>
-          Sign in to manage your parish content.
+          {t('login.subtitle')}
         </p>
         <form className="form" onSubmit={handleSubmit}>
           <label>
-            Email
+            {t('login.emailLabel')}
             <input
               type="email"
               value={email}
@@ -44,7 +53,7 @@ export function LoginPage() {
             />
           </label>
           <label>
-            Password
+            {t('login.passwordLabel')}
             <input
               type="password"
               value={password}
@@ -55,9 +64,22 @@ export function LoginPage() {
           </label>
           {error && <p className="error-text">{error}</p>}
           <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+            {submitting ? t('login.signingIn') : t('login.signIn')}
           </button>
         </form>
+
+        <div className="login-language-switcher">
+          {SUPPORTED_LANGUAGES.map((code) => (
+            <button
+              key={code}
+              type="button"
+              className={`lang-pill ${code === language ? 'lang-pill-active' : ''}`}
+              onClick={() => setLanguage(code)}
+            >
+              {LANGUAGE_LABELS[code]}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

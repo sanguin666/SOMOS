@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { BackChevronIcon, BellIcon } from '../components/icons';
+import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
 import type { Poi } from '../api/types';
 
@@ -30,6 +31,7 @@ const INITIAL_EVENTS: DemoEvent[] = [
 ];
 
 export function EventsScreen({ poi, onBack }: Props) {
+  const { t } = useI18n();
   const [events, setEvents] = useState(INITIAL_EVENTS);
 
   function toggleNotify(id: string) {
@@ -38,12 +40,12 @@ export function EventsScreen({ poi, onBack }: Props) {
 
   return (
     <Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
-        <AccessibleText variant="title">Events</AccessibleText>
+        <AccessibleText variant="title">{t('events.title')}</AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
           {poi.name}
         </AccessibleText>
@@ -69,7 +71,11 @@ export function EventsScreen({ poi, onBack }: Props) {
 
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={event.notify ? `Turn off notifications for ${event.title}` : `Turn on notifications for ${event.title}`}
+            accessibilityLabel={
+              event.notify
+                ? t('events.notifyOn', { title: event.title })
+                : t('events.notifyOff', { title: event.title })
+            }
             onPress={() => toggleNotify(event.id)}
             style={[styles.bellButton, event.notify && styles.bellButtonActive]}
           >

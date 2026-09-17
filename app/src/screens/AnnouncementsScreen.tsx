@@ -6,6 +6,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { BackChevronIcon, PlayIcon, PlusIcon } from '../components/icons';
 import { getAnnouncements } from '../api/announcements';
 import { API_BASE_URL } from '../api/client';
+import { useI18n } from '../i18n/I18nContext';
 import type { Announcement, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 
@@ -20,6 +21,7 @@ function formatDate(iso: string) {
 }
 
 export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
+  const { t } = useI18n();
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
   const [error, setError] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -41,12 +43,12 @@ export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
   return (
     <Screen scroll>
       <View style={styles.headerRow}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
           <BackChevronIcon size={20} color={colors.text} />
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="New announcement"
+          accessibilityLabel={t('announcements.newAria')}
           onPress={onCompose}
           style={styles.iconButton}
         >
@@ -55,7 +57,7 @@ export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
       </View>
 
       <View style={styles.titleBlock}>
-        <AccessibleText variant="title">Announcements</AccessibleText>
+        <AccessibleText variant="title">{t('announcements.title')}</AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
           {poi.name}
         </AccessibleText>
@@ -63,19 +65,19 @@ export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
-          Couldn't load announcements. Pull up the app again to retry.
+          {t('announcements.error')}
         </AccessibleText>
       )}
 
       {!error && announcements === null && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          Loading…
+          {t('announcements.loading')}
         </AccessibleText>
       )}
 
       {announcements?.length === 0 && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          No announcements yet.
+          {t('announcements.empty')}
         </AccessibleText>
       )}
 
@@ -100,6 +102,7 @@ function AnnouncementCard({
   expanded: boolean;
   onToggleExpand: () => void;
 }) {
+  const { t } = useI18n();
   const audioSource = item.audioUrl ? `${API_BASE_URL}${item.audioUrl}` : undefined;
   const player = useAudioPlayer(audioSource);
   const playerStatus = useAudioPlayerStatus(player);
@@ -134,13 +137,13 @@ function AnnouncementCard({
       {item.audioUrl && (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={playerStatus.playing ? 'Pause voice message' : 'Play voice message'}
+          accessibilityLabel={playerStatus.playing ? t('announcements.pauseVoice') : t('announcements.playVoice')}
           onPress={() => (playerStatus.playing ? player.pause() : player.play())}
           style={styles.audioButton}
         >
           <PlayIcon size={16} color="#FFFFFF" />
           <AccessibleText variant="caption" color="#FFFFFF" style={styles.audioLabel}>
-            {playerStatus.playing ? 'Pause voice message' : 'Play voice message'}
+            {playerStatus.playing ? t('announcements.pauseVoice') : t('announcements.playVoice')}
           </AccessibleText>
         </Pressable>
       )}
