@@ -7,6 +7,10 @@ export type Poi = {
   name: string;
   type: PoiType;
   language: SupportedLanguage;
+  description: string | null;
+  pictureUrl: string | null;
+  qrFlyerHeadline: string | null;
+  qrFlyerSubtext: string | null;
   address: string | null;
   city: string | null;
   postalCode: string | null;
@@ -46,6 +50,14 @@ export type Announcement = {
   body: string | null;
   audioUrl: string | null;
   createdAt: string;
+};
+
+export type Event = {
+  id: string;
+  title: string;
+  startsAt: string;
+  location: string | null;
+  description: string | null;
 };
 
 export type LivestreamStatus = 'upcoming' | 'live' | 'ended';

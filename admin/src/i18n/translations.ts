@@ -20,11 +20,13 @@ export type Translations = {
     language: string;
     signOut: string;
     navDonations: string;
+    navEvents: string;
     navAnnouncements: string;
     navLivestreams: string;
     navPrayerRequests: string;
     navCommunity: string;
-    navModules: string;
+    navMyQr: string;
+    navSettings: string;
     noAdminPois: string;
   };
   donations: {
@@ -52,6 +54,26 @@ export type Translations = {
     anonymous: string;
     loadError: string;
     loading: string;
+  };
+  events: {
+    title: string;
+    subtitle: string;
+    titleLabel: string;
+    startsAtLabel: string;
+    locationLabel: string;
+    descriptionLabel: string;
+    schedule: string;
+    scheduling: string;
+    save: string;
+    cancel: string;
+    edit: string;
+    delete: string;
+    loadError: string;
+    createError: string;
+    saveError: string;
+    deleteError: string;
+    loading: string;
+    empty: string;
   };
   announcements: {
     title: string;
@@ -120,6 +142,7 @@ export type Translations = {
   modules: {
     title: string;
     subtitle: string;
+    modulesSectionTitle: string;
     activate: string;
     deactivate: string;
     notActivated: string;
@@ -139,6 +162,34 @@ export type Translations = {
     prayerRequests: string;
     livestream: string;
     community: string;
+  };
+  poiInfo: {
+    title: string;
+    subtitle: string;
+    nameLabel: string;
+    descriptionLabel: string;
+    descriptionPlaceholder: string;
+    pictureUrlLabel: string;
+    pictureUrlPlaceholder: string;
+    pictureAlt: string;
+    save: string;
+    saving: string;
+    saveError: string;
+    saveSuccess: string;
+  };
+  qr: {
+    title: string;
+    subtitle: string;
+    flyerHeadlineLabel: string;
+    flyerSubtextLabel: string;
+    defaultHeadline: string;
+    defaultSubtext: string;
+    save: string;
+    saving: string;
+    saveError: string;
+    print: string;
+    previewTitle: string;
+    scanHint: string;
   };
 };
 
@@ -160,11 +211,13 @@ const en: Translations = {
     language: 'Language',
     signOut: 'Sign out',
     navDonations: 'Donations',
+    navEvents: 'Events',
     navAnnouncements: 'Announcements',
     navLivestreams: 'Livestreams',
     navPrayerRequests: 'Prayer Requests',
     navCommunity: 'Community',
-    navModules: 'Modules',
+    navMyQr: 'My QR',
+    navSettings: 'Settings',
     noAdminPois: "Your account isn't an admin of any parish yet.",
   },
   donations: {
@@ -192,6 +245,26 @@ const en: Translations = {
     anonymous: 'Anonymous',
     loadError: 'Could not load donation data.',
     loading: 'Loading…',
+  },
+  events: {
+    title: 'Events',
+    subtitle: "Schedule Masses, baptisms, weddings, and other events for this parish.",
+    titleLabel: 'Title',
+    startsAtLabel: 'Date & time',
+    locationLabel: 'Location',
+    descriptionLabel: 'Description',
+    schedule: 'Schedule',
+    scheduling: 'Scheduling…',
+    save: 'Save',
+    cancel: 'Cancel',
+    edit: 'Edit',
+    delete: 'Delete',
+    loadError: 'Could not load events.',
+    createError: 'Could not schedule the event.',
+    saveError: 'Could not save changes.',
+    deleteError: 'Could not delete the event.',
+    loading: 'Loading…',
+    empty: 'No events scheduled yet.',
   },
   announcements: {
     title: 'Announcements',
@@ -258,8 +331,9 @@ const en: Translations = {
     loading: 'Loading…',
   },
   modules: {
-    title: 'Modules',
-    subtitle: "Turn features on or off for this parish's app experience.",
+    title: 'Settings',
+    subtitle: "Manage this parish's active modules and public info.",
+    modulesSectionTitle: 'Active modules',
     activate: 'Activate',
     deactivate: 'Deactivate',
     notActivated: 'not activated',
@@ -279,6 +353,34 @@ const en: Translations = {
     prayerRequests: 'Prayer Requests',
     livestream: 'Livestream',
     community: 'Community',
+  },
+  poiInfo: {
+    title: 'Parish info',
+    subtitle: 'Shown to congregants in the app.',
+    nameLabel: 'Name',
+    descriptionLabel: 'Description',
+    descriptionPlaceholder: 'A short description of your parish or community.',
+    pictureUrlLabel: 'Picture URL',
+    pictureUrlPlaceholder: 'https://example.com/your-logo.jpg',
+    pictureAlt: 'Parish picture',
+    save: 'Save',
+    saving: 'Saving…',
+    saveError: 'Could not save your changes.',
+    saveSuccess: 'Saved.',
+  },
+  qr: {
+    title: 'My QR',
+    subtitle: 'A printable flyer with your QR code — put it up anywhere congregants can scan it to get the app and join your parish.',
+    flyerHeadlineLabel: 'Flyer headline',
+    flyerSubtextLabel: 'Flyer subtext',
+    defaultHeadline: 'Scan to join us',
+    defaultSubtext: 'Get the myPeople app and stay connected with our parish — announcements, events, prayer requests, and more.',
+    save: 'Save',
+    saving: 'Saving…',
+    saveError: 'Could not save your changes.',
+    print: 'Print / Save as PDF',
+    previewTitle: 'Flyer preview',
+    scanHint: 'Scan with your phone camera',
   },
 };
 
@@ -300,11 +402,13 @@ const es: Translations = {
     language: 'Idioma',
     signOut: 'Cerrar sesión',
     navDonations: 'Donaciones',
+    navEvents: 'Eventos',
     navAnnouncements: 'Anuncios',
     navLivestreams: 'Transmisiones',
     navPrayerRequests: 'Peticiones de oración',
     navCommunity: 'Comunidad',
-    navModules: 'Módulos',
+    navMyQr: 'Mi código QR',
+    navSettings: 'Configuración',
     noAdminPois: 'Tu cuenta todavía no es administradora de ninguna parroquia.',
   },
   donations: {
@@ -332,6 +436,26 @@ const es: Translations = {
     anonymous: 'Anónimo',
     loadError: 'No se pudieron cargar los datos de donaciones.',
     loading: 'Cargando…',
+  },
+  events: {
+    title: 'Eventos',
+    subtitle: 'Programa misas, bautizos, bodas y otros eventos para esta parroquia.',
+    titleLabel: 'Título',
+    startsAtLabel: 'Fecha y hora',
+    locationLabel: 'Lugar',
+    descriptionLabel: 'Descripción',
+    schedule: 'Programar',
+    scheduling: 'Programando…',
+    save: 'Guardar',
+    cancel: 'Cancelar',
+    edit: 'Editar',
+    delete: 'Eliminar',
+    loadError: 'No se pudieron cargar los eventos.',
+    createError: 'No se pudo programar el evento.',
+    saveError: 'No se pudieron guardar los cambios.',
+    deleteError: 'No se pudo eliminar el evento.',
+    loading: 'Cargando…',
+    empty: 'Todavía no hay eventos programados.',
   },
   announcements: {
     title: 'Anuncios',
@@ -398,8 +522,9 @@ const es: Translations = {
     loading: 'Cargando…',
   },
   modules: {
-    title: 'Módulos',
-    subtitle: 'Activa o desactiva funciones para la experiencia de esta parroquia en la app.',
+    title: 'Configuración',
+    subtitle: 'Gestiona los módulos activos y la información pública de esta parroquia.',
+    modulesSectionTitle: 'Módulos activos',
     activate: 'Activar',
     deactivate: 'Desactivar',
     notActivated: 'no activado',
@@ -419,6 +544,34 @@ const es: Translations = {
     prayerRequests: 'Peticiones de oración',
     livestream: 'Transmisión en vivo',
     community: 'Comunidad',
+  },
+  poiInfo: {
+    title: 'Información de la parroquia',
+    subtitle: 'Se muestra a los feligreses en la app.',
+    nameLabel: 'Nombre',
+    descriptionLabel: 'Descripción',
+    descriptionPlaceholder: 'Una breve descripción de tu parroquia o comunidad.',
+    pictureUrlLabel: 'URL de la imagen',
+    pictureUrlPlaceholder: 'https://ejemplo.com/tu-logo.jpg',
+    pictureAlt: 'Imagen de la parroquia',
+    save: 'Guardar',
+    saving: 'Guardando…',
+    saveError: 'No se pudieron guardar los cambios.',
+    saveSuccess: 'Guardado.',
+  },
+  qr: {
+    title: 'Mi código QR',
+    subtitle: 'Un folleto imprimible con tu código QR: colócalo donde los feligreses puedan escanearlo para obtener la app y unirse a tu parroquia.',
+    flyerHeadlineLabel: 'Título del folleto',
+    flyerSubtextLabel: 'Texto del folleto',
+    defaultHeadline: 'Escanea para unirte',
+    defaultSubtext: 'Obtén la app myPeople y mantente conectado con nuestra parroquia: anuncios, eventos, peticiones de oración y más.',
+    save: 'Guardar',
+    saving: 'Guardando…',
+    saveError: 'No se pudieron guardar los cambios.',
+    print: 'Imprimir / Guardar como PDF',
+    previewTitle: 'Vista previa del folleto',
+    scanHint: 'Escanea con la cámara de tu teléfono',
   },
 };
 
@@ -440,11 +593,13 @@ const fr: Translations = {
     language: 'Langue',
     signOut: 'Se déconnecter',
     navDonations: 'Dons',
+    navEvents: 'Événements',
     navAnnouncements: 'Annonces',
     navLivestreams: 'Diffusions',
     navPrayerRequests: 'Intentions de prière',
     navCommunity: 'Communauté',
-    navModules: 'Modules',
+    navMyQr: 'Mon code QR',
+    navSettings: 'Paramètres',
     noAdminPois: "Votre compte n'est encore administrateur d'aucune paroisse.",
   },
   donations: {
@@ -472,6 +627,26 @@ const fr: Translations = {
     anonymous: 'Anonyme',
     loadError: 'Impossible de charger les données de dons.',
     loading: 'Chargement…',
+  },
+  events: {
+    title: 'Événements',
+    subtitle: 'Planifiez les messes, baptêmes, mariages et autres événements de cette paroisse.',
+    titleLabel: 'Titre',
+    startsAtLabel: 'Date et heure',
+    locationLabel: 'Lieu',
+    descriptionLabel: 'Description',
+    schedule: 'Planifier',
+    scheduling: 'Planification…',
+    save: 'Enregistrer',
+    cancel: 'Annuler',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    loadError: 'Impossible de charger les événements.',
+    createError: "Impossible de planifier l'événement.",
+    saveError: 'Impossible d’enregistrer les modifications.',
+    deleteError: "Impossible de supprimer l'événement.",
+    loading: 'Chargement…',
+    empty: "Aucun événement prévu pour l'instant.",
   },
   announcements: {
     title: 'Annonces',
@@ -538,8 +713,9 @@ const fr: Translations = {
     loading: 'Chargement…',
   },
   modules: {
-    title: 'Modules',
-    subtitle: "Activez ou désactivez des fonctionnalités pour l'app de cette paroisse.",
+    title: 'Paramètres',
+    subtitle: "Gérez les modules actifs et les informations publiques de cette paroisse.",
+    modulesSectionTitle: 'Modules actifs',
     activate: 'Activer',
     deactivate: 'Désactiver',
     notActivated: 'non activé',
@@ -559,6 +735,34 @@ const fr: Translations = {
     prayerRequests: 'Intentions de prière',
     livestream: 'Diffusion en direct',
     community: 'Communauté',
+  },
+  poiInfo: {
+    title: 'Informations de la paroisse',
+    subtitle: "Affichées aux paroissiens dans l'app.",
+    nameLabel: 'Nom',
+    descriptionLabel: 'Description',
+    descriptionPlaceholder: 'Une courte description de votre paroisse ou communauté.',
+    pictureUrlLabel: 'URL de la photo',
+    pictureUrlPlaceholder: 'https://exemple.com/votre-logo.jpg',
+    pictureAlt: 'Photo de la paroisse',
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saveError: 'Impossible d’enregistrer les modifications.',
+    saveSuccess: 'Enregistré.',
+  },
+  qr: {
+    title: 'Mon code QR',
+    subtitle: "Un flyer imprimable avec votre code QR — affichez-le partout où les paroissiens peuvent le scanner pour obtenir l'app et rejoindre votre paroisse.",
+    flyerHeadlineLabel: 'Titre du flyer',
+    flyerSubtextLabel: 'Texte du flyer',
+    defaultHeadline: 'Scannez pour nous rejoindre',
+    defaultSubtext: "Téléchargez l'app myPeople et restez connecté à notre paroisse : annonces, événements, intentions de prière, et plus encore.",
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saveError: 'Impossible d’enregistrer les modifications.',
+    print: 'Imprimer / Enregistrer en PDF',
+    previewTitle: 'Aperçu du flyer',
+    scanHint: 'Scannez avec l’appareil photo de votre téléphone',
   },
 };
 

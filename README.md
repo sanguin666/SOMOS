@@ -8,6 +8,7 @@ Mobile + web app for churches and other points of interest: donations, events, a
 backend/   NestJS API (Node.js + TypeORM + PostgreSQL)
 app/       Expo / React Native app (+ React Native Web) — the congregant-facing app
 admin/     React (Vite) admin dashboard for parish staff
+landing/   Static marketing site (no build step) advertising myPeople to churches
 docker-compose.yml   Local PostgreSQL for development
 ```
 
@@ -82,7 +83,7 @@ npm install
 npm run dev
 ```
 
-Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), and turn modules on or off for that parish.
+Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: schedule Events, publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), print a QR flyer from **My QR**, and manage **Settings** — active modules plus the parish's own info (description, picture) shown in the app.
 
 Content that's meant to come from parish staff (editing/deleting announcements and livestreams, moderating prayer requests and community posts, toggling modules) requires this admin login. Posting itself — an announcement, a prayer request, a community post — is still open from the congregant app with no login yet, matching the phone-based auth that isn't built.
 
@@ -116,7 +117,7 @@ Every new screen should reuse these components instead of raw `Text`/`Pressable`
 Each POI activates modules à la carte (`active_modules`). Currently built:
 
 - **Donations** — in-app donations (Stripe integration still to come), with a demo confirmation flow
-- **Events** — event notifications (baptisms, weddings, funerals, communions, etc.) — currently demo content in the app, no backend table yet
+- **Events** — Masses, baptisms, weddings, funerals, communions, etc. (`backend/src/events`); scheduling/editing is admin-only, the app only reads them (a reminder toggle per event is a local, device-only preference — there's no account yet to attach it to)
 - **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed; editing/deleting is admin-only, posting is still open from the app (no congregant login yet)
 - **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`); moderated (removed) from the admin dashboard
 - **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`); scheduling/editing is admin-only
@@ -128,10 +129,20 @@ More modules can be added following the same pattern (an entry in `ModuleType`, 
 
 The app and admin dashboard UI (menus, buttons, labels, error messages — everything that isn't content posted by a POI) is available in English, Spanish, and French.
 
-- **POI language** (`pois.language`) — the language a POI's own staff publish content in (announcements, prayer requests, community posts, livestream titles, etc.). Set from the admin dashboard's Modules page ("Content language" card); it's metadata only for now — posted content is stored and shown exactly as written, in that language, to every reader regardless of their own UI language.
+- **POI language** (`pois.language`) — the language a POI's own staff publish content in (announcements, prayer requests, community posts, livestream titles, etc.). Set from the admin dashboard's Settings page ("Content language" card); it's metadata only for now — posted content is stored and shown exactly as written, in that language, to every reader regardless of their own UI language.
 - **User language** (`users.language`) — each person's own UI language preference. In the app, a language pill switcher on the home screen sets it (device-local, via AsyncStorage, since there's no real congregant account/session yet). In the admin dashboard, it's set from the login screen or the sidebar switcher, stored locally, and synced to the signed-in admin's account (`PATCH /auth/me/language`) so it follows them across devices/browsers.
 - **Not built yet:** automatic translation of POI-authored content into each reader's own language. The `language` fields above lay the groundwork for this (an AI translation service could use the POI's source language and the reader's target language) but for now a POI's posts are shown as-is, in the POI's language, to everyone.
 
 ## Admin auth
 
 The admin dashboard (`admin/`) uses a real email + password login (`POST /auth/login`, JWT), separate from the congregant app which has no working login yet. A `PoiAdminGuard` (`backend/src/auth/guards`) checks the caller has an `admin` `user_pois` row for the `:poiId` in the URL before allowing an admin-only action — see `backend/src/auth` for the guard and `backend/src/user-pois/user-pois.service.ts` for the membership lookups it uses.
+
+## Settings & the QR flyer
+
+The admin dashboard's **Settings** page (`admin/src/pages/SettingsPage.tsx`, `PATCH /pois/:poiId/profile`) combines the active-module toggles with the POI's own public info — a description and a picture (pasted in as a URL for now; the upload pipeline used for announcement voice messages could be reused for direct uploads later) — plus the content-language picker.
+
+The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer for the parish's entrance: a QR code (via the `qrcode` package) encoding a link to the landing site's `/join?token=<poi token>` page, an editable headline/subtext (`qrFlyerHeadline`/`qrFlyerSubtext` on `Poi`, defaulting to generic copy if left blank), and a "Print / Save as PDF" button that uses the browser's own print dialog with a dedicated print stylesheet — no PDF library needed.
+
+## Marketing landing page
+
+`landing/` is a small static site (plain HTML/CSS, no build step) advertising myPeople to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). `landing/join.html` is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback. Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.

@@ -36,6 +36,25 @@ export class Poi {
   @Column({ type: 'enum', enum: Language, default: Language.EN })
   language!: Language;
 
+  // Shown on the POI's hub screen in the app and on its onboarding flyer.
+  @Column('text', { nullable: true })
+  description?: string;
+
+  // A URL to a logo/photo for the POI — pasted in by the admin for now
+  // rather than uploaded (the upload pipeline used for announcement voice
+  // messages could be reused for direct uploads later).
+  @Column({ name: 'picture_url', nullable: true })
+  pictureUrl?: string;
+
+  // Editable text for the printable onboarding flyer generated on the
+  // admin dashboard's "My QR" page — left blank to fall back to a
+  // sensible default there.
+  @Column({ name: 'qr_flyer_headline', nullable: true })
+  qrFlyerHeadline?: string;
+
+  @Column('text', { name: 'qr_flyer_subtext', nullable: true })
+  qrFlyerSubtext?: string;
+
   @Column({ nullable: true })
   address?: string;
 

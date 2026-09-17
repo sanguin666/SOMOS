@@ -5,10 +5,12 @@ import { I18nProvider, useI18n } from './i18n/I18nContext';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardLayout } from './layout/DashboardLayout';
 import { AnnouncementsPage } from './pages/AnnouncementsPage';
+import { EventsPage } from './pages/EventsPage';
 import { LivestreamsPage } from './pages/LivestreamsPage';
 import { PrayerRequestsPage } from './pages/PrayerRequestsPage';
 import { CommunityPage } from './pages/CommunityPage';
-import { ModulesPage } from './pages/ModulesPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { MyQrPage } from './pages/MyQrPage';
 import { DonationsPage } from './pages/DonationsPage';
 
 // Reconciles the UI's language with the account's saved one on login.
@@ -81,11 +83,13 @@ function AppRoutes() {
       >
         <Route index element={<PoiIndexRedirect />} />
         <Route path="donations" element={<DonationsPage />} />
+        <Route path="events" element={<EventsPage />} />
         <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="livestreams" element={<LivestreamsPage />} />
         <Route path="prayer-requests" element={<PrayerRequestsPage />} />
         <Route path="community" element={<CommunityPage />} />
-        <Route path="modules" element={<ModulesPage />} />
+        <Route path="my-qr" element={<MyQrPage />} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
