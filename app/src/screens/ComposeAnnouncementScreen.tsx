@@ -13,6 +13,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon, MicIcon, PlayIcon } from '../components/icons';
 import { createAnnouncement } from '../api/announcements';
+import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 
@@ -35,6 +36,7 @@ function formatDuration(ms: number) {
  * for the demo it's reachable from the Announcements screen for anyone.
  */
 export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
+  const { t } = useI18n();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -51,14 +53,14 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
     try {
       const { granted } = await requestRecordingPermissionsAsync();
       if (!granted) {
-        setError('Microphone permission is needed to record a voice message.');
+        setError(t('composeAnnouncement.micPermissionError'));
         return;
       }
       setRecordedUri(null);
       await recorder.prepareToRecordAsync();
       recorder.record();
     } catch {
-      setError("Couldn't start recording on this device.");
+      setError(t('composeAnnouncement.startRecordingError'));
     }
   }
 
@@ -73,11 +75,11 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
 
   async function submit() {
     if (!title.trim()) {
-      setError('Please add a title.');
+      setError(t('composeAnnouncement.titleRequiredError'));
       return;
     }
     if (!body.trim() && !recordedUri) {
-      setError('Add some text or record a voice message.');
+      setError(t('composeAnnouncement.contentRequiredError'));
       return;
     }
     setSubmitting(true);
@@ -90,7 +92,7 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
       });
       onCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
+      setError(err instanceof Error ? err.message : t('composeAnnouncement.genericError'));
     } finally {
       setSubmitting(false);
     }
@@ -98,29 +100,34 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
 
   return (
     <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
-        <AccessibleText variant="title">New Announcement</AccessibleText>
+        <AccessibleText variant="title">{t('composeAnnouncement.title')}</AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
           {poi.name}
         </AccessibleText>
       </View>
 
-      <TextInput value={title} onChangeText={setTitle} placeholder="Title" style={styles.titleInput} />
+      <TextInput
+        value={title}
+        onChangeText={setTitle}
+        placeholder={t('composeAnnouncement.titlePlaceholder')}
+        style={styles.titleInput}
+      />
 
       <TextInput
         value={body}
         onChangeText={setBody}
-        placeholder="Write a message (optional if you record one below)…"
+        placeholder={t('composeAnnouncement.bodyPlaceholder')}
         multiline
         style={styles.bodyInput}
       />
 
       <AccessibleText variant="caption" style={styles.sectionLabel}>
-        VOICE MESSAGE (OPTIONAL)
+        {t('composeAnnouncement.voiceMessageLabel')}
       </AccessibleText>
 
       {recorderState.isRecording ? (
@@ -131,12 +138,12 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
           </AccessibleText>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Stop recording"
+            accessibilityLabel={t('composeAnnouncement.stop')}
             onPress={stopRecording}
             style={styles.stopButton}
           >
             <AccessibleText variant="body" color="#FFFFFF" style={styles.pillLabel}>
-              Stop
+              {t('composeAnnouncement.stop')}
             </AccessibleText>
           </Pressable>
         </View>
@@ -144,36 +151,36 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
         <View style={styles.recordedRow}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={playerStatus.playing ? 'Pause preview' : 'Play preview'}
+            accessibilityLabel={playerStatus.playing ? t('composeAnnouncement.pausePreviewAria') : t('composeAnnouncement.playPreviewAria')}
             onPress={() => (playerStatus.playing ? player.pause() : player.play())}
             style={styles.playButton}
           >
             <PlayIcon size={18} color="#FFFFFF" />
           </Pressable>
           <AccessibleText variant="body" style={styles.recordedLabel}>
-            Voice message recorded
+            {t('composeAnnouncement.recorded')}
           </AccessibleText>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Discard recording and record again"
+            accessibilityLabel={t('composeAnnouncement.reRecordAria')}
             onPress={discardRecording}
             style={styles.discardButton}
           >
             <AccessibleText variant="caption" color={colors.danger}>
-              Re-record
+              {t('composeAnnouncement.reRecord')}
             </AccessibleText>
           </Pressable>
         </View>
       ) : (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Record a voice message"
+          accessibilityLabel={t('composeAnnouncement.recordAria')}
           onPress={startRecording}
           style={styles.recordButton}
         >
           <MicIcon size={20} color={colors.primary} />
           <AccessibleText variant="body" color={colors.primary} style={styles.pillLabel}>
-            Record voice message
+            {t('composeAnnouncement.recordButton')}
           </AccessibleText>
         </Pressable>
       )}
@@ -186,7 +193,11 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
 
       <View style={styles.spacer} />
 
-      <AccessibleButton label={submitting ? 'Posting…' : 'Post announcement'} onPress={submit} disabled={submitting} />
+      <AccessibleButton
+        label={submitting ? t('composeAnnouncement.postingButton') : t('composeAnnouncement.postButton')}
+        onPress={submit}
+        disabled={submitting}
+      />
     </Screen>
   );
 }

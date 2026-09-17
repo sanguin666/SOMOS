@@ -5,6 +5,7 @@ import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
 import { getPoiByQrCode } from '../api/pois';
 import { DEMO_QR_TOKEN } from '../demo';
+import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
 import { spacing } from '../theme/theme';
 
@@ -19,6 +20,7 @@ type Props = {
  * lets the demo proceed with a button instead of an actual scan.
  */
 export function ScanQRScreen({ onBack, onFound }: Props) {
+  const { t } = useI18n();
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
 
   async function simulateScan() {
@@ -35,7 +37,7 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
     <View style={styles.container}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
         onPress={onBack}
         style={styles.backButton}
       >
@@ -44,10 +46,10 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
 
       <View style={styles.header}>
         <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.centerText}>
-          Scan the QR code
+          {t('scan.title')}
         </AccessibleText>
         <AccessibleText variant="caption" color="rgba(255,255,255,0.7)" style={styles.centerText}>
-          Point your camera at the code on the flyer
+          {t('scan.subtitle')}
         </AccessibleText>
       </View>
 
@@ -61,7 +63,7 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
       <View style={styles.footer}>
         {status === 'error' && (
           <AccessibleText variant="caption" color="#FFB4A8" style={[styles.centerText, styles.errorText]}>
-            Couldn't reach the server. Check that the backend is running and try again.
+            {t('scan.error')}
           </AccessibleText>
         )}
 
@@ -70,7 +72,7 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
             <ActivityIndicator color="#FFFFFF" size="large" />
           </View>
         ) : (
-          <AccessibleButton label="Simulate scan" onPress={simulateScan} />
+          <AccessibleButton label={t('scan.simulateButton')} onPress={simulateScan} />
         )}
       </View>
     </View>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usePoiId } from '../layout/usePoiId';
+import { useI18n } from '../i18n/I18nContext';
 import { getDonationStats, getRecentDonations } from '../api/donations';
 import type { DailyTotal, Donation, DonationStats } from '../api/types';
 
@@ -129,6 +130,7 @@ const PLOT_W = CHART_W - PAD.left - PAD.right;
 const PLOT_H = CHART_H - PAD.top - PAD.bottom;
 
 function DonationChart({ data }: { data: DailyTotal[] }) {
+  const { t } = useI18n();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [showTable, setShowTable] = useState(false);
 
@@ -171,9 +173,9 @@ function DonationChart({ data }: { data: DailyTotal[] }) {
   return (
     <div className="chart-card">
       <div className="chart-card-header">
-        <h3>Daily donations</h3>
+        <h3>{t('donations.dailyDonationsTitle')}</h3>
         <span className="muted" style={{ fontSize: 13 }}>
-          Last 30 days
+          {t('donations.last30Days')}
         </span>
       </div>
 
@@ -182,7 +184,7 @@ function DonationChart({ data }: { data: DailyTotal[] }) {
           className="chart-svg"
           viewBox={`0 0 ${CHART_W} ${CHART_H}`}
           role="img"
-          aria-label="Daily donation totals over the last 30 days"
+          aria-label={`${t('donations.dailyDonationsTitle')} — ${t('donations.last30Days')}`}
         >
           {ticks.map((t) => (
             <g key={t}>
@@ -230,23 +232,24 @@ function DonationChart({ data }: { data: DailyTotal[] }) {
           <div className="chart-tooltip" style={{ left: `${tooltipLeftPct}%`, top: `${tooltipTopPct}%` }}>
             <div className="chart-tooltip-value">{formatCurrency(hovered.total)}</div>
             <div className="chart-tooltip-label">
-              {formatDateLong(hovered.date)} · {hovered.count} gift{hovered.count === 1 ? '' : 's'}
+              {formatDateLong(hovered.date)} · {hovered.count} {t('donations.giftWord')}
+              {hovered.count === 1 ? '' : 's'}
             </div>
           </div>
         )}
       </div>
 
       <button type="button" className="table-toggle" onClick={() => setShowTable((v) => !v)}>
-        {showTable ? 'Hide table view' : 'View as table'}
+        {showTable ? t('donations.hideTableView') : t('donations.viewAsTable')}
       </button>
 
       {showTable && (
         <table className="data-table">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Total</th>
-              <th>Gifts</th>
+              <th>{t('donations.dateHeader')}</th>
+              <th>{t('donations.totalHeader')}</th>
+              <th>{t('donations.giftsHeader')}</th>
             </tr>
           </thead>
           <tbody>
@@ -264,18 +267,19 @@ function DonationChart({ data }: { data: DailyTotal[] }) {
   );
 }
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, t: ReturnType<typeof useI18n>['t']): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.round(diffMs / 60000);
-  if (minutes < 60) return `${Math.max(minutes, 1)}m ago`;
+  if (minutes < 60) return t('donations.minutesAgo', { n: Math.max(minutes, 1) });
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t('donations.hoursAgo', { n: hours });
   const days = Math.round(hours / 24);
-  return `${days}d ago`;
+  return t('donations.daysAgo', { n: days });
 }
 
 export function DonationsPage() {
   const poiId = usePoiId();
+  const { t } = useI18n();
   const [stats, setStats] = useState<DonationStats | null>(null);
   const [recent, setRecent] = useState<Donation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -288,13 +292,13 @@ export function DonationsPage() {
         setStats(statsResult);
         setRecent(recentResult);
       })
-      .catch(() => setError('Could not load donation data.'));
+      .catch(() => setError(t('donations.loadError')));
   }, [poiId]);
 
   if (error) {
     return (
       <div>
-        <h2>Donations</h2>
+        <h2>{t('donations.title')}</h2>
         <p className="error-text">{error}</p>
       </div>
     );
@@ -303,8 +307,8 @@ export function DonationsPage() {
   if (!stats || !recent) {
     return (
       <div>
-        <h2>Donations</h2>
-        <p className="muted">Loading…</p>
+        <h2>{t('donations.title')}</h2>
+        <p className="muted">{t('donations.loading')}</p>
       </div>
     );
   }
@@ -316,29 +320,29 @@ export function DonationsPage() {
 
   return (
     <div>
-      <h2>Donations</h2>
-      <p className="muted">How giving is trending for this parish.</p>
+      <h2>{t('donations.title')}</h2>
+      <p className="muted">{t('donations.subtitle')}</p>
 
       <div className="kpi-row">
         <StatTile
-          label="This week"
+          label={t('donations.thisWeek')}
           value={formatCurrency(stats.thisWeek.total)}
           delta={computeDelta(stats.thisWeek.total, stats.lastWeek.total)}
-          comparedTo="last week"
+          comparedTo={t('donations.vsLastWeek')}
           sparkline={last12.map((d) => d.total)}
         />
         <StatTile
-          label="This month"
+          label={t('donations.thisMonth')}
           value={formatCurrency(stats.thisMonth.total)}
           delta={computeDelta(stats.thisMonth.total, stats.lastMonth.total)}
-          comparedTo="last month"
+          comparedTo={t('donations.vsLastMonth')}
           sparkline={last12.map((d) => d.total)}
         />
         <StatTile
-          label="Average gift"
+          label={t('donations.averageGift')}
           value={formatCurrency(thisMonthAvg)}
           delta={computeDelta(thisMonthAvg, lastMonthAvg)}
-          comparedTo="last month's average"
+          comparedTo={t('donations.vsLastMonthAverage')}
           sparkline={avgSparkline}
         />
       </div>
@@ -347,18 +351,18 @@ export function DonationsPage() {
 
       <div className="chart-card">
         <div className="chart-card-header">
-          <h3>Recent gifts</h3>
+          <h3>{t('donations.recentGiftsTitle')}</h3>
         </div>
         {recent.length === 0 ? (
-          <p className="muted">No donations yet.</p>
+          <p className="muted">{t('donations.noDonations')}</p>
         ) : (
           <div className="donation-list">
             {recent.map((donation) => (
               <div key={donation.id} className="donation-item">
-                <span>{donation.donorName ?? 'Anonymous'}</span>
+                <span>{donation.donorName ?? t('donations.anonymous')}</span>
                 <span>
                   <span className="donation-amount">{formatCurrency(donation.amount)}</span>{' '}
-                  <span className="muted">· {timeAgo(donation.createdAt)}</span>
+                  <span className="muted">· {timeAgo(donation.createdAt, t)}</span>
                 </span>
               </div>
             ))}

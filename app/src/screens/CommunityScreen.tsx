@@ -5,6 +5,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon, ChatBubbleIcon, ChevronRightIcon } from '../components/icons';
 import { createCommunityPost, getCommunityPosts } from '../api/community';
+import { useI18n } from '../i18n/I18nContext';
 import type { CommunityPost, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
+  const { t } = useI18n();
   const [posts, setPosts] = useState<CommunityPost[] | null>(null);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
@@ -49,12 +51,12 @@ export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
 
   return (
     <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
-        <AccessibleText variant="title">Community</AccessibleText>
+        <AccessibleText variant="title">{t('community.title')}</AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
           {poi.name}
         </AccessibleText>
@@ -64,18 +66,18 @@ export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
         <TextInput
           value={message}
           onChangeText={setMessage}
-          placeholder="Start a conversation…"
+          placeholder={t('community.messagePlaceholder')}
           multiline
           style={styles.messageInput}
         />
         <TextInput
           value={authorName}
           onChangeText={setAuthorName}
-          placeholder="Your name (optional)"
+          placeholder={t('community.namePlaceholder')}
           style={styles.nameInput}
         />
         <AccessibleButton
-          label={submitting ? 'Posting…' : 'Post'}
+          label={submitting ? t('community.postingButton') : t('community.postButton')}
           onPress={submit}
           disabled={submitting || !message.trim()}
         />
@@ -83,13 +85,13 @@ export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
-          Couldn't load the community board. Pull up the app again to retry.
+          {t('community.error')}
         </AccessibleText>
       )}
 
       {!error && posts === null && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          Loading…
+          {t('community.loading')}
         </AccessibleText>
       )}
 
@@ -97,14 +99,14 @@ export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
         <Pressable
           key={item.id}
           accessibilityRole="button"
-          accessibilityLabel={`Open discussion: ${item.message}`}
+          accessibilityLabel={t('community.openAria', { message: item.message })}
           onPress={() => onOpenPost(item)}
           style={styles.card}
         >
           <View style={styles.cardBody}>
             <AccessibleText variant="body">{item.message}</AccessibleText>
             <View style={styles.cardFooter}>
-              <AccessibleText variant="caption">— {item.authorName ?? 'Anonymous'}</AccessibleText>
+              <AccessibleText variant="caption">— {item.authorName ?? t('common.anonymous')}</AccessibleText>
               <View style={styles.commentCount}>
                 <ChatBubbleIcon size={16} color={colors.primary} />
                 <AccessibleText variant="caption" color={colors.primary} style={styles.commentCountLabel}>

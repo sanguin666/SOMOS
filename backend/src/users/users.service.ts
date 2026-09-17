@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
+import type { Language } from '../common/enums/language.enum.js';
 
 @Injectable()
 export class UsersService {
@@ -46,5 +47,11 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
     await this.usersRepository.remove(user);
+  }
+
+  async updateLanguage(id: string, language: Language): Promise<User> {
+    const user = await this.findOne(id);
+    user.language = language;
+    return this.usersRepository.save(user);
   }
 }

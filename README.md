@@ -13,8 +13,8 @@ docker-compose.yml   Local PostgreSQL for development
 
 ## Base data model
 
-- `users` — either a congregant (identified by phone number — the SMS login flow itself isn't built yet) or a parish admin (identified by email + password, used by the admin dashboard)
-- `pois` — a point of interest a user can join, with a name, `type` (only `church` for now — the name stays generic since other kinds of venues/organizations may be supported later), address, and the QR code token used for onboarding
+- `users` — either a congregant (identified by phone number — the SMS login flow itself isn't built yet) or a parish admin (identified by email + password, used by the admin dashboard); each has a `language` (`en`/`es`/`fr`) for their own UI
+- `pois` — a point of interest a user can join, with a name, `type` (only `church` for now — the name stays generic since other kinds of venues/organizations may be supported later), `language` (the language this POI publishes content in), address, and the QR code token used for onboarding
 - `user_pois` — many-to-many join table: a user can belong to several POIs, with a `role` (`member` or `admin`) per POI — an admin user can manage several churches this way
 - `active_modules` — the product modules subscribed to by a POI (e.g. `donations`, `events`), with subscription status and expiration date
 
@@ -123,6 +123,14 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 - **Community** — a discussion board: posts with flat (non-nested) comment replies (`src/community`); moderated from the admin dashboard, posting is still open from the app
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).
+
+## Languages
+
+The app and admin dashboard UI (menus, buttons, labels, error messages — everything that isn't content posted by a POI) is available in English, Spanish, and French.
+
+- **POI language** (`pois.language`) — the language a POI's own staff publish content in (announcements, prayer requests, community posts, livestream titles, etc.). Set from the admin dashboard's Modules page ("Content language" card); it's metadata only for now — posted content is stored and shown exactly as written, in that language, to every reader regardless of their own UI language.
+- **User language** (`users.language`) — each person's own UI language preference. In the app, a language pill switcher on the home screen sets it (device-local, via AsyncStorage, since there's no real congregant account/session yet). In the admin dashboard, it's set from the login screen or the sidebar switcher, stored locally, and synced to the signed-in admin's account (`PATCH /auth/me/language`) so it follows them across devices/browsers.
+- **Not built yet:** automatic translation of POI-authored content into each reader's own language. The `language` fields above lay the groundwork for this (an AI translation service could use the POI's source language and the reader's target language) but for now a POI's posts are shown as-is, in the POI's language, to everyone.
 
 ## Admin auth
 

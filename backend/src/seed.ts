@@ -15,6 +15,7 @@ import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
 import { PoiType } from './common/enums/poi-type.enum.js';
 import { MemberRole } from './common/enums/member-role.enum.js';
+import { Language } from './common/enums/language.enum.js';
 
 /**
  * Seeds two demo POIs with fixed QR tokens, so the app has something real
@@ -178,15 +179,31 @@ async function seed() {
   }
   await activateAllModules(poi2);
 
+  // Demonstrate the language feature: give the two demo POIs different
+  // content languages. Unconditional (not gated by "just created") so it
+  // also takes effect on a database seeded before this column existed.
+  if (poi.language !== Language.EN) {
+    poi.language = Language.EN;
+    await poiRepository.save(poi);
+  }
+  if (poi2.language !== Language.ES) {
+    poi2.language = Language.ES;
+    await poiRepository.save(poi2);
+  }
+
   const poi2AnnouncementCount = await announcementRepository.count({
     where: { poi: { id: poi2.id } },
   });
   if (poi2AnnouncementCount === 0) {
+    // Written in Spanish, matching this POI's content language (see
+    // above) — POI content isn't translated for readers, only the app's
+    // own menus are, so this is exactly what a Spanish-speaking parish's
+    // announcement should look like.
     await announcementRepository.save(
       announcementRepository.create({
         poi: poi2,
-        title: 'Welcome to Holy Trinity Chapel',
-        body: 'This is a demo announcement for our second parish, used to show off the admin dashboard.',
+        title: 'Bienvenidos a Holy Trinity Chapel',
+        body: 'Este es un anuncio de muestra para nuestra segunda parroquia, usado para mostrar el panel de administración.',
       }),
     );
     console.log('Seeded demo announcement for Holy Trinity Chapel');

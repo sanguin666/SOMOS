@@ -5,6 +5,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon, HeartIcon } from '../components/icons';
 import { createDonation } from '../api/donations';
+import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
 import type { Poi } from '../api/types';
 
@@ -26,6 +27,7 @@ const PRESET_AMOUNTS = [10, 25, 50, 100];
  * implement it), so a native-only confirmation would look broken there.
  */
 export function DonateScreen({ poi, onBack }: Props) {
+  const { t } = useI18n();
   const [selected, setSelected] = useState<number>(50);
   const [customMode, setCustomMode] = useState(false);
   const [customAmount, setCustomAmount] = useState('');
@@ -54,35 +56,34 @@ export function DonateScreen({ poi, onBack }: Props) {
           <HeartIcon size={32} color={colors.primary} />
         </View>
         <AccessibleText variant="title" style={styles.centerText}>
-          Thank you!
+          {t('donate.thankYou')}
         </AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted} style={styles.centerText}>
-          This is a demo — no real payment was made. A ${amount} donation to {poi.name} would be
-          processed here once Stripe is connected.
+          {t('donate.confirmation', { amount, poiName: poi.name })}
         </AccessibleText>
         <View style={styles.spacer} />
-        <AccessibleButton label="Done" onPress={onBack} />
+        <AccessibleButton label={t('donate.doneButton')} onPress={onBack} />
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
         <AccessibleText variant="title" style={styles.title}>
-          Donate to {poi.name}
+          {t('donate.title', { poiName: poi.name })}
         </AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
-          Every gift helps our community thrive.
+          {t('donate.subtitle')}
         </AccessibleText>
       </View>
 
       <AccessibleText variant="caption" style={styles.sectionLabel}>
-        CHOOSE AN AMOUNT
+        {t('donate.chooseAmount')}
       </AccessibleText>
 
       <View style={styles.grid}>
@@ -128,24 +129,24 @@ export function DonateScreen({ poi, onBack }: Props) {
       ) : (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Custom amount"
+          accessibilityLabel={t('donate.customAmount')}
           onPress={() => setCustomMode(true)}
           style={styles.customButton}
         >
-          <AccessibleText variant="bodyLarge">Custom amount</AccessibleText>
+          <AccessibleText variant="bodyLarge">{t('donate.customAmount')}</AccessibleText>
         </Pressable>
       )}
 
       <View style={styles.spacer} />
 
       <AccessibleButton
-        label={submitting ? 'Processing…' : `Donate $${amount}`}
+        label={submitting ? t('donate.processingButton') : t('donate.donateButton', { amount })}
         onPress={donate}
         disabled={submitting || amount <= 0}
       />
 
       <AccessibleText variant="caption" style={styles.footnote}>
-        Secure payment · Powered by Stripe
+        {t('donate.footnote')}
       </AccessibleText>
     </Screen>
   );

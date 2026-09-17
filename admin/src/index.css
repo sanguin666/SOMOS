@@ -246,6 +246,36 @@ a {
   margin: 0 0 4px;
 }
 
+.login-language-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.lang-pill {
+  min-width: 44px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lang-pill-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.sidebar-lang-switcher {
+  display: flex;
+  gap: 6px;
+}
+
 .comment-list {
   margin-top: 12px;
   padding-left: 16px;
