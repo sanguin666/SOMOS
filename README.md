@@ -20,6 +20,8 @@ docker-compose.yml   Local PostgreSQL for development
 
 ## Local demo (no cost)
 
+**Windows:** double-click `start.bat` to do all of the below in one go (installs/updates dependencies, starts Postgres if Docker is available, seeds demo data, and launches the backend, admin dashboard, and mobile app each in their own window). Re-run it any time for a full restart. Otherwise, follow the manual steps below.
+
 ### 1. PostgreSQL database
 
 With Docker (recommended):
