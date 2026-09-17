@@ -10,6 +10,7 @@ import type { Relation } from 'typeorm';
 import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from '../../active-modules/entities/active-module.entity.js';
 import { PoiType } from '../../common/enums/poi-type.enum.js';
+import { Language } from '../../common/enums/language.enum.js';
 
 /**
  * A point of interest a user can join: a church today, potentially other
@@ -27,6 +28,32 @@ export class Poi {
   // Drives the app's visual theme (accent color, imagery, wording).
   @Column({ type: 'enum', enum: PoiType, default: PoiType.CHURCH })
   type!: PoiType;
+
+  // The language this POI publishes content in (announcements, events,
+  // etc.) — not translated for readers yet, just tagged, since there's no
+  // translation service wired up. The app's own menus translate separately
+  // based on the reader's own language (see the `language` column on User).
+  @Column({ type: 'enum', enum: Language, default: Language.EN })
+  language!: Language;
+
+  // Shown on the POI's hub screen in the app and on its onboarding flyer.
+  @Column('text', { nullable: true })
+  description?: string;
+
+  // A URL to a logo/photo for the POI — pasted in by the admin for now
+  // rather than uploaded (the upload pipeline used for announcement voice
+  // messages could be reused for direct uploads later).
+  @Column({ name: 'picture_url', nullable: true })
+  pictureUrl?: string;
+
+  // Editable text for the printable onboarding flyer generated on the
+  // admin dashboard's "My QR" page — left blank to fall back to a
+  // sensible default there.
+  @Column({ name: 'qr_flyer_headline', nullable: true })
+  qrFlyerHeadline?: string;
+
+  @Column('text', { name: 'qr_flyer_subtext', nullable: true })
+  qrFlyerSubtext?: string;
 
   @Column({ nullable: true })
   address?: string;

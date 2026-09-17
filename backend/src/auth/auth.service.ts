@@ -4,6 +4,7 @@ import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service.js';
 import { UserPoisService } from '../user-pois/user-pois.service.js';
 import { LoginDto } from './dto/login.dto.js';
+import type { Language } from '../common/enums/language.enum.js';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +31,13 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      language: user.language,
       adminPois,
     };
+  }
+
+  async updateMyLanguage(userId: string, language: Language): Promise<{ language: Language }> {
+    const user = await this.usersService.updateLanguage(userId, language);
+    return { language: user.language };
   }
 }

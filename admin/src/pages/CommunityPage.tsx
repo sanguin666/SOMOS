@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { usePoiId } from '../layout/usePoiId';
+import { useI18n } from '../i18n/I18nContext';
 import { deleteComment, deletePost, getComments, getCommunityPosts } from '../api/community';
 import type { CommunityComment, CommunityPost } from '../api/types';
 
 export function CommunityPage() {
   const poiId = usePoiId();
+  const { t } = useI18n();
   const [posts, setPosts] = useState<CommunityPost[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -13,7 +15,7 @@ export function CommunityPage() {
   function load() {
     getCommunityPosts(poiId)
       .then(setPosts)
-      .catch(() => setError('Could not load community posts.'));
+      .catch(() => setError(t('community.loadError')));
   }
 
   useEffect(load, [poiId]);
@@ -29,7 +31,7 @@ export function CommunityPage() {
     try {
       setComments(await getComments(poiId, post.id));
     } catch {
-      setError('Could not load replies.');
+      setError(t('community.repliesLoadError'));
     }
   }
 
@@ -42,7 +44,7 @@ export function CommunityPage() {
         setComments(null);
       }
     } catch {
-      setError('Could not remove that post.');
+      setError(t('community.removePostError'));
     }
   }
 
@@ -57,50 +59,50 @@ export function CommunityPage() {
           ) ?? null,
       );
     } catch {
-      setError('Could not remove that reply.');
+      setError(t('community.removeReplyError'));
     }
   }
 
   return (
     <div>
-      <h2>Community</h2>
-      <p className="muted">Moderate posts and replies. Anyone can post here from the app.</p>
+      <h2>{t('community.title')}</h2>
+      <p className="muted">{t('community.subtitle')}</p>
 
       {error && <p className="error-text">{error}</p>}
-      {posts === null && !error && <p className="muted">Loading…</p>}
-      {posts?.length === 0 && <p className="muted">No posts yet.</p>}
+      {posts === null && !error && <p className="muted">{t('community.loading')}</p>}
+      {posts?.length === 0 && <p className="muted">{t('community.empty')}</p>}
 
       {posts?.map((post) => (
         <div key={post.id} className="card">
           <p>{post.message}</p>
           <p className="card-meta">
-            — {post.authorName ?? 'Anonymous'} · {new Date(post.createdAt).toLocaleString()}
+            — {post.authorName ?? t('community.anonymous')} · {new Date(post.createdAt).toLocaleString()}
           </p>
           <div className="card-actions">
             <button type="button" className="btn" onClick={() => toggleExpand(post)}>
-              {expandedId === post.id ? 'Hide replies' : `Replies (${post.commentCount})`}
+              {expandedId === post.id ? t('community.hideReplies') : `${t('community.replies')} (${post.commentCount})`}
             </button>
             <button type="button" className="btn btn-danger" onClick={() => handleDeletePost(post.id)}>
-              Remove post
+              {t('community.removePost')}
             </button>
           </div>
 
           {expandedId === post.id && (
             <div className="comment-list">
-              {comments === null && <p className="muted">Loading replies…</p>}
-              {comments?.length === 0 && <p className="muted">No replies.</p>}
+              {comments === null && <p className="muted">{t('community.loadingReplies')}</p>}
+              {comments?.length === 0 && <p className="muted">{t('community.noReplies')}</p>}
               {comments?.map((comment) => (
                 <div key={comment.id} className="comment-item">
                   <div>
                     <p style={{ margin: 0 }}>{comment.message}</p>
-                    <p className="card-meta">— {comment.authorName ?? 'Anonymous'}</p>
+                    <p className="card-meta">— {comment.authorName ?? t('community.anonymous')}</p>
                   </div>
                   <button
                     type="button"
                     className="btn btn-danger"
                     onClick={() => handleDeleteComment(post.id, comment.id)}
                   >
-                    Remove
+                    {t('community.removeReply')}
                   </button>
                 </div>
               ))}

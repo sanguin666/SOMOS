@@ -38,6 +38,14 @@ export type Announcement = {
   createdAt: string;
 };
 
+export type Event = {
+  id: string;
+  title: string;
+  startsAt: string;
+  location: string | null;
+  description: string | null;
+};
+
 export type PrayerRequest = {
   id: string;
   authorName: string | null;

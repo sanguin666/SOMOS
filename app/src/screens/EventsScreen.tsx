@@ -1,82 +1,116 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { BackChevronIcon, BellIcon } from '../components/icons';
+import { getEvents } from '../api/events';
+import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
-import type { Poi } from '../api/types';
+import type { Event, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
   onBack: () => void;
 };
 
-type DemoEvent = {
-  id: string;
-  month: string;
-  day: string;
-  title: string;
-  details: string;
-  notify: boolean;
-};
-
-// No events module exists in the backend yet (only the donations/events
-// subscription flags on a POI) — this list is demo content to show the
-// screen's shape. A real events module would fetch these per POI.
-const INITIAL_EVENTS: DemoEvent[] = [
-  { id: '1', month: 'SEP', day: '21', title: 'Sunday Mass', details: '10:00 AM · Main Hall', notify: true },
-  { id: '2', month: 'SEP', day: '28', title: 'Baptism Ceremony', details: '2:00 PM · Chapel', notify: false },
-  { id: '3', month: 'OCT', day: '04', title: 'Community Potluck', details: '6:00 PM · Parish Hall', notify: false },
-];
+function formatDetails(event: Event): string {
+  const time = new Date(event.startsAt).toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  return event.location ? `${time} · ${event.location}` : time;
+}
 
 export function EventsScreen({ poi, onBack }: Props) {
-  const [events, setEvents] = useState(INITIAL_EVENTS);
+  const { t } = useI18n();
+  const [events, setEvents] = useState<Event[] | null>(null);
+  const [error, setError] = useState(false);
+  // Which events the reader wants a reminder for — device-local only,
+  // since there's no congregant account yet to attach a subscription to.
+  const [notifying, setNotifying] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    getEvents(poi.id)
+      .then(setEvents)
+      .catch(() => setError(true));
+  }, [poi.id]);
 
   function toggleNotify(id: string) {
-    setEvents((current) => current.map((e) => (e.id === id ? { ...e, notify: !e.notify } : e)));
+    setNotifying((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }
 
   return (
-    <Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+    <Screen scroll>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
-        <AccessibleText variant="title">Events</AccessibleText>
+        <AccessibleText variant="title">{t('events.title')}</AccessibleText>
         <AccessibleText variant="body" color={colors.textMuted}>
           {poi.name}
         </AccessibleText>
       </View>
 
-      {events.map((event) => (
-        <View key={event.id} style={styles.eventRow}>
-          <View style={styles.dateChip}>
-            <AccessibleText variant="caption" color="#FFFFFF" style={styles.dateMonth}>
-              {event.month}
-            </AccessibleText>
-            <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.dateDay}>
-              {event.day}
-            </AccessibleText>
-          </View>
+      {error && (
+        <AccessibleText variant="body" color={colors.danger}>
+          {t('events.error')}
+        </AccessibleText>
+      )}
 
-          <View style={styles.eventText}>
-            <AccessibleText variant="bodyLarge" style={styles.eventTitle}>
-              {event.title}
-            </AccessibleText>
-            <AccessibleText variant="caption">{event.details}</AccessibleText>
-          </View>
+      {!error && events === null && (
+        <AccessibleText variant="body" color={colors.textMuted}>
+          {t('events.loading')}
+        </AccessibleText>
+      )}
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={event.notify ? `Turn off notifications for ${event.title}` : `Turn on notifications for ${event.title}`}
-            onPress={() => toggleNotify(event.id)}
-            style={[styles.bellButton, event.notify && styles.bellButtonActive]}
-          >
-            <BellIcon size={18} color={event.notify ? '#FFFFFF' : colors.textMuted} filled={event.notify} />
-          </Pressable>
-        </View>
-      ))}
+      {!error && events?.length === 0 && (
+        <AccessibleText variant="body" color={colors.textMuted}>
+          {t('events.empty')}
+        </AccessibleText>
+      )}
+
+      {events?.map((event) => {
+        const startsAt = new Date(event.startsAt);
+        const isNotifying = notifying.has(event.id);
+        return (
+          <View key={event.id} style={styles.eventRow}>
+            <View style={styles.dateChip}>
+              <AccessibleText variant="caption" color="#FFFFFF" style={styles.dateMonth}>
+                {startsAt.toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
+              </AccessibleText>
+              <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.dateDay}>
+                {startsAt.getDate()}
+              </AccessibleText>
+            </View>
+
+            <View style={styles.eventText}>
+              <AccessibleText variant="bodyLarge" style={styles.eventTitle}>
+                {event.title}
+              </AccessibleText>
+              <AccessibleText variant="caption">{formatDetails(event)}</AccessibleText>
+            </View>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                isNotifying
+                  ? t('events.notifyOn', { title: event.title })
+                  : t('events.notifyOff', { title: event.title })
+              }
+              onPress={() => toggleNotify(event.id)}
+              style={[styles.bellButton, isNotifying && styles.bellButtonActive]}
+            >
+              <BellIcon size={18} color={isNotifying ? '#FFFFFF' : colors.textMuted} filled={isNotifying} />
+            </Pressable>
+          </View>
+        );
+      })}
     </Screen>
   );
 }

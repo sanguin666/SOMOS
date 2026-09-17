@@ -5,6 +5,7 @@ import { Poi } from './pois/entities/poi.entity.js';
 import { UserPoi } from './user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from './active-modules/entities/active-module.entity.js';
 import { Announcement } from './announcements/entities/announcement.entity.js';
+import { Event } from './events/entities/event.entity.js';
 import { PrayerRequest } from './prayer-requests/entities/prayer-request.entity.js';
 import { Livestream } from './livestreams/entities/livestream.entity.js';
 import { CommunityPost } from './community/entities/community-post.entity.js';
@@ -15,6 +16,7 @@ import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
 import { PoiType } from './common/enums/poi-type.enum.js';
 import { MemberRole } from './common/enums/member-role.enum.js';
+import { Language } from './common/enums/language.enum.js';
 
 /**
  * Seeds two demo POIs with fixed QR tokens, so the app has something real
@@ -41,6 +43,7 @@ const dataSource = new DataSource({
     UserPoi,
     ActiveModule,
     Announcement,
+    Event,
     PrayerRequest,
     Livestream,
     CommunityPost,
@@ -58,6 +61,7 @@ async function seed() {
   const userPoiRepository = dataSource.getRepository(UserPoi);
   const activeModuleRepository = dataSource.getRepository(ActiveModule);
   const announcementRepository = dataSource.getRepository(Announcement);
+  const eventRepository = dataSource.getRepository(Event);
   const prayerRequestRepository = dataSource.getRepository(PrayerRequest);
   const livestreamRepository = dataSource.getRepository(Livestream);
   const communityPostRepository = dataSource.getRepository(CommunityPost);
@@ -149,6 +153,7 @@ async function seed() {
         name: "St. Mary's Parish",
         type: PoiType.CHURCH,
         city: 'Springfield',
+        description: 'A welcoming Catholic parish in the heart of Springfield, serving families for over 80 years.',
         qrCodeToken: DEMO_QR_TOKEN,
       }),
     );
@@ -169,6 +174,7 @@ async function seed() {
         name: 'Holy Trinity Chapel',
         type: PoiType.CHURCH,
         city: 'Springfield',
+        description: 'Una comunidad acogedora de habla hispana en el centro de Springfield.',
         qrCodeToken: DEMO_QR_TOKEN_2,
       }),
     );
@@ -178,15 +184,31 @@ async function seed() {
   }
   await activateAllModules(poi2);
 
+  // Demonstrate the language feature: give the two demo POIs different
+  // content languages. Unconditional (not gated by "just created") so it
+  // also takes effect on a database seeded before this column existed.
+  if (poi.language !== Language.EN) {
+    poi.language = Language.EN;
+    await poiRepository.save(poi);
+  }
+  if (poi2.language !== Language.ES) {
+    poi2.language = Language.ES;
+    await poiRepository.save(poi2);
+  }
+
   const poi2AnnouncementCount = await announcementRepository.count({
     where: { poi: { id: poi2.id } },
   });
   if (poi2AnnouncementCount === 0) {
+    // Written in Spanish, matching this POI's content language (see
+    // above) — POI content isn't translated for readers, only the app's
+    // own menus are, so this is exactly what a Spanish-speaking parish's
+    // announcement should look like.
     await announcementRepository.save(
       announcementRepository.create({
         poi: poi2,
-        title: 'Welcome to Holy Trinity Chapel',
-        body: 'This is a demo announcement for our second parish, used to show off the admin dashboard.',
+        title: 'Bienvenidos a Holy Trinity Chapel',
+        body: 'Este es un anuncio de muestra para nuestra segunda parroquia, usado para mostrar el panel de administración.',
       }),
     );
     console.log('Seeded demo announcement for Holy Trinity Chapel');
@@ -240,6 +262,44 @@ async function seed() {
       }),
     ]);
     console.log('Seeded demo announcements');
+  }
+
+  const eventCount = await eventRepository.count({
+    where: { poi: { id: poi.id } },
+  });
+  if (eventCount === 0) {
+    const now = new Date();
+    const upcomingSunday = new Date(now);
+    upcomingSunday.setDate(upcomingSunday.getDate() + ((7 - upcomingSunday.getDay()) % 7 || 7));
+    upcomingSunday.setHours(10, 0, 0, 0);
+    const baptism = new Date(upcomingSunday);
+    baptism.setDate(baptism.getDate() + 7);
+    baptism.setHours(14, 0, 0, 0);
+    const potluck = new Date(upcomingSunday);
+    potluck.setDate(potluck.getDate() + 13);
+    potluck.setHours(18, 0, 0, 0);
+    await eventRepository.save([
+      eventRepository.create({
+        poi,
+        title: 'Sunday Mass',
+        startsAt: upcomingSunday,
+        location: 'Main Hall',
+      }),
+      eventRepository.create({
+        poi,
+        title: 'Baptism Ceremony',
+        startsAt: baptism,
+        location: 'Chapel',
+      }),
+      eventRepository.create({
+        poi,
+        title: 'Community Potluck',
+        startsAt: potluck,
+        location: 'Parish Hall',
+        description: 'Bring a dish to share — all are welcome!',
+      }),
+    ]);
+    console.log('Seeded demo events');
   }
 
   const prayerRequestCount = await prayerRequestRepository.count({

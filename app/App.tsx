@@ -11,6 +11,7 @@ import { PrayerRequestsScreen } from './src/screens/PrayerRequestsScreen';
 import { LivestreamScreen } from './src/screens/LivestreamScreen';
 import { CommunityScreen } from './src/screens/CommunityScreen';
 import { CommunityThreadScreen } from './src/screens/CommunityThreadScreen';
+import { I18nProvider } from './src/i18n/I18nContext';
 import type { CommunityPost, Poi } from './src/api/types';
 
 type Route =
@@ -44,7 +45,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <I18nProvider>
       {current.name === 'home' && (
         <HomeScreen onScanQR={() => push({ name: 'scan' })} onOpenPoi={(poi) => push({ name: 'hub', poi })} />
       )}
@@ -99,6 +100,6 @@ export default function App() {
       )}
 
       <StatusBar style="auto" />
-    </>
+    </I18nProvider>
   );
 }

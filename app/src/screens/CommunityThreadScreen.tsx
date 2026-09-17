@@ -5,6 +5,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
 import { createComment, getComments } from '../api/community';
+import { useI18n } from '../i18n/I18nContext';
 import type { CommunityComment, CommunityPost, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function CommunityThreadScreen({ poi, post, onBack }: Props) {
+  const { t } = useI18n();
   const [comments, setComments] = useState<CommunityComment[] | null>(null);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
@@ -49,41 +51,41 @@ export function CommunityThreadScreen({ poi, post, onBack }: Props) {
 
   return (
     <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} style={styles.iconButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.postCard}>
         <AccessibleText variant="body">{post.message}</AccessibleText>
-        <AccessibleText variant="caption">— {post.authorName ?? 'Anonymous'}</AccessibleText>
+        <AccessibleText variant="caption">— {post.authorName ?? t('common.anonymous')}</AccessibleText>
       </View>
 
       <AccessibleText variant="caption" style={styles.sectionLabel}>
-        REPLIES
+        {t('communityThread.repliesLabel')}
       </AccessibleText>
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
-          Couldn't load replies. Pull up the app again to retry.
+          {t('communityThread.error')}
         </AccessibleText>
       )}
 
       {!error && comments === null && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          Loading…
+          {t('communityThread.loading')}
         </AccessibleText>
       )}
 
       {comments !== null && comments.length === 0 && (
         <AccessibleText variant="body" color={colors.textMuted}>
-          No replies yet — be the first to respond.
+          {t('communityThread.empty')}
         </AccessibleText>
       )}
 
       {comments?.map((item) => (
         <View key={item.id} style={styles.commentCard}>
           <AccessibleText variant="body">{item.message}</AccessibleText>
-          <AccessibleText variant="caption">— {item.authorName ?? 'Anonymous'}</AccessibleText>
+          <AccessibleText variant="caption">— {item.authorName ?? t('common.anonymous')}</AccessibleText>
         </View>
       ))}
 
@@ -91,18 +93,18 @@ export function CommunityThreadScreen({ poi, post, onBack }: Props) {
         <TextInput
           value={message}
           onChangeText={setMessage}
-          placeholder="Write a reply…"
+          placeholder={t('communityThread.messagePlaceholder')}
           multiline
           style={styles.messageInput}
         />
         <TextInput
           value={authorName}
           onChangeText={setAuthorName}
-          placeholder="Your name (optional)"
+          placeholder={t('communityThread.namePlaceholder')}
           style={styles.nameInput}
         />
         <AccessibleButton
-          label={submitting ? 'Replying…' : 'Reply'}
+          label={submitting ? t('communityThread.replyingButton') : t('communityThread.replyButton')}
           onPress={submit}
           disabled={submitting || !message.trim()}
         />

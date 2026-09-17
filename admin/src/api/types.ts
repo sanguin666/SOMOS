@@ -1,9 +1,16 @@
 export type PoiType = 'church';
 
+export type SupportedLanguage = 'en' | 'es' | 'fr';
+
 export type Poi = {
   id: string;
   name: string;
   type: PoiType;
+  language: SupportedLanguage;
+  description: string | null;
+  pictureUrl: string | null;
+  qrFlyerHeadline: string | null;
+  qrFlyerSubtext: string | null;
   address: string | null;
   city: string | null;
   postalCode: string | null;
@@ -15,6 +22,7 @@ export type CurrentUser = {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  language: SupportedLanguage;
   adminPois: Poi[];
 };
 
@@ -42,6 +50,14 @@ export type Announcement = {
   body: string | null;
   audioUrl: string | null;
   createdAt: string;
+};
+
+export type Event = {
+  id: string;
+  title: string;
+  startsAt: string;
+  location: string | null;
+  description: string | null;
 };
 
 export type LivestreamStatus = 'upcoming' | 'live' | 'ended';

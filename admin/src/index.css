@@ -246,6 +246,36 @@ a {
   margin: 0 0 4px;
 }
 
+.login-language-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.lang-pill {
+  min-width: 44px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lang-pill-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.sidebar-lang-switcher {
+  display: flex;
+  gap: 6px;
+}
+
 .comment-list {
   margin-top: 12px;
   padding-left: 16px;
@@ -432,4 +462,91 @@ a {
 .donation-amount {
   font-weight: 700;
   font-variant-numeric: proportional-nums;
+}
+
+.qr-flyer {
+  margin-top: 12px;
+  padding: 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: center;
+}
+
+.qr-flyer-inner {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.qr-flyer-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.qr-flyer-poi-name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.qr-flyer-headline {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.15;
+  color: var(--color-primary);
+}
+
+.qr-flyer-code {
+  width: 220px;
+  height: 220px;
+  margin: 8px 0;
+}
+
+.qr-flyer-hint {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.qr-flyer-subtext {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .qr-flyer,
+  .qr-flyer * {
+    visibility: visible;
+  }
+  .qr-flyer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border: none;
+    padding: 48px;
+  }
+  .qr-flyer-headline {
+    font-size: 48px;
+  }
+  .qr-flyer-code {
+    width: 320px;
+    height: 320px;
+  }
 }

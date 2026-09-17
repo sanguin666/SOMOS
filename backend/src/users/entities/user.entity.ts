@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
+import { Language } from '../../common/enums/language.enum.js';
 
 @Entity('users')
 export class User {
@@ -33,6 +34,14 @@ export class User {
 
   @Column({ name: 'last_name', nullable: true })
   lastName?: string;
+
+  // UI language for this user's own account. Meaningful today for admins
+  // (who have a real session) — the admin dashboard reads/writes it.
+  // Congregant users don't have a session yet, so the app's language
+  // switcher is a device-local preference instead; this column is here so
+  // it becomes real once congregant login exists.
+  @Column({ type: 'enum', enum: Language, default: Language.EN })
+  language!: Language;
 
   @OneToMany(() => UserPoi, (membership) => membership.user)
   pois!: Relation<UserPoi>[];
