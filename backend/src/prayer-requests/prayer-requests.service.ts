@@ -49,4 +49,14 @@ export class PrayerRequestsService {
     }
     return updated;
   }
+
+  async remove(poiId: string, id: string): Promise<void> {
+    const prayerRequest = await this.prayerRequestsRepository.findOne({
+      where: { id, poi: { id: poiId } },
+    });
+    if (!prayerRequest) {
+      throw new NotFoundException(`Prayer request ${id} not found`);
+    }
+    await this.prayerRequestsRepository.remove(prayerRequest);
+  }
 }

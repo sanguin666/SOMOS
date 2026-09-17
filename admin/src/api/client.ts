@@ -1,0 +1,73 @@
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const TOKEN_STORAGE_KEY = 'mypeople-admin-token';
+
+export function getToken(): string | null {
+  return localStorage.getItem(TOKEN_STORAGE_KEY);
+}
+
+export function setToken(token: string | null): void {
+  if (token) {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  } else {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  }
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+async function request<T>(
+  path: string,
+  options: { method?: string; body?: BodyInit; headers?: Record<string, string> } = {},
+): Promise<T> {
+  const token = getToken();
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: options.method ?? 'GET',
+    body: options.body,
+    headers: {
+      ...options.headers,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new ApiError(payload?.message ?? response.statusText, response.status);
+  }
+
+  // NestJS returns 200 (not 204) with an empty body for controller methods
+  // that resolve to void (e.g. our delete endpoints), so check the body
+  // itself rather than trusting the status code.
+  const text = await response.text();
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
+export function apiGet<T>(path: string): Promise<T> {
+  return request<T>(path);
+}
+
+export function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'POST',
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+    headers: body !== undefined ? { 'Content-Type': 'application/json' } : {},
+  });
+}
+
+export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'PATCH',
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+    headers: body !== undefined ? { 'Content-Type': 'application/json' } : {},
+  });
+}
+
+export function apiDelete<T>(path: string): Promise<T> {
+  return request<T>(path, { method: 'DELETE' });
+}

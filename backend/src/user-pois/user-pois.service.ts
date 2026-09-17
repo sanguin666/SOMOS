@@ -5,6 +5,8 @@ import { UserPoi } from './entities/user-poi.entity.js';
 import { UsersService } from '../users/users.service.js';
 import { PoisService } from '../pois/pois.service.js';
 import { JoinPoiDto } from './dto/join-poi.dto.js';
+import { MemberRole } from '../common/enums/member-role.enum.js';
+import type { Poi } from '../pois/entities/poi.entity.js';
 
 @Injectable()
 export class UserPoisService {
@@ -49,5 +51,22 @@ export class UserPoisService {
       user: { id: userId },
       poi: { id: poiId },
     });
+  }
+
+  // Used by the admin dashboard: which POIs can this user manage, and are
+  // they allowed to manage this specific one?
+  async findAdminPoisForUser(userId: string): Promise<Poi[]> {
+    const memberships = await this.membershipRepository.find({
+      where: { user: { id: userId }, role: MemberRole.ADMIN },
+      relations: { poi: true },
+    });
+    return memberships.map((m) => m.poi);
+  }
+
+  async isAdminOfPoi(userId: string, poiId: string): Promise<boolean> {
+    const membership = await this.membershipRepository.findOne({
+      where: { user: { id: userId }, poi: { id: poiId }, role: MemberRole.ADMIN },
+    });
+    return membership !== null;
   }
 }

@@ -54,4 +54,15 @@ export class CommunityPostsService {
       })),
     );
   }
+
+  // Moderation: an admin removing a post (and its comments, via cascade).
+  async remove(poiId: string, id: string): Promise<void> {
+    const post = await this.postsRepository.findOne({
+      where: { id, poi: { id: poiId } },
+    });
+    if (!post) {
+      throw new NotFoundException(`Community post ${id} not found`);
+    }
+    await this.postsRepository.remove(post);
+  }
 }

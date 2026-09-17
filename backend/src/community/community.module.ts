@@ -6,11 +6,13 @@ import { CommunityPostsService } from './community-posts.service.js';
 import { CommunityCommentsService } from './community-comments.service.js';
 import { CommunityController } from './community.controller.js';
 import { PoisModule } from '../pois/pois.module.js';
+import { AuthModule } from '../auth/auth.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CommunityPost, CommunityComment]),
     PoisModule,
+    AuthModule,
   ],
   controllers: [CommunityController],
   providers: [CommunityPostsService, CommunityCommentsService],

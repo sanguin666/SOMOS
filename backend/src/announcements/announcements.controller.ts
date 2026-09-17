@@ -1,17 +1,23 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   UnsupportedMediaTypeException,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnnouncementsService } from './announcements.service.js';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto.js';
+import { UpdateAnnouncementDto } from './dto/update-announcement.dto.js';
 import { localDiskStorage } from '../common/upload/multer-storage.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
 const MAX_AUDIO_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB — a few minutes of voice audio.
 
@@ -46,5 +52,21 @@ export class AnnouncementsController {
   @Get()
   findForPoi(@Param('poiId') poiId: string) {
     return this.announcementsService.findForPoi(poiId);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  update(
+    @Param('poiId') poiId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateAnnouncementDto,
+  ) {
+    return this.announcementsService.update(poiId, id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  remove(@Param('poiId') poiId: string, @Param('id') id: string) {
+    return this.announcementsService.remove(poiId, id);
   }
 }

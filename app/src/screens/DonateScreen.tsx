@@ -4,6 +4,7 @@ import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon, HeartIcon } from '../components/icons';
+import { createDonation } from '../api/donations';
 import { colors, radii, spacing } from '../theme/theme';
 import type { Poi } from '../api/types';
 
@@ -16,7 +17,9 @@ const PRESET_AMOUNTS = [10, 25, 50, 100];
 
 /**
  * No payment processor is wired up yet (planned: Stripe) — donating here
- * confirms the demo interaction without moving any real money.
+ * confirms the demo interaction without moving any real money, but the
+ * amount is still recorded so the admin dashboard's donations graph has
+ * real data to show.
  *
  * The confirmation is a screen state rather than Alert.alert(): RN's Alert
  * has no effect at all on the web target (react-native-web doesn't
@@ -27,8 +30,22 @@ export function DonateScreen({ poi, onBack }: Props) {
   const [customMode, setCustomMode] = useState(false);
   const [customAmount, setCustomAmount] = useState('');
   const [donated, setDonated] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const amount = customMode ? Number(customAmount) || 0 : selected;
+
+  async function donate() {
+    setSubmitting(true);
+    try {
+      await createDonation(poi.id, { amount });
+    } catch {
+      // Non-critical for this demo flow — no real payment is at stake, so
+      // still show the confirmation rather than blocking the user on it.
+    } finally {
+      setSubmitting(false);
+      setDonated(true);
+    }
+  }
 
   if (donated) {
     return (
@@ -121,7 +138,11 @@ export function DonateScreen({ poi, onBack }: Props) {
 
       <View style={styles.spacer} />
 
-      <AccessibleButton label={`Donate $${amount}`} onPress={() => setDonated(true)} />
+      <AccessibleButton
+        label={submitting ? 'Processing…' : `Donate $${amount}`}
+        onPress={donate}
+        disabled={submitting || amount <= 0}
+      />
 
       <AccessibleText variant="caption" style={styles.footnote}>
         Secure payment · Powered by Stripe

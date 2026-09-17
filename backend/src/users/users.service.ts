@@ -33,6 +33,10 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { phone } });
   }
 
+  findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { email } });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     Object.assign(user, updateUserDto);

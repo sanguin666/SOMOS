@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CommunityPostsService } from './community-posts.service.js';
 import { CommunityCommentsService } from './community-comments.service.js';
 import { CreateCommunityPostDto } from './dto/create-community-post.dto.js';
 import { CreateCommunityCommentDto } from './dto/create-community-comment.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
 @Controller('pois/:poiId/community-posts')
 export class CommunityController {
@@ -37,5 +39,21 @@ export class CommunityController {
   @Get(':postId/comments')
   findComments(@Param('postId') postId: string) {
     return this.commentsService.findForPost(postId);
+  }
+
+  // Moderation.
+  @Delete(':postId')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  removePost(@Param('poiId') poiId: string, @Param('postId') postId: string) {
+    return this.postsService.remove(poiId, postId);
+  }
+
+  @Delete(':postId/comments/:commentId')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  removeComment(
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    return this.commentsService.remove(postId, commentId);
   }
 }

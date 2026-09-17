@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PrayerRequestsService } from './prayer-requests.service.js';
 import { CreatePrayerRequestDto } from './dto/create-prayer-request.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
 @Controller('pois/:poiId/prayer-requests')
 export class PrayerRequestsController {
@@ -24,5 +26,12 @@ export class PrayerRequestsController {
   @Post(':id/pray')
   pray(@Param('id') id: string) {
     return this.prayerRequestsService.pray(id);
+  }
+
+  // Moderation: an admin removing an inappropriate or resolved request.
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  remove(@Param('poiId') poiId: string, @Param('id') id: string) {
+    return this.prayerRequestsService.remove(poiId, id);
   }
 }
