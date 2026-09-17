@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
 const NAV_ITEMS = [
+  { to: 'donations', label: 'Donations' },
   { to: 'announcements', label: 'Announcements' },
   { to: 'livestreams', label: 'Livestreams' },
   { to: 'prayer-requests', label: 'Prayer Requests' },
@@ -19,7 +20,7 @@ export function DashboardLayout() {
   const currentPoi = user.adminPois.find((p) => p.id === poiId);
 
   function handlePoiChange(nextPoiId: string) {
-    navigate(`/poi/${nextPoiId}/announcements`);
+    navigate(`/poi/${nextPoiId}/donations`);
   }
 
   return (

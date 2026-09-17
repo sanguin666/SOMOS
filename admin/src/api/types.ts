@@ -76,3 +76,29 @@ export type CommunityComment = {
   message: string;
   createdAt: string;
 };
+
+export type Donation = {
+  id: string;
+  amount: number;
+  donorName: string | null;
+  createdAt: string;
+};
+
+export type PeriodTotal = {
+  total: number;
+  count: number;
+};
+
+export type DailyTotal = {
+  date: string;
+  total: number;
+  count: number;
+};
+
+export type DonationStats = {
+  dailyTotals: DailyTotal[];
+  thisWeek: PeriodTotal;
+  lastWeek: PeriodTotal;
+  thisMonth: PeriodTotal;
+  lastMonth: PeriodTotal;
+};

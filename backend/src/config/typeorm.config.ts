@@ -9,6 +9,7 @@ import { PrayerRequest } from '../prayer-requests/entities/prayer-request.entity
 import { Livestream } from '../livestreams/entities/livestream.entity.js';
 import { CommunityPost } from '../community/entities/community-post.entity.js';
 import { CommunityComment } from '../community/entities/community-comment.entity.js';
+import { Donation } from '../donations/entities/donation.entity.js';
 
 export function buildTypeOrmConfig(
   configService: ConfigService,
@@ -30,6 +31,7 @@ export function buildTypeOrmConfig(
       Livestream,
       CommunityPost,
       CommunityComment,
+      Donation,
     ],
     // Convenient for the local demo: tables are created/updated automatically.
     // Switch to real migrations before any production use.

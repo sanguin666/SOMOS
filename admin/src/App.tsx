@@ -8,6 +8,7 @@ import { LivestreamsPage } from './pages/LivestreamsPage';
 import { PrayerRequestsPage } from './pages/PrayerRequestsPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { ModulesPage } from './pages/ModulesPage';
+import { DonationsPage } from './pages/DonationsPage';
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -27,12 +28,12 @@ function Home() {
       </div>
     );
   }
-  return <Navigate to={`/poi/${firstPoi.id}/announcements`} replace />;
+  return <Navigate to={`/poi/${firstPoi.id}/donations`} replace />;
 }
 
 function PoiIndexRedirect() {
   const { poiId } = useParams<{ poiId: string }>();
-  return <Navigate to={`/poi/${poiId}/announcements`} replace />;
+  return <Navigate to={`/poi/${poiId}/donations`} replace />;
 }
 
 function AppRoutes() {
@@ -56,6 +57,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<PoiIndexRedirect />} />
+        <Route path="donations" element={<DonationsPage />} />
         <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="livestreams" element={<LivestreamsPage />} />
         <Route path="prayer-requests" element={<PrayerRequestsPage />} />

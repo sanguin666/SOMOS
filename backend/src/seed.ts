@@ -9,6 +9,7 @@ import { PrayerRequest } from './prayer-requests/entities/prayer-request.entity.
 import { Livestream } from './livestreams/entities/livestream.entity.js';
 import { CommunityPost } from './community/entities/community-post.entity.js';
 import { CommunityComment } from './community/entities/community-comment.entity.js';
+import { Donation } from './donations/entities/donation.entity.js';
 import { ModuleType } from './common/enums/module-type.enum.js';
 import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
@@ -44,6 +45,7 @@ const dataSource = new DataSource({
     Livestream,
     CommunityPost,
     CommunityComment,
+    Donation,
   ],
   synchronize: true,
 });
@@ -60,6 +62,58 @@ async function seed() {
   const livestreamRepository = dataSource.getRepository(Livestream);
   const communityPostRepository = dataSource.getRepository(CommunityPost);
   const communityCommentRepository = dataSource.getRepository(CommunityComment);
+  const donationRepository = dataSource.getRepository(Donation);
+
+  const DONOR_NAMES = ['Margaret', 'Robert', 'Linda', 'Tom', 'Susan', 'James', 'Patricia', 'David', 'Carol'];
+  const GIFT_AMOUNTS = [10, 15, 20, 25, 30, 50, 75, 100];
+
+  // ~9 weeks of donation history, so the admin dashboard has real
+  // week-over-week and month-over-month comparisons and a full 30-day
+  // chart. Sunday (the main service day) gets a clear bump over the rest
+  // of the week, with a gentle upward trend and random noise so it reads
+  // as real data rather than a straight line.
+  async function seedDonations(target: Poi, scale: number) {
+    const existingCount = await donationRepository.count({ where: { poi: { id: target.id } } });
+    if (existingCount > 0) return;
+
+    const daysBack = 63;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const donations: Donation[] = [];
+
+    for (let i = daysBack; i >= 0; i--) {
+      const day = new Date(today);
+      day.setDate(day.getDate() - i);
+      const isSunday = day.getDay() === 0;
+      const weekIndex = Math.floor((daysBack - i) / 7);
+      const growth = 1 + weekIndex * 0.015;
+
+      const giftsToday = isSunday
+        ? Math.round((6 + Math.random() * 9) * scale)
+        : Math.random() < 0.55
+          ? Math.round((Math.random() * 3) * scale)
+          : 0;
+
+      for (let j = 0; j < giftsToday; j++) {
+        const base = GIFT_AMOUNTS[Math.floor(Math.random() * GIFT_AMOUNTS.length)];
+        const amount = Math.round(base * growth * (0.85 + Math.random() * 0.3) * 100) / 100;
+        const createdAt = new Date(day);
+        const hour = isSunday ? 8 + Math.floor(Math.random() * 4) : 7 + Math.floor(Math.random() * 14);
+        createdAt.setHours(hour, Math.floor(Math.random() * 60), Math.floor(Math.random() * 60));
+        donations.push(
+          donationRepository.create({
+            poi: target,
+            amount,
+            donorName: Math.random() < 0.4 ? DONOR_NAMES[Math.floor(Math.random() * DONOR_NAMES.length)] : undefined,
+            createdAt,
+          }),
+        );
+      }
+    }
+
+    await donationRepository.save(donations);
+    console.log(`Seeded ${donations.length} demo donations for ${target.name}`);
+  }
 
   async function activateAllModules(target: Poi) {
     for (const moduleType of [
@@ -277,6 +331,9 @@ async function seed() {
     ]);
     console.log('Seeded demo community posts');
   }
+
+  await seedDonations(poi, 1);
+  await seedDonations(poi2, 0.4);
 
   console.log('\nDemo POI ready:');
   console.log(`  id:       ${poi.id}`);

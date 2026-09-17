@@ -9,6 +9,15 @@
   --color-danger: #b3261e;
   --radius: 10px;
 
+  /* Chart tokens (dataviz skill reference palette, light mode only — this
+     app doesn't have a dark theme yet). */
+  --series-1: #2a78d6;
+  --chart-grid: #e1e0d9;
+  --chart-axis: #c3c2b7;
+  --chart-muted: #898781;
+  --delta-up: #006300;
+  --delta-down: #d03b3b;
+
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   color-scheme: light;
 }
@@ -251,4 +260,176 @@ a {
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
+}
+
+/* Donations dashboard */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stat-tile {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.stat-value {
+  margin: 6px 0 4px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: proportional-nums;
+}
+
+.stat-delta {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-delta-up {
+  color: var(--delta-up);
+}
+
+.stat-delta-down {
+  color: var(--delta-down);
+}
+
+.stat-delta-neutral {
+  color: var(--chart-muted);
+}
+
+.sparkline {
+  display: block;
+  width: 100%;
+  height: 28px;
+  margin-top: 10px;
+}
+
+.chart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.chart-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chart-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.chart-wrap {
+  position: relative;
+}
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chart-axis-label {
+  fill: var(--chart-muted);
+  font-size: 11px;
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: var(--color-text);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+  margin-top: -10px;
+}
+
+.chart-tooltip-value {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.chart-tooltip-label {
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 2px;
+}
+
+.table-toggle {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 8px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table td:not(:first-child),
+.data-table th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.donation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.donation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.donation-item:last-child {
+  border-bottom: none;
+}
+
+.donation-amount {
+  font-weight: 700;
+  font-variant-numeric: proportional-nums;
 }

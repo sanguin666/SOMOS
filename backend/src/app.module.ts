@@ -13,6 +13,7 @@ import { PrayerRequestsModule } from './prayer-requests/prayer-requests.module.j
 import { LivestreamsModule } from './livestreams/livestreams.module.js';
 import { CommunityModule } from './community/community.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { DonationsModule } from './donations/donations.module.js';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AuthModule } from './auth/auth.module.js';
     LivestreamsModule,
     CommunityModule,
     AuthModule,
+    DonationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
