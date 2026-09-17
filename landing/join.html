@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Join your parish on myPeople</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="brand-mark"></span>
+        myPeople
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="join-card">
+        <h1>You're almost there</h1>
+        <p>
+          Download the myPeople app to finish joining your parish. Once installed,
+          open it and scan the same QR code again — or enter the code below by hand.
+        </p>
+
+        <div class="store-badges">
+          <span class="store-badge">Download on the App Store</span>
+          <span class="store-badge">Get it on Google Play</span>
+        </div>
+
+        <p id="token-label" style="display: none">Your parish's code:</p>
+        <p id="token-box" class="token-box" style="display: none"></p>
+
+        <p class="footer-note" style="margin-top: 24px">
+          The app isn't published to app stores yet — this page is a placeholder for
+          that flow. In the meantime, use the "Simulate scan" button in the demo app.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="brand-mark"></span>
+        myPeople
+      </a>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="mailto:hello@mypeople.app">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var token = new URLSearchParams(window.location.search).get('token');
+    if (token) {
+      document.getElementById('token-label').style.display = 'block';
+      var box = document.getElementById('token-box');
+      box.style.display = 'block';
+      box.textContent = token;
+    }
+  </script>
+</body>
+</html>

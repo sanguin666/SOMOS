@@ -5,6 +5,7 @@ import { Poi } from '../pois/entities/poi.entity.js';
 import { UserPoi } from '../user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from '../active-modules/entities/active-module.entity.js';
 import { Announcement } from '../announcements/entities/announcement.entity.js';
+import { Event } from '../events/entities/event.entity.js';
 import { PrayerRequest } from '../prayer-requests/entities/prayer-request.entity.js';
 import { Livestream } from '../livestreams/entities/livestream.entity.js';
 import { CommunityPost } from '../community/entities/community-post.entity.js';
@@ -27,6 +28,7 @@ export function buildTypeOrmConfig(
       UserPoi,
       ActiveModule,
       Announcement,
+      Event,
       PrayerRequest,
       Livestream,
       CommunityPost,

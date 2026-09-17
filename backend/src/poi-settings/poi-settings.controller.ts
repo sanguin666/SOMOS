@@ -1,6 +1,7 @@
 import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common';
 import { PoisService } from '../pois/pois.service.js';
 import { UpdateLanguageDto } from '../common/dto/update-language.dto.js';
+import { UpdatePoiProfileDto } from '../common/dto/update-poi-profile.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
@@ -15,6 +16,12 @@ export class PoiSettingsController {
   @Patch('language')
   @UseGuards(JwtAuthGuard, PoiAdminGuard)
   updateLanguage(@Param('poiId') poiId: string, @Body() dto: UpdateLanguageDto) {
+    return this.poisService.update(poiId, dto);
+  }
+
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  updateProfile(@Param('poiId') poiId: string, @Body() dto: UpdatePoiProfileDto) {
     return this.poisService.update(poiId, dto);
   }
 }

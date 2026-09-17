@@ -3,7 +3,7 @@ import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
 import { activateModule, getActiveModules, setModuleStatus } from '../api/activeModules';
 import { getPoi } from '../api/pois';
-import { updatePoiLanguage } from '../api/poiSettings';
+import { updatePoiLanguage, updatePoiProfile } from '../api/poiSettings';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 
@@ -15,7 +15,7 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   fr: 'Français',
 };
 
-export function ModulesPage() {
+export function SettingsPage() {
   const poiId = usePoiId();
   const { t } = useI18n();
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
@@ -26,6 +26,12 @@ export function ModulesPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('en');
   const [savingLanguage, setSavingLanguage] = useState(false);
   const [languageError, setLanguageError] = useState<string | null>(null);
+
+  const [description, setDescription] = useState('');
+  const [pictureUrl, setPictureUrl] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profileSaved, setProfileSaved] = useState(false);
 
   const ALL_MODULE_TYPES: { type: ModuleType; label: string }[] = [
     { type: 'donations', label: t('moduleNames.donations') },
@@ -43,6 +49,8 @@ export function ModulesPage() {
     getPoi(poiId).then((result) => {
       setPoi(result);
       setSelectedLanguage(result.language);
+      setDescription(result.description ?? '');
+      setPictureUrl(result.pictureUrl ?? '');
     });
   }
 
@@ -79,10 +87,73 @@ export function ModulesPage() {
     }
   }
 
+  async function saveProfile() {
+    setSavingProfile(true);
+    setProfileError(null);
+    setProfileSaved(false);
+    try {
+      const updated = await updatePoiProfile(poiId, {
+        description: description.trim(),
+        pictureUrl: pictureUrl.trim(),
+      });
+      setPoi(updated);
+      setProfileSaved(true);
+    } catch {
+      setProfileError(t('poiInfo.saveError'));
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
   return (
     <div>
       <h2>{t('modules.title')}</h2>
       <p className="muted">{t('modules.subtitle')}</p>
+
+      {poi && (
+        <div className="card">
+          <p className="card-title">{t('poiInfo.title')}</p>
+          <p className="muted" style={{ marginTop: 4 }}>
+            {t('poiInfo.subtitle')}
+          </p>
+          <div className="form" style={{ marginTop: 12 }}>
+            <label>
+              {t('poiInfo.nameLabel')}
+              <input value={poi.name} disabled />
+            </label>
+            <label>
+              {t('poiInfo.descriptionLabel')}
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t('poiInfo.descriptionPlaceholder')}
+              />
+            </label>
+            <label>
+              {t('poiInfo.pictureUrlLabel')}
+              <input
+                value={pictureUrl}
+                onChange={(e) => setPictureUrl(e.target.value)}
+                placeholder={t('poiInfo.pictureUrlPlaceholder')}
+              />
+            </label>
+            {pictureUrl.trim() && (
+              <img
+                src={pictureUrl.trim()}
+                alt={t('poiInfo.pictureAlt')}
+                style={{ maxWidth: 160, maxHeight: 160, borderRadius: 8, objectFit: 'cover' }}
+              />
+            )}
+            <div className="card-actions">
+              <button type="button" className="btn btn-primary" disabled={savingProfile} onClick={saveProfile}>
+                {savingProfile ? t('poiInfo.saving') : t('poiInfo.save')}
+              </button>
+            </div>
+            {profileError && <p className="error-text">{profileError}</p>}
+            {profileSaved && !profileError && <p className="muted">{t('poiInfo.saveSuccess')}</p>}
+          </div>
+        </div>
+      )}
 
       {poi && (
         <div className="card">
@@ -110,6 +181,8 @@ export function ModulesPage() {
           {languageError && <p className="error-text">{languageError}</p>}
         </div>
       )}
+
+      <h3 style={{ marginTop: 24 }}>{t('modules.modulesSectionTitle')}</h3>
 
       {error && <p className="error-text">{error}</p>}
       {modules === null && !error && <p className="muted">{t('modules.loading')}</p>}

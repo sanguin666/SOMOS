@@ -44,7 +44,10 @@ export class PoisService {
     return poi;
   }
 
-  async update(id: string, updatePoiDto: UpdatePoiDto): Promise<Poi> {
+  // Accepts any partial update to the entity's own fields — not just
+  // UpdatePoiDto — so the separate admin-gated endpoints in
+  // PoiSettingsController (language, profile) can reuse this too.
+  async update(id: string, updatePoiDto: UpdatePoiDto | Partial<Poi>): Promise<Poi> {
     const poi = await this.findOne(id);
     Object.assign(poi, updatePoiDto);
     return this.poisRepository.save(poi);

@@ -21,11 +21,13 @@ export function DashboardLayout() {
 
   const navItems = [
     { to: 'donations', label: t('layout.navDonations') },
+    { to: 'events', label: t('layout.navEvents') },
     { to: 'announcements', label: t('layout.navAnnouncements') },
     { to: 'livestreams', label: t('layout.navLivestreams') },
     { to: 'prayer-requests', label: t('layout.navPrayerRequests') },
     { to: 'community', label: t('layout.navCommunity') },
-    { to: 'modules', label: t('layout.navModules') },
+    { to: 'my-qr', label: t('layout.navMyQr') },
+    { to: 'settings', label: t('layout.navSettings') },
   ];
 
   function handlePoiChange(nextPoiId: string) {

@@ -60,6 +60,9 @@ export type Translations = {
     title: string;
     notifyOn: string;
     notifyOff: string;
+    loading: string;
+    error: string;
+    empty: string;
   };
   announcements: {
     title: string;
@@ -189,6 +192,9 @@ const en: Translations = {
     title: 'Events',
     notifyOn: 'Turn off notifications for {{title}}',
     notifyOff: 'Turn on notifications for {{title}}',
+    loading: 'Loading…',
+    error: "Couldn't load events. Pull up the app again to retry.",
+    empty: 'No upcoming events yet.',
   },
   announcements: {
     title: 'Announcements',
@@ -318,6 +324,9 @@ const es: Translations = {
     title: 'Eventos',
     notifyOn: 'Desactivar notificaciones de {{title}}',
     notifyOff: 'Activar notificaciones de {{title}}',
+    loading: 'Cargando…',
+    error: 'No se pudieron cargar los eventos. Vuelve a abrir la app para reintentar.',
+    empty: 'Todavía no hay próximos eventos.',
   },
   announcements: {
     title: 'Anuncios',
@@ -447,6 +456,9 @@ const fr: Translations = {
     title: 'Événements',
     notifyOn: 'Désactiver les notifications pour {{title}}',
     notifyOff: 'Activer les notifications pour {{title}}',
+    loading: 'Chargement…',
+    error: "Impossible de charger les événements. Rouvrez l'app pour réessayer.",
+    empty: "Aucun événement à venir pour l'instant.",
   },
   announcements: {
     title: 'Annonces',
