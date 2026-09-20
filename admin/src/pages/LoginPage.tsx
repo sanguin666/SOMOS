@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import { ApiError } from '../api/client';
+import { LogoMark } from '../components/LogoMark';
 
 const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
   en: 'EN',
@@ -37,6 +38,7 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
+        <LogoMark size={44} />
         <h1>{t('login.heading')}</h1>
         <p className="muted" style={{ marginBottom: 20 }}>
           {t('login.subtitle')}
