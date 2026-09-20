@@ -7,13 +7,15 @@ import { updatePoiProfile } from '../api/poiSettings';
 import type { Poi } from '../api/types';
 
 // Where the QR code sends a phone's camera — the public landing page's
-// join flow (see the `landing/` site), which explains how to get the app
-// and carries the POI's token through so it can be linked automatically
-// once a real onboarding flow exists.
+// #join section (see the `landing/` site), which explains how to get the
+// app and carries the POI's token through so it can be linked automatically
+// once a real onboarding flow exists. The token is a query param (read by
+// landing/assets/main.js) rather than part of the hash, since the hash is
+// just the same-page anchor.
 const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? 'https://somos.app';
 
 function joinUrlFor(qrCodeToken: string): string {
-  return `${LANDING_URL}/join?token=${encodeURIComponent(qrCodeToken)}`;
+  return `${LANDING_URL}/?token=${encodeURIComponent(qrCodeToken)}#join`;
 }
 
 export function MyQrPage() {

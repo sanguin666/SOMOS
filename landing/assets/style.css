@@ -120,6 +120,15 @@ img {
   color: var(--text);
 }
 
+.site-nav a.current {
+  color: var(--primary-dark);
+}
+
+/* Anchor targets sit below the sticky promo bar + header. */
+section[id] {
+  scroll-margin-top: 128px;
+}
+
 .lang-switch {
   display: flex;
   gap: 6px;
