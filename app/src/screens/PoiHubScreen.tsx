@@ -15,7 +15,9 @@ import {
   PlayIcon,
 } from '../components/icons';
 import { getActiveModules } from '../api/pois';
-import type { ActiveModule, ModuleType, Poi } from '../api/types';
+import { getAnnouncements } from '../api/announcements';
+import { getEvents } from '../api/events';
+import type { ActiveModule, Announcement, Event, ModuleType, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
@@ -40,6 +42,14 @@ const ALL_MODULE_TYPES: ModuleType[] = [
   'community',
 ];
 
+// How many recent announcements to preview on the landing feed — the full
+// list is one tap away via "See all", so this stays short on purpose.
+const ANNOUNCEMENT_PREVIEW_COUNT = 2;
+
+function formatAnnouncementDate(iso: string) {
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 export function PoiHubScreen({
   poi,
   onBack,
@@ -53,6 +63,8 @@ export function PoiHubScreen({
   const { t } = useI18n();
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
+  const [nextEvent, setNextEvent] = useState<Event | null>(null);
   const poiTheme = getPoiTheme(poi.type);
 
   useEffect(() => {
@@ -73,9 +85,69 @@ export function PoiHubScreen({
     modules?.some((m) => m.moduleType === type && m.status !== 'expired' && m.status !== 'cancelled') ?? false;
 
   const noModulesActive = modules !== null && !ALL_MODULE_TYPES.some(hasModule);
+  const announcementsActive = hasModule('announcements');
+  const eventsActive = hasModule('events');
+
+  // The landing feed's content is best-effort: a failed fetch here just
+  // means that section doesn't show, since every module stays reachable
+  // from the pill row above regardless.
+  useEffect(() => {
+    if (!announcementsActive) return;
+    let cancelled = false;
+    getAnnouncements(poi.id)
+      .then((result) => {
+        if (!cancelled) setAnnouncements(result.slice(0, ANNOUNCEMENT_PREVIEW_COUNT));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [poi.id, announcementsActive]);
+
+  useEffect(() => {
+    if (!eventsActive) return;
+    let cancelled = false;
+    getEvents(poi.id)
+      .then((result) => {
+        if (cancelled) return;
+        const now = Date.now();
+        const upcoming = result
+          .filter((e) => new Date(e.startsAt).getTime() >= now)
+          .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+        setNextEvent(upcoming[0] ?? null);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [poi.id, eventsActive]);
+
+  const tabBar =
+    modules !== null && !noModulesActive ? (
+      <View style={styles.tabBar}>
+        {hasModule('donations') && (
+          <TabBarItem icon={<HeartIcon size={22} color={poiTheme.accent} />} label={t('hub.donationsLabel')} onPress={onOpenDonate} />
+        )}
+        {hasModule('events') && (
+          <TabBarItem icon={<CalendarIcon size={22} color={poiTheme.accent} />} label={t('hub.eventsLabel')} onPress={onOpenEvents} />
+        )}
+        {hasModule('announcements') && (
+          <TabBarItem icon={<MegaphoneIcon size={22} color={poiTheme.accent} />} label={t('hub.announcementsLabel')} onPress={onOpenAnnouncements} />
+        )}
+        {hasModule('prayer_requests') && (
+          <TabBarItem icon={<CandleIcon size={22} color={poiTheme.accent} />} label={t('hub.prayerRequestsLabel')} onPress={onOpenPrayerRequests} />
+        )}
+        {hasModule('livestreams') && (
+          <TabBarItem icon={<PlayIcon size={22} color={poiTheme.accent} />} label={t('hub.livestreamLabel')} onPress={onOpenLivestream} />
+        )}
+        {hasModule('community') && (
+          <TabBarItem icon={<ChatBubbleIcon size={22} color={poiTheme.accent} />} label={t('hub.communityLabel')} onPress={onOpenCommunity} />
+        )}
+      </View>
+    ) : null;
 
   return (
-    <Screen scroll>
+    <Screen scroll footer={tabBar}>
       <View style={[styles.hero, { backgroundColor: poiTheme.accent }]}>
         <View style={styles.heroGlyphWrap} pointerEvents="none">
           <PlaceGlyphIcon size={140} color="rgba(255,255,255,0.12)" />
@@ -105,10 +177,6 @@ export function PoiHubScreen({
         </View>
       </View>
 
-      <AccessibleText variant="caption" style={styles.sectionLabel}>
-        {t('hub.availableHere')}
-      </AccessibleText>
-
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
           {t('hub.errorLoad')}
@@ -127,92 +195,76 @@ export function PoiHubScreen({
         </AccessibleText>
       )}
 
-      {hasModule('donations') && (
-        <ModuleCard
-          icon={<HeartIcon size={24} />}
-          accent={poiTheme.accent}
-          title={t('hub.donationsTitle')}
-          subtitle={t('hub.donationsSubtitle')}
-          onPress={onOpenDonate}
-        />
+      {nextEvent && (
+        <Pressable accessibilityRole="button" accessibilityLabel={nextEvent.title} onPress={onOpenEvents} style={styles.eventCard}>
+          <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accent }]}>
+            <AccessibleText variant="caption" color="#FFFFFF" style={styles.eventDateMonth}>
+              {new Date(nextEvent.startsAt).toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
+            </AccessibleText>
+            <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.eventDateDay}>
+              {new Date(nextEvent.startsAt).getDate()}
+            </AccessibleText>
+          </View>
+          <View style={styles.eventText}>
+            <AccessibleText variant="caption" style={styles.sectionLabel}>
+              {t('hub.nextEvent')}
+            </AccessibleText>
+            <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+              {nextEvent.title}
+            </AccessibleText>
+          </View>
+          <ChevronRightIcon size={20} color={colors.textMuted} />
+        </Pressable>
       )}
 
-      {hasModule('events') && (
-        <ModuleCard
-          icon={<CalendarIcon size={24} />}
-          accent={poiTheme.accent}
-          title={t('hub.eventsTitle')}
-          subtitle={t('hub.eventsSubtitle')}
-          onPress={onOpenEvents}
-        />
-      )}
+      {announcements !== null && announcements.length > 0 && (
+        <View style={styles.feedSection}>
+          <View style={styles.feedSectionHeader}>
+            <AccessibleText variant="caption" style={styles.sectionLabel}>
+              {t('hub.latestAnnouncements')}
+            </AccessibleText>
+            <Pressable accessibilityRole="button" onPress={onOpenAnnouncements} style={styles.seeAllButton}>
+              <AccessibleText variant="caption" color={poiTheme.accent} style={styles.seeAllLabel}>
+                {t('hub.seeAll')}
+              </AccessibleText>
+              <ChevronRightIcon size={16} color={poiTheme.accent} />
+            </Pressable>
+          </View>
 
-      {hasModule('announcements') && (
-        <ModuleCard
-          icon={<MegaphoneIcon size={24} />}
-          accent={poiTheme.accent}
-          title={t('hub.announcementsTitle')}
-          subtitle={t('hub.announcementsSubtitle')}
-          onPress={onOpenAnnouncements}
-        />
-      )}
-
-      {hasModule('prayer_requests') && (
-        <ModuleCard
-          icon={<CandleIcon size={24} />}
-          accent={poiTheme.accent}
-          title={t('hub.prayerRequestsTitle')}
-          subtitle={t('hub.prayerRequestsSubtitle')}
-          onPress={onOpenPrayerRequests}
-        />
-      )}
-
-      {hasModule('livestreams') && (
-        <ModuleCard
-          icon={<PlayIcon size={24} />}
-          accent={poiTheme.accent}
-          title={t('hub.livestreamTitle')}
-          subtitle={t('hub.livestreamSubtitle')}
-          onPress={onOpenLivestream}
-        />
-      )}
-
-      {hasModule('community') && (
-        <ModuleCard
-          icon={<ChatBubbleIcon size={24} />}
-          accent={poiTheme.accent}
-          title={t('hub.communityTitle')}
-          subtitle={t('hub.communitySubtitle')}
-          onPress={onOpenCommunity}
-        />
+          {announcements.map((item) => (
+            <Pressable
+              key={item.id}
+              accessibilityRole="button"
+              accessibilityLabel={item.title}
+              onPress={onOpenAnnouncements}
+              style={styles.feedCard}
+            >
+              <View style={styles.feedCardHeader}>
+                <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+                  {item.title}
+                </AccessibleText>
+                <AccessibleText variant="caption">{formatAnnouncementDate(item.createdAt)}</AccessibleText>
+              </View>
+              {item.body && (
+                <AccessibleText variant="body" color={colors.textMuted} numberOfLines={2}>
+                  {item.body}
+                </AccessibleText>
+              )}
+            </Pressable>
+          ))}
+        </View>
       )}
     </Screen>
   );
 }
 
-function ModuleCard({
-  icon,
-  accent,
-  title,
-  subtitle,
-  onPress,
-}: {
-  icon: ReactNode;
-  accent: string;
-  title: string;
-  subtitle: string;
-  onPress: () => void;
-}) {
+function TabBarItem({ icon, label, onPress }: { icon: ReactNode; label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={styles.card}>
-      <View style={[styles.cardIcon, { backgroundColor: accent }]}>{icon}</View>
-      <View style={styles.cardText}>
-        <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-          {title}
-        </AccessibleText>
-        <AccessibleText variant="caption">{subtitle}</AccessibleText>
-      </View>
-      <ChevronRightIcon size={20} color={colors.textMuted} />
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.tabBarItem}>
+      {icon}
+      <AccessibleText variant="caption" numberOfLines={1} style={styles.tabBarLabel}>
+        {label}
+      </AccessibleText>
     </Pressable>
   );
 }
@@ -253,34 +305,82 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.6,
-    marginTop: spacing.md,
   },
-  card: {
+  tabBar: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.xs,
+    paddingTop: spacing.xs,
+  },
+  tabBarItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    minHeight: 56,
+  },
+  tabBarLabel: {
+    fontWeight: '700',
+  },
+  eventCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     borderRadius: radii.lg,
     padding: spacing.lg,
     minHeight: 64,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
   },
-  cardIcon: {
+  eventDateChip: {
     width: 48,
     height: 48,
-    borderRadius: 9999,
+    borderRadius: radii.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cardText: {
+  eventDateMonth: {
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  eventDateDay: {
+    fontWeight: '800',
+  },
+  eventText: {
     flex: 1,
     gap: 2,
   },
   cardTitle: {
     fontWeight: '700',
+  },
+  feedSection: {
+    gap: spacing.sm,
+  },
+  feedSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  seeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    minHeight: 32,
+  },
+  seeAllLabel: {
+    fontWeight: '700',
+  },
+  feedCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  feedCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
 });
