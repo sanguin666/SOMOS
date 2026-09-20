@@ -1,0 +1,23 @@
+// The SOMOS mark: a heart split into two colors that meet at the center in
+// an S. Fixed brand colors — not themeable.
+export function LogoMark({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" role="img" aria-label="SOMOS">
+      <path
+        d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z"
+        fill="#E1663F"
+      />
+      <path
+        d="M50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z"
+        fill="#E0A458"
+      />
+      <path
+        d="M50 20 C34 35 34 52 50 52 C66 52 66 69 50 84"
+        fill="none"
+        stroke="#F7F1E7"
+        strokeWidth={5}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}

@@ -10,7 +10,7 @@ import type { Poi } from '../api/types';
 // join flow (see the `landing/` site), which explains how to get the app
 // and carries the POI's token through so it can be linked automatically
 // once a real onboarding flow exists.
-const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? 'https://mypeople.app';
+const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? 'https://somos.app';
 
 function joinUrlFor(qrCodeToken: string): string {
   return `${LANDING_URL}/join?token=${encodeURIComponent(qrCodeToken)}`;

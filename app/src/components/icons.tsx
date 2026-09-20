@@ -5,6 +5,30 @@ type IconProps = {
   color?: string;
 };
 
+// The SOMOS mark: a heart split into two colors that meet at the center in
+// an S. Fixed brand colors — not tinted via `color` like the other icons.
+export function LogoMark({ size = 40 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Path
+        d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z"
+        fill="#E1663F"
+      />
+      <Path
+        d="M50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z"
+        fill="#E0A458"
+      />
+      <Path
+        d="M50 20 C34 35 34 52 50 52 C66 52 66 69 50 84"
+        fill="none"
+        stroke="#F7F1E7"
+        strokeWidth={5}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
 export function BackChevronIcon({ size = 20, color = '#111111' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -115,9 +139,8 @@ export function PlusIcon({ size = 20, color = '#111111' }: IconProps) {
   );
 }
 
-// Decorative mark used on POI hero banners — a simple roof/place glyph,
-// the same one used in the myPeople splash screen. Not tied to any single
-// POI type; kept generic on purpose.
+// Decorative mark used on POI hero banners — a simple roof/place glyph.
+// Not tied to any single POI type; kept generic on purpose.
 export function PlaceGlyphIcon({ size = 64, color = '#FFFFFF' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">

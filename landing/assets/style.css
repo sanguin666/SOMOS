@@ -1,6 +1,7 @@
 :root {
-  --primary: #1a4d8f;
-  --primary-dark: #123a6b;
+  --primary: #e1663f;
+  --primary-dark: #b84f2f;
+  --accent: #e0a458;
   --bg: #ffffff;
   --surface: #f4f6f8;
   --text: #111111;
@@ -65,10 +66,10 @@ img {
 }
 
 .brand-mark {
+  display: block;
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  background: var(--primary);
+  flex-shrink: 0;
 }
 
 .site-nav {
