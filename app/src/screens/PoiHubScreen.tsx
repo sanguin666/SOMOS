@@ -126,22 +126,22 @@ export function PoiHubScreen({
     modules !== null && !noModulesActive ? (
       <View style={styles.tabBar}>
         {hasModule('donations') && (
-          <TabBarItem icon={<HeartIcon size={22} color={poiTheme.accent} />} label={t('hub.donationsLabel')} onPress={onOpenDonate} />
+          <TabBarItem icon={<HeartIcon size={18} color={poiTheme.accent} />} label={t('hub.donationsLabel')} onPress={onOpenDonate} />
         )}
         {hasModule('events') && (
-          <TabBarItem icon={<CalendarIcon size={22} color={poiTheme.accent} />} label={t('hub.eventsLabel')} onPress={onOpenEvents} />
+          <TabBarItem icon={<CalendarIcon size={18} color={poiTheme.accent} />} label={t('hub.eventsLabel')} onPress={onOpenEvents} />
         )}
         {hasModule('announcements') && (
-          <TabBarItem icon={<MegaphoneIcon size={22} color={poiTheme.accent} />} label={t('hub.announcementsLabel')} onPress={onOpenAnnouncements} />
+          <TabBarItem icon={<MegaphoneIcon size={18} color={poiTheme.accent} />} label={t('hub.announcementsLabel')} onPress={onOpenAnnouncements} />
         )}
         {hasModule('prayer_requests') && (
-          <TabBarItem icon={<CandleIcon size={22} color={poiTheme.accent} />} label={t('hub.prayerRequestsLabel')} onPress={onOpenPrayerRequests} />
+          <TabBarItem icon={<CandleIcon size={18} color={poiTheme.accent} />} label={t('hub.prayerRequestsLabel')} onPress={onOpenPrayerRequests} />
         )}
         {hasModule('livestreams') && (
-          <TabBarItem icon={<PlayIcon size={22} color={poiTheme.accent} />} label={t('hub.livestreamLabel')} onPress={onOpenLivestream} />
+          <TabBarItem icon={<PlayIcon size={18} color={poiTheme.accent} />} label={t('hub.livestreamLabel')} onPress={onOpenLivestream} />
         )}
         {hasModule('community') && (
-          <TabBarItem icon={<ChatBubbleIcon size={22} color={poiTheme.accent} />} label={t('hub.communityLabel')} onPress={onOpenCommunity} />
+          <TabBarItem icon={<ChatBubbleIcon size={18} color={poiTheme.accent} />} label={t('hub.communityLabel')} onPress={onOpenCommunity} />
         )}
       </View>
     ) : null;
@@ -269,6 +269,8 @@ function TabBarItem({ icon, label, onPress }: { icon: ReactNode; label: string; 
   );
 }
 
+
+
 const styles = StyleSheet.create({
   hero: {
     marginTop: -spacing.lg,
@@ -308,18 +310,25 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    rowGap: spacing.xs,
+    columnGap: spacing.xs,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.background,
-    paddingHorizontal: spacing.xs,
-    paddingTop: spacing.xs,
+    padding: spacing.sm,
   },
   tabBarItem: {
-    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-    minHeight: 56,
+    gap: spacing.xs,
+    minHeight: 44,
+    paddingHorizontal: spacing.sm,
+    borderRadius: 9999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
   },
   tabBarLabel: {
     fontWeight: '700',
