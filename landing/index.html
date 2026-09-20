@@ -17,7 +17,7 @@
   <div class="promo-bar">
     <div class="container">
       <span data-i18n="promoBar"></span>
-      <a href="pricing.html" data-i18n="promoLink"></a>
+      <a href="#pricing" data-i18n="promoLink"></a>
     </div>
   </div>
 
@@ -31,7 +31,7 @@
         <a href="#features" data-i18n="navFeatures"></a>
         <a href="#for-churches" data-i18n="navChurches"></a>
         <a href="#for-congregants" data-i18n="navCongregants"></a>
-        <a href="pricing.html" data-i18n="navPricing"></a>
+        <a href="#pricing" data-i18n="navPricing"></a>
         <div class="lang-switch">
           <button type="button" class="lang-pill" data-lang-pill="es">ES</button>
           <button type="button" class="lang-pill" data-lang-pill="en">EN</button>
@@ -51,11 +51,11 @@
           <p data-i18n="heroSub"></p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#get-started" data-i18n="heroCtaPrimary"></a>
-            <a class="btn btn-outline" href="#for-congregants" data-i18n="heroCtaSecondary"></a>
+            <a class="btn btn-outline" href="#join" data-i18n="heroCtaSecondary"></a>
           </div>
           <p class="pricing-note">
             <span data-i18n="heroPricingNote"></span>
-            <a href="pricing.html" data-i18n="promoLink"></a>
+            <a href="#pricing" data-i18n="promoLink"></a>
           </p>
         </div>
 
@@ -306,6 +306,46 @@
       </div>
     </section>
 
+    <section id="pricing" class="bg-surface">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow" data-i18n="pricingEyebrow"></span>
+          <h2 data-i18n="pricingHeading"></h2>
+          <p data-i18n="pricingSub"></p>
+        </div>
+        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 780px; margin: 0 auto;">
+          <div class="feature-card" style="background: #FFFFFF;">
+            <h3 data-i18n="pricingBaseTitle"></h3>
+            <div style="font-size: 30px; font-weight: 900; color: var(--primary-dark); margin: 8px 0 12px;" data-i18n="pricingBasePrice"></div>
+            <p data-i18n="pricingBaseDesc"></p>
+          </div>
+          <div class="feature-card" style="background: #FFFFFF;">
+            <h3 data-i18n="pricingModulesTitle"></h3>
+            <div style="font-size: 18px; font-weight: 800; color: var(--primary-dark); margin: 8px 0 12px;" data-i18n="pricingModulesPrice"></div>
+            <p data-i18n="pricingModulesDesc"></p>
+          </div>
+        </div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 14px; max-width: 560px; margin: 28px auto 0;" data-i18n="pricingComingSoon"></p>
+      </div>
+    </section>
+
+    <section id="join">
+      <div class="container" style="max-width: 620px; text-align: center;">
+        <span class="eyebrow" data-i18n="joinEyebrow"></span>
+        <h2 style="font-size: clamp(24px, 3.5vw, 30px); font-weight: 900; margin: 10px 0 0;" data-i18n="joinHeading"></h2>
+        <p style="color: var(--text-muted); font-size: 16px; line-height: 1.6; margin: 14px 0 24px;" data-i18n="joinPara"></p>
+        <div class="store-badges">
+          <span class="store-badge" data-i18n="joinAppStore"></span>
+          <span class="store-badge" data-i18n="joinGooglePlay"></span>
+        </div>
+        <div id="join-token-wrap" style="display: none;">
+          <p style="font-weight: 700; margin: 0 0 8px;" data-i18n="joinTokenLabel"></p>
+          <p id="join-token-box" class="token-box"></p>
+        </div>
+        <p class="footer-note" style="color: var(--text-muted); margin-top: 20px;" data-i18n="joinFallbackNote"></p>
+      </div>
+    </section>
+
     <section id="get-started">
       <div class="container">
         <div class="cta-band">
@@ -313,7 +353,7 @@
           <p data-i18n="ctaPara"></p>
           <div class="hero-actions" style="justify-content: center;">
             <a class="btn btn-primary" href="mailto:hello@somos.app" data-i18n="ctaBtn1"></a>
-            <a class="btn btn-outline" href="join.html" data-i18n="ctaBtn2"></a>
+            <a class="btn btn-outline" href="#join" data-i18n="ctaBtn2"></a>
           </div>
         </div>
       </div>
@@ -329,8 +369,8 @@
       <div class="footer-links">
         <a href="#features" data-i18n="navFeatures"></a>
         <a href="#for-churches" data-i18n="navChurches"></a>
-        <a href="join.html" data-i18n="footerJoinLink"></a>
-        <a href="pricing.html" data-i18n="navPricing"></a>
+        <a href="#join" data-i18n="footerJoinLink"></a>
+        <a href="#pricing" data-i18n="navPricing"></a>
         <a href="mailto:hello@somos.app" data-i18n="navContact"></a>
       </div>
     </div>
@@ -340,5 +380,6 @@
   </footer>
 
   <script src="assets/i18n.js"></script>
+  <script src="assets/main.js"></script>
 </body>
 </html>
