@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SOMOS — Precios</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="promo-bar">
+    <div class="container">
+      <span data-i18n="promoBar"></span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 100 100" role="img" aria-label="SOMOS"><path d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E1663F"/><path d="M50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E0A458"/><path d="M50 20 C34 35 34 52 50 52 C66 52 66 69 50 84" fill="none" stroke="#F7F1E7" stroke-width="5" stroke-linecap="round"/></svg>
+        SOMOS
+      </a>
+      <nav class="site-nav">
+        <a href="index.html#features" data-i18n="navFeatures"></a>
+        <a href="index.html#for-churches" data-i18n="navChurches"></a>
+        <a href="index.html#for-congregants" data-i18n="navCongregants"></a>
+        <div class="lang-switch">
+          <button type="button" class="lang-pill" data-lang-pill="es">ES</button>
+          <button type="button" class="lang-pill" data-lang-pill="en">EN</button>
+          <button type="button" class="lang-pill" data-lang-pill="fr">FR</button>
+        </div>
+      </nav>
+      <a class="btn btn-primary" href="mailto:hello@somos.app" data-i18n="navContact"></a>
+    </div>
+  </header>
+
+  <main>
+    <section class="pricing-hero">
+      <div class="container">
+        <span class="eyebrow" data-i18n="pricingEyebrow"></span>
+        <h1 data-i18n="pricingHeading"></h1>
+        <p data-i18n="pricingSub"></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+          <div class="feature-card">
+            <h3 data-i18n="pricingBaseTitle"></h3>
+            <div style="font-size: 32px; font-weight: 900; color: var(--primary-dark); margin: 8px 0 12px;" data-i18n="pricingBasePrice"></div>
+            <p data-i18n="pricingBaseDesc"></p>
+          </div>
+          <div class="feature-card">
+            <h3 data-i18n="pricingModulesTitle"></h3>
+            <div style="font-size: 20px; font-weight: 800; color: var(--primary-dark); margin: 8px 0 12px;" data-i18n="pricingModulesPrice"></div>
+            <p data-i18n="pricingModulesDesc"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="get-started">
+      <div class="container">
+        <div class="cta-band">
+          <p data-i18n="pricingComingSoon" style="margin: 0 0 24px;"></p>
+          <div class="hero-actions" style="justify-content: center;">
+            <a class="btn btn-primary" href="mailto:hello@somos.app" data-i18n="pricingContactBtn"></a>
+            <a class="btn btn-outline" href="index.html" data-i18n="pricingBackBtn"></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 100 100" role="img" aria-label="SOMOS"><path d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E1663F"/><path d="M50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E0A458"/><path d="M50 20 C34 35 34 52 50 52 C66 52 66 69 50 84" fill="none" stroke="#F7F1E7" stroke-width="5" stroke-linecap="round"/></svg>
+        SOMOS
+      </a>
+      <div class="footer-links">
+        <a href="index.html#features" data-i18n="navFeatures"></a>
+        <a href="join.html" data-i18n="footerJoinLink"></a>
+        <a href="mailto:hello@somos.app" data-i18n="navContact"></a>
+      </div>
+    </div>
+    <div class="container">
+      <p class="footer-note" data-i18n="footerCopyright"></p>
+    </div>
+  </footer>
+
+  <script src="assets/i18n.js"></script>
+</body>
+</html>
