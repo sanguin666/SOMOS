@@ -27,22 +27,18 @@ export type Translations = {
     simulateButton: string;
   };
   hub: {
-    availableHere: string;
     errorLoad: string;
     noModules: string;
     locationNotSet: string;
-    donationsTitle: string;
-    donationsSubtitle: string;
-    eventsTitle: string;
-    eventsSubtitle: string;
-    announcementsTitle: string;
-    announcementsSubtitle: string;
-    prayerRequestsTitle: string;
-    prayerRequestsSubtitle: string;
-    livestreamTitle: string;
-    livestreamSubtitle: string;
-    communityTitle: string;
-    communitySubtitle: string;
+    donationsLabel: string;
+    eventsLabel: string;
+    announcementsLabel: string;
+    prayerRequestsLabel: string;
+    livestreamLabel: string;
+    communityLabel: string;
+    nextEvent: string;
+    latestAnnouncements: string;
+    seeAll: string;
   };
   donate: {
     title: string;
@@ -158,22 +154,18 @@ const en: Translations = {
     simulateButton: 'Simulate scan',
   },
   hub: {
-    availableHere: 'AVAILABLE HERE',
     errorLoad: "Couldn't load what's available here. Pull up the app again to retry.",
     noModules: 'No modules are active for this place yet.',
     locationNotSet: 'Location not set',
-    donationsTitle: 'Donations',
-    donationsSubtitle: 'Give safely online',
-    eventsTitle: 'Events',
-    eventsSubtitle: "See what's coming up",
-    announcementsTitle: 'Announcements',
-    announcementsSubtitle: 'Read the latest bulletin',
-    prayerRequestsTitle: 'Prayer Requests',
-    prayerRequestsSubtitle: 'Share or pray for a request',
-    livestreamTitle: 'Livestream',
-    livestreamSubtitle: 'Watch live or catch a replay',
-    communityTitle: 'Community',
-    communitySubtitle: 'Discuss together',
+    donationsLabel: 'Donate',
+    eventsLabel: 'Events',
+    announcementsLabel: 'News',
+    prayerRequestsLabel: 'Prayer',
+    livestreamLabel: 'Live',
+    communityLabel: 'Group',
+    nextEvent: 'Next event',
+    latestAnnouncements: 'Latest',
+    seeAll: 'See all',
   },
   donate: {
     title: 'Donate to {{poiName}}',
@@ -290,22 +282,18 @@ const es: Translations = {
     simulateButton: 'Simular escaneo',
   },
   hub: {
-    availableHere: 'DISPONIBLE AQUÍ',
     errorLoad: 'No se pudo cargar lo disponible aquí. Vuelve a abrir la app para reintentar.',
     noModules: 'Todavía no hay módulos activos para este lugar.',
     locationNotSet: 'Ubicación no establecida',
-    donationsTitle: 'Donaciones',
-    donationsSubtitle: 'Dona de forma segura en línea',
-    eventsTitle: 'Eventos',
-    eventsSubtitle: 'Mira lo que se aproxima',
-    announcementsTitle: 'Anuncios',
-    announcementsSubtitle: 'Lee el último boletín',
-    prayerRequestsTitle: 'Peticiones de oración',
-    prayerRequestsSubtitle: 'Comparte o ora por una petición',
-    livestreamTitle: 'Transmisión en vivo',
-    livestreamSubtitle: 'Mira en vivo o una repetición',
-    communityTitle: 'Comunidad',
-    communitySubtitle: 'Conversemos juntos',
+    donationsLabel: 'Donar',
+    eventsLabel: 'Eventos',
+    announcementsLabel: 'Noticias',
+    prayerRequestsLabel: 'Oración',
+    livestreamLabel: 'En vivo',
+    communityLabel: 'Grupo',
+    nextEvent: 'Próximo evento',
+    latestAnnouncements: 'Últimos anuncios',
+    seeAll: 'Ver todos',
   },
   donate: {
     title: 'Donar a {{poiName}}',
@@ -422,22 +410,18 @@ const fr: Translations = {
     simulateButton: 'Simuler un scan',
   },
   hub: {
-    availableHere: 'DISPONIBLE ICI',
     errorLoad: "Impossible de charger le contenu disponible ici. Rouvrez l'app pour réessayer.",
     noModules: "Aucun module n'est encore actif pour ce lieu.",
     locationNotSet: 'Emplacement non défini',
-    donationsTitle: 'Dons',
-    donationsSubtitle: 'Donnez en toute sécurité en ligne',
-    eventsTitle: 'Événements',
-    eventsSubtitle: 'Découvrez ce qui arrive',
-    announcementsTitle: 'Annonces',
-    announcementsSubtitle: 'Lisez le dernier bulletin',
-    prayerRequestsTitle: 'Intentions de prière',
-    prayerRequestsSubtitle: 'Partagez ou priez pour une intention',
-    livestreamTitle: 'Diffusion en direct',
-    livestreamSubtitle: 'Regardez en direct ou en rediffusion',
-    communityTitle: 'Communauté',
-    communitySubtitle: 'Échangeons ensemble',
+    donationsLabel: 'Dons',
+    eventsLabel: 'Agenda',
+    announcementsLabel: 'Actus',
+    prayerRequestsLabel: 'Prière',
+    livestreamLabel: 'Direct',
+    communityLabel: 'Groupe',
+    nextEvent: 'Prochain événement',
+    latestAnnouncements: 'Dernières annonces',
+    seeAll: 'Tout voir',
   },
   donate: {
     title: 'Faire un don à {{poiName}}',
