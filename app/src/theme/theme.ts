@@ -9,15 +9,23 @@
 
 export const colors = {
   background: '#FFFFFF',
-  surface: '#F4F6F8',
+  surface: '#F7F1E7',
   text: '#111111',
   textMuted: '#3D3D3D',
-  primary: '#1A4D8F',
+  primary: '#E1663F',
+  // Same hue as `primary`, darkened until it clears 4.5:1 on white — use
+  // this instead of `primary` wherever the brand color is small text or a
+  // small filled shape (a link, a small badge). `primary` itself only
+  // reaches ~3.2:1 on white, which is fine for large/bold text (≥22px
+  // bold, e.g. AccessibleButton's label) and for graphical elements (icons,
+  // large fills), per WCAG's large-text and non-text contrast thresholds,
+  // but not for anything smaller.
+  primaryStrong: '#B8502E',
   primaryText: '#FFFFFF',
   danger: '#B3261E',
   dangerText: '#FFFFFF',
   border: '#111111',
-  focus: '#1A4D8F',
+  focus: '#E1663F',
 } as const;
 
 // Deliberately large size scale. React Native scales these values

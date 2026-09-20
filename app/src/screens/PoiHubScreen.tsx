@@ -10,8 +10,8 @@ import {
   ChatBubbleIcon,
   ChevronRightIcon,
   HeartIcon,
+  LogoMark,
   MegaphoneIcon,
-  PlaceGlyphIcon,
   PlayIcon,
 } from '../components/icons';
 import { getActiveModules } from '../api/pois';
@@ -149,32 +149,38 @@ export function PoiHubScreen({
   return (
     <Screen scroll footer={tabBar}>
       <View style={[styles.hero, { backgroundColor: poiTheme.accent }]}>
-        <View style={styles.heroGlyphWrap} pointerEvents="none">
-          <PlaceGlyphIcon size={140} color="rgba(255,255,255,0.12)" />
-        </View>
+        <LogoMark size={32} haloColor={colors.surface} />
 
-        <View style={styles.headerRow}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('common.back')}
-            onPress={onBack}
-            style={styles.iconButton}
+        <View style={styles.heroTitleBlock}>
+          <AccessibleText
+            variant="bodyLarge"
+            color={poiTheme.accentText}
+            numberOfLines={1}
+            style={styles.heroName}
           >
-            <BackChevronIcon size={20} color="#FFFFFF" />
-          </Pressable>
-          <View style={styles.iconButton}>
-            <BellIcon size={20} color="#FFFFFF" />
-          </View>
-        </View>
-
-        <View style={styles.titleBlock}>
-          <AccessibleText variant="title" color={poiTheme.accentText}>
             {poi.name}
           </AccessibleText>
-          <AccessibleText variant="body" color="rgba(255,255,255,0.85)">
+          <AccessibleText
+            variant="body"
+            color="rgba(255,255,255,0.85)"
+            numberOfLines={1}
+            style={styles.heroLocation}
+          >
             {poi.city ?? t('hub.locationNotSet')}
           </AccessibleText>
         </View>
+
+        <View style={styles.iconButton}>
+          <BellIcon size={18} color="#FFFFFF" />
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+          onPress={onBack}
+          style={styles.iconButton}
+        >
+          <BackChevronIcon size={16} color="#FFFFFF" />
+        </Pressable>
       </View>
 
       {error && (
@@ -197,7 +203,7 @@ export function PoiHubScreen({
 
       {nextEvent && (
         <Pressable accessibilityRole="button" accessibilityLabel={nextEvent.title} onPress={onOpenEvents} style={styles.eventCard}>
-          <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accent }]}>
+          <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
             <AccessibleText variant="caption" color="#FFFFFF" style={styles.eventDateMonth}>
               {new Date(nextEvent.startsAt).toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
             </AccessibleText>
@@ -224,10 +230,10 @@ export function PoiHubScreen({
               {t('hub.latestAnnouncements')}
             </AccessibleText>
             <Pressable accessibilityRole="button" onPress={onOpenAnnouncements} style={styles.seeAllButton}>
-              <AccessibleText variant="caption" color={poiTheme.accent} style={styles.seeAllLabel}>
+              <AccessibleText variant="caption" color={poiTheme.accentStrong} style={styles.seeAllLabel}>
                 {t('hub.seeAll')}
               </AccessibleText>
-              <ChevronRightIcon size={16} color={poiTheme.accent} />
+              <ChevronRightIcon size={16} color={poiTheme.accentStrong} />
             </Pressable>
           </View>
 
@@ -276,21 +282,12 @@ const styles = StyleSheet.create({
     marginTop: -spacing.lg,
     marginHorizontal: -spacing.lg,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xl,
+    paddingVertical: spacing.sm,
     borderBottomLeftRadius: radii.lg,
     borderBottomRightRadius: radii.lg,
-    overflow: 'hidden',
-    gap: spacing.lg,
-  },
-  heroGlyphWrap: {
-    position: 'absolute',
-    right: -24,
-    bottom: -24,
-  },
-  headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   iconButton: {
     width: 44,
@@ -300,8 +297,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  titleBlock: {
-    gap: spacing.xs,
+  heroTitleBlock: {
+    flex: 1,
+  },
+  heroName: {
+    fontWeight: '800',
+  },
+  heroLocation: {
+    fontWeight: '700',
   },
   sectionLabel: {
     fontWeight: '700',
@@ -312,7 +315,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     paddingTop: spacing.xs,
   },
   tabBarItem: {

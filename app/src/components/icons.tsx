@@ -7,9 +7,21 @@ type IconProps = {
 
 // The SOMOS mark: a heart split into two colors that meet at the center in
 // an S. Fixed brand colors — not tinted via `color` like the other icons.
-export function LogoMark({ size = 40 }: { size?: number }) {
+// `haloColor`, when set, traces a thin outline just outside the heart's own
+// silhouette — for placing the mark on a background that's the same color
+// as one of its halves (the corail header), where it would otherwise blend
+// into the background on that side.
+export function LogoMark({ size = 40, haloColor }: { size?: number; haloColor?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100">
+      {haloColor && (
+        <Path
+          d="M50 84 C22 62 9 42 9 27 C9 13 20 5 32 5 C43 5 49 13 50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 Z"
+          fill="none"
+          stroke={haloColor}
+          strokeWidth={6}
+        />
+      )}
       <Path
         d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z"
         fill="#E1663F"
