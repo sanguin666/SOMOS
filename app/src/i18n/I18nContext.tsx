@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SUPPORTED_LANGUAGES, translations, type SupportedLanguage, type Translations } from './translations';
 
-const STORAGE_KEY = 'mypeople-language';
+const STORAGE_KEY = 'somos-language';
 
 type I18nState = {
   language: SupportedLanguage;

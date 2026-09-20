@@ -1,6 +1,6 @@
-# myPeople — backend
+# SOMOS — backend
 
-NestJS API for the myPeople app. See the [root README](../README.md) for full setup instructions (local demo).
+NestJS API for the SOMOS app. See the [root README](../README.md) for full setup instructions (local demo).
 
 ## Quick start
 

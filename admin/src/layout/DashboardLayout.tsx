@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
+import { LogoMark } from '../components/LogoMark';
 
 const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
   en: 'EN',
@@ -38,7 +39,10 @@ export function DashboardLayout() {
     <div className="layout">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h1>myPeople Admin</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <LogoMark size={28} />
+            <h1>SOMOS Admin</h1>
+          </div>
           <p className="muted" style={{ fontSize: 13, margin: 0 }}>
             {user.firstName ?? user.email}
           </p>

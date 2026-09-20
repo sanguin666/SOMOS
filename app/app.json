@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myPeople",
-    "slug": "mypeople",
+    "name": "SOMOS",
+    "slug": "somos",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F7F1E7",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -25,7 +25,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Allow myPeople to access your microphone to record a voice message."
+          "microphonePermission": "Allow SOMOS to access your microphone to record a voice message."
         }
       ]
     ]

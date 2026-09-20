@@ -1,4 +1,4 @@
-# myPeople
+# SOMOS
 
 Mobile + web app for churches and other points of interest: donations, events, and future modules, with a strong focus on accessibility for a mostly elderly audience.
 
@@ -8,7 +8,7 @@ Mobile + web app for churches and other points of interest: donations, events, a
 backend/   NestJS API (Node.js + TypeORM + PostgreSQL)
 app/       Expo / React Native app (+ React Native Web) — the congregant-facing app
 admin/     React (Vite) admin dashboard for parish staff
-landing/   Static marketing site (no build step) advertising myPeople to churches
+landing/   Static marketing site (no build step) advertising SOMOS to churches
 docker-compose.yml   Local PostgreSQL for development
 ```
 
@@ -145,4 +145,4 @@ The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer 
 
 ## Marketing landing page
 
-`landing/` is a small static site (plain HTML/CSS, no build step) advertising myPeople to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). `landing/join.html` is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback. Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.
+`landing/` is a small static site (plain HTML/CSS, no build step) advertising SOMOS to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). `landing/join.html` is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback. Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.

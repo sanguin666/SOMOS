@@ -11,6 +11,7 @@ import type { PoiType } from '../api/types';
  */
 export type PoiTheme = {
   accent: string;
+  accentStrong: string;
   accentSoft: string;
   accentText: string;
   label: string;
@@ -19,7 +20,8 @@ export type PoiTheme = {
 const POI_THEMES: Record<PoiType, PoiTheme> = {
   church: {
     accent: colors.primary,
-    accentSoft: '#EAF0F8',
+    accentStrong: colors.primaryStrong,
+    accentSoft: colors.surface,
     accentText: colors.primaryText,
     label: 'Church',
   },

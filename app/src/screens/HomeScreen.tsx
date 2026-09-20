@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
+import { LogoMark } from '../components/icons';
 import { getPoiByQrCode } from '../api/pois';
 import { DEMO_QR_TOKEN } from '../demo';
 import { useI18n } from '../i18n/I18nContext';
@@ -41,7 +42,10 @@ export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
 
   return (
     <Screen>
-      <AccessibleText variant="title">myPeople</AccessibleText>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <LogoMark size={40} />
+        <AccessibleText variant="title">SOMOS</AccessibleText>
+      </View>
       <AccessibleText variant="bodyLarge">{t('home.welcome')}</AccessibleText>
 
       {error && (
