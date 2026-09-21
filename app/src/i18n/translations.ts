@@ -25,6 +25,10 @@ export type Translations = {
     subtitle: string;
     error: string;
     simulateButton: string;
+    codeLabel: string;
+    codePlaceholder: string;
+    codeButton: string;
+    codeNotFound: string;
   };
   hub: {
     errorLoad: string;
@@ -42,6 +46,14 @@ export type Translations = {
     nextLivestream: string;
     latestAnnouncements: string;
     seeAll: string;
+    homeLabel: string;
+    switchPlace: string;
+  };
+  places: {
+    title: string;
+    addPlace: string;
+    appHome: string;
+    close: string;
   };
   donate: {
     title: string;
@@ -155,6 +167,10 @@ const en: Translations = {
     subtitle: 'Point your camera at the code on the flyer',
     error: "Couldn't reach the server. Check that the backend is running and try again.",
     simulateButton: 'Simulate scan',
+    codeLabel: 'Or type the code printed under it',
+    codePlaceholder: 'Place code',
+    codeButton: 'Open this place',
+    codeNotFound: 'No place uses that code. Check it and try again.',
   },
   hub: {
     errorLoad: "Couldn't load what's available here. Pull up the app again to retry.",
@@ -172,6 +188,14 @@ const en: Translations = {
     nextLivestream: 'Live services',
     latestAnnouncements: 'Latest',
     seeAll: 'See all',
+    homeLabel: 'Home',
+    switchPlace: 'Change place',
+  },
+  places: {
+    title: 'Your places',
+    addPlace: 'Add a place',
+    appHome: 'Ansae home',
+    close: 'Close',
   },
   donate: {
     title: 'Donate to {{poiName}}',
@@ -286,6 +310,10 @@ const es: Translations = {
     subtitle: 'Apunta tu cámara al código del folleto',
     error: 'No se pudo conectar con el servidor. Verifica que el backend esté en ejecución e inténtalo de nuevo.',
     simulateButton: 'Simular escaneo',
+    codeLabel: 'O escribe el código impreso debajo',
+    codePlaceholder: 'Código del lugar',
+    codeButton: 'Abrir este lugar',
+    codeNotFound: 'Ningún lugar usa ese código. Revísalo e inténtalo de nuevo.',
   },
   hub: {
     errorLoad: 'No se pudo cargar lo disponible aquí. Vuelve a abrir la app para reintentar.',
@@ -303,6 +331,14 @@ const es: Translations = {
     nextLivestream: 'Servicios en vivo',
     latestAnnouncements: 'Últimos anuncios',
     seeAll: 'Ver todos',
+    homeLabel: 'Inicio',
+    switchPlace: 'Cambiar de lugar',
+  },
+  places: {
+    title: 'Tus lugares',
+    addPlace: 'Añadir un lugar',
+    appHome: 'Inicio de Ansae',
+    close: 'Cerrar',
   },
   donate: {
     title: 'Donar a {{poiName}}',
@@ -417,6 +453,10 @@ const fr: Translations = {
     subtitle: 'Pointez votre caméra vers le code sur le dépliant',
     error: "Impossible de joindre le serveur. Vérifiez que le backend est démarré et réessayez.",
     simulateButton: 'Simuler un scan',
+    codeLabel: 'Ou saisissez le code imprimé en dessous',
+    codePlaceholder: 'Code du lieu',
+    codeButton: 'Ouvrir ce lieu',
+    codeNotFound: 'Aucun lieu n’utilise ce code. Vérifiez-le et réessayez.',
   },
   hub: {
     errorLoad: "Impossible de charger le contenu disponible ici. Rouvrez l'app pour réessayer.",
@@ -434,6 +474,14 @@ const fr: Translations = {
     nextLivestream: 'Offices en direct',
     latestAnnouncements: 'Dernières annonces',
     seeAll: 'Tout voir',
+    homeLabel: 'Accueil',
+    switchPlace: 'Changer de lieu',
+  },
+  places: {
+    title: 'Vos lieux',
+    addPlace: 'Ajouter un lieu',
+    appHome: 'Accueil Ansae',
+    close: 'Fermer',
   },
   donate: {
     title: 'Faire un don à {{poiName}}',

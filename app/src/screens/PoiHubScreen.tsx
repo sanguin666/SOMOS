@@ -14,7 +14,7 @@ import type { ActiveModule, CommunityPost, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
+  onOpenPlaces: () => void;
 };
 
 // A drill-down opened from within a tab. It replaces the tab's own content
@@ -31,7 +31,7 @@ type Drilldown =
  * only what sits between them, so the chrome never moves and the selected
  * tab is the one thing that changes.
  */
-export function PoiHubScreen({ poi, onBack }: Props) {
+export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [tab, setTab] = useState<HubTab>('home');
   const [drilldown, setDrilldown] = useState<Drilldown>({ kind: 'list' });
@@ -63,7 +63,7 @@ export function PoiHubScreen({ poi, onBack }: Props) {
       modules={modules}
       activeTab={tab}
       onSelectTab={selectTab}
-      onBack={onBack}
+      onOpenPlaces={onOpenPlaces}
     >
       {tab === 'home' && <PoiHomeScreen poi={poi} modules={modules} onSelectTab={selectTab} />}
 
