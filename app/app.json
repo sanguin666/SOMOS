@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Ansae",
+    "name": "ANSAE",
     "slug": "ansae",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -26,7 +26,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Allow Ansae to access your microphone to record a voice message."
+          "microphonePermission": "Allow ANSAE to access your microphone to record a voice message."
         }
       ]
     ]

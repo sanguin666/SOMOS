@@ -194,7 +194,7 @@ const en: Translations = {
   places: {
     title: 'Your places',
     addPlace: 'Add a place',
-    appHome: 'Ansae home',
+    appHome: 'ANSAE home',
     close: 'Close',
   },
   donate: {
@@ -337,7 +337,7 @@ const es: Translations = {
   places: {
     title: 'Tus lugares',
     addPlace: 'Añadir un lugar',
-    appHome: 'Inicio de Ansae',
+    appHome: 'Inicio de ANSAE',
     close: 'Cerrar',
   },
   donate: {
@@ -480,7 +480,7 @@ const fr: Translations = {
   places: {
     title: 'Vos lieux',
     addPlace: 'Ajouter un lieu',
-    appHome: 'Accueil Ansae',
+    appHome: 'Accueil ANSAE',
     close: 'Fermer',
   },
   donate: {

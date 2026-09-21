@@ -1,6 +1,6 @@
-# Ansae — backend
+# ANSAE — backend
 
-NestJS API for the Ansae app. See the [root README](../README.md) for full setup instructions (local demo).
+NestJS API for the ANSAE app. See the [root README](../README.md) for full setup instructions (local demo).
 
 ## Quick start
 
