@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
 import { getPoiByQrCode } from '../api/pois';
+import { ApiError } from '../api/client';
 import { DEMO_QR_TOKEN } from '../demo';
 import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
-import { spacing } from '../theme/theme';
+import { colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   onBack: () => void;
@@ -25,15 +26,17 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
   // The viewfinder fills the screen edge to edge, so the chrome over it
   // is what has to stay clear of the camera cutout and the gesture bar.
   const insets = useSafeAreaInsets();
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'not-found'>('idle');
+  const [code, setCode] = useState('');
 
-  async function simulateScan() {
+  async function open(token: string) {
     setStatus('loading');
     try {
-      const poi = await getPoiByQrCode(DEMO_QR_TOKEN);
-      onFound(poi);
-    } catch {
-      setStatus('error');
+      onFound(await getPoiByQrCode(token));
+    } catch (error) {
+      // A wrong code and an unreachable backend need different advice, and
+      // only the first is the user's to fix.
+      setStatus(error instanceof ApiError && error.status === 404 ? 'not-found' : 'error');
     }
   }
 
@@ -65,9 +68,9 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
       </View>
 
       <View style={[styles.footer, { bottom: insets.bottom + spacing.xl, left: insets.left + spacing.lg, right: insets.right + spacing.lg }]}>
-        {status === 'error' && (
+        {(status === 'error' || status === 'not-found') && (
           <AccessibleText variant="caption" color="#FFB4A8" style={[styles.centerText, styles.errorText]}>
-            {t('scan.error')}
+            {t(status === 'not-found' ? 'scan.codeNotFound' : 'scan.error')}
           </AccessibleText>
         )}
 
@@ -76,7 +79,34 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
             <ActivityIndicator color="#FFFFFF" size="large" />
           </View>
         ) : (
-          <AccessibleButton label={t('scan.simulateButton')} onPress={simulateScan} />
+          <>
+            <AccessibleButton label={t('scan.simulateButton')} onPress={() => open(DEMO_QR_TOKEN)} />
+
+            {/* Until the camera is wired up this is the only way to reach a
+                second place, and it stays useful afterwards: every flyer
+                prints the code under the QR for anyone whose camera won't
+                focus. */}
+            <AccessibleText variant="caption" color="rgba(255,255,255,0.7)" style={styles.centerText}>
+              {t('scan.codeLabel')}
+            </AccessibleText>
+            <TextInput
+              value={code}
+              onChangeText={setCode}
+              placeholder={t('scan.codePlaceholder')}
+              placeholderTextColor="rgba(255,255,255,0.45)"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              onSubmitEditing={() => code.trim() && open(code.trim())}
+              style={styles.codeInput}
+            />
+            <AccessibleButton
+              label={t('scan.codeButton')}
+              variant="secondary"
+              disabled={code.trim().length === 0}
+              onPress={() => open(code.trim())}
+              style={code.trim().length === 0 ? styles.codeButtonDisabled : undefined}
+            />
+          </>
         )}
       </View>
     </View>
@@ -105,14 +135,29 @@ const styles = StyleSheet.create({
   centerText: {
     textAlign: 'center',
   },
+  codeInput: {
+    minHeight: 56,
+    borderRadius: radii.md,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+    paddingHorizontal: spacing.md,
+    fontSize: 22,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  codeButtonDisabled: {
+    opacity: 0.5,
+  },
   viewfinder: {
     position: 'absolute',
     top: '50%',
     left: '50%',
-    width: 260,
-    height: 260,
-    marginLeft: -130,
-    marginTop: -130,
+    width: 220,
+    height: 220,
+    marginLeft: -110,
+    // Sits above the true center: the code entry under the shutter button
+    // makes the footer tall enough to swallow a centered frame.
+    marginTop: -180,
   },
   corner: {
     position: 'absolute',

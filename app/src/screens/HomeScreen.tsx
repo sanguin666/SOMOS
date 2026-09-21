@@ -4,7 +4,8 @@ import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { LogoMark } from '../components/icons';
-import { getPoiByQrCode } from '../api/pois';
+import { getPoi, getPoiByQrCode } from '../api/pois';
+import { getSavedPlaces } from '../storage/savedPlaces';
 import { DEMO_QR_TOKEN } from '../demo';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
@@ -27,11 +28,15 @@ export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
+  // Re-opens the place this device was in last. Until a congregant can
+  // sign in, the demo POI stands in for anyone who has never scanned
+  // anything, so the button always leads somewhere.
   async function openMyPlaces() {
     setLoading(true);
     setError(false);
     try {
-      const poi = await getPoiByQrCode(DEMO_QR_TOKEN);
+      const [mostRecent] = await getSavedPlaces();
+      const poi = mostRecent ? await getPoi(mostRecent.id) : await getPoiByQrCode(DEMO_QR_TOKEN);
       onOpenPoi(poi);
     } catch {
       setError(true);

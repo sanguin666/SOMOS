@@ -8,6 +8,10 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public readonly cause?: unknown,
+    // The HTTP status, when there was a response at all — absent when the
+    // request never reached the server. Lets a caller tell "you typed the
+    // wrong thing" apart from "the backend is down".
+    public readonly status?: number,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -34,10 +38,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     if (response.status === 404) {
-      throw new ApiError("We couldn't find that.");
+      throw new ApiError("We couldn't find that.", undefined, 404);
     }
     const serverMessage = await readErrorMessage(response);
-    throw new ApiError(serverMessage ?? 'Something went wrong. Please try again.');
+    throw new ApiError(
+      serverMessage ?? 'Something went wrong. Please try again.',
+      undefined,
+      response.status,
+    );
   }
 
   return response.json() as Promise<T>;

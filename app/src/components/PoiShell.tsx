@@ -3,12 +3,12 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Screen } from './Screen';
 import { AccessibleText } from './AccessibleText';
 import {
-  BackChevronIcon,
-  BellIcon,
   CalendarIcon,
   CandleIcon,
   ChatBubbleIcon,
+  ChevronDownIcon,
   HeartIcon,
+  HomeIcon,
   LogoMark,
   MegaphoneIcon,
   PlayIcon,
@@ -18,9 +18,9 @@ import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
-// 'home' is the hub's landing feed. It is a tab value but not a tab button:
-// the banner's back chevron is what returns to it, which keeps the bar down
-// to one button per module and their labels readable.
+// 'home' is the place's own landing page. It is a tab value but not a tab
+// button: the banner's home button is what returns to it, which keeps the
+// bar down to one button per module and their labels readable.
 export type HubTab = 'home' | ModuleType;
 
 type Props = {
@@ -29,7 +29,9 @@ type Props = {
   modules: ActiveModule[] | null;
   activeTab: HubTab;
   onSelectTab: (tab: HubTab) => void;
-  onBack: () => void;
+  // Opens the place switcher; the banner only reports the tap so the
+  // switcher's state lives with whoever owns the place list.
+  onOpenPlaces: () => void;
   children: ReactNode;
 };
 
@@ -48,7 +50,7 @@ function isLive(module: ActiveModule) {
  * neither one moves or flickers when a tab is selected — only the
  * highlight does. Both clear the device's system UI via `Screen`.
  */
-export function PoiShell({ poi, modules, activeTab, onSelectTab, onBack, children }: Props) {
+export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, children }: Props) {
   const { t } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
@@ -82,15 +84,25 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onBack, childre
     <View style={styles.hero}>
       <LogoMark size={32} haloColor={colors.surface} />
 
-      <View style={styles.heroTitleBlock}>
-        <AccessibleText
-          variant="bodyLarge"
-          color={poiTheme.accentText}
-          numberOfLines={1}
-          style={styles.heroName}
-        >
-          {poi.name}
-        </AccessibleText>
+      {/* The whole name block is the switcher's target: it is the largest
+          thing in the banner, so it stays easy to hit. */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${poi.name}. ${t('hub.switchPlace')}`}
+        onPress={onOpenPlaces}
+        style={styles.heroTitleBlock}
+      >
+        <View style={styles.heroNameRow}>
+          <AccessibleText
+            variant="bodyLarge"
+            color={poiTheme.accentText}
+            numberOfLines={1}
+            style={styles.heroName}
+          >
+            {poi.name}
+          </AccessibleText>
+          <ChevronDownIcon size={18} color={poiTheme.accentText} />
+        </View>
         <AccessibleText
           variant="body"
           color="rgba(255,255,255,0.85)"
@@ -99,18 +111,15 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onBack, childre
         >
           {poi.city ?? t('hub.locationNotSet')}
         </AccessibleText>
-      </View>
+      </Pressable>
 
-      <View style={styles.iconButton}>
-        <BellIcon size={18} color="#FFFFFF" />
-      </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={t('common.back')}
-        onPress={activeTab === 'home' ? onBack : () => onSelectTab('home')}
-        style={styles.iconButton}
+        accessibilityLabel={t('hub.homeLabel')}
+        onPress={() => onSelectTab('home')}
+        style={[styles.iconButton, activeTab === 'home' && styles.iconButtonActive]}
       >
-        <BackChevronIcon size={16} color="#FFFFFF" />
+        <HomeIcon size={22} color="#FFFFFF" />
       </Pressable>
     </View>
   );
@@ -210,18 +219,29 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   iconButton: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: 9999,
     backgroundColor: 'rgba(255,255,255,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Brighter while the place's own page is showing, so the button reads
+  // as where you already are rather than somewhere else to go.
+  iconButtonActive: {
+    backgroundColor: 'rgba(255,255,255,0.38)',
+  },
   heroTitleBlock: {
     flex: 1,
   },
+  heroNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   heroName: {
     fontWeight: '800',
+    flexShrink: 1,
   },
   heroLocation: {
     fontWeight: '700',
