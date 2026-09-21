@@ -47,7 +47,13 @@ export type Translations = {
     latestAnnouncements: string;
     seeAll: string;
     homeLabel: string;
+    moreLabel: string;
     switchPlace: string;
+  };
+  more: {
+    title: string;
+    prayerRequests: string;
+    community: string;
   };
   places: {
     title: string;
@@ -77,6 +83,8 @@ export type Translations = {
   };
   events: {
     title: string;
+    watchLive: string;
+    watchLiveHint: string;
     notifyOn: string;
     notifyOff: string;
     loading: string;
@@ -197,7 +205,13 @@ const en: Translations = {
     latestAnnouncements: 'Latest',
     seeAll: 'See all',
     homeLabel: 'Home',
+    moreLabel: 'More',
     switchPlace: 'Change place',
+  },
+  more: {
+    title: 'More',
+    prayerRequests: 'Prayer requests',
+    community: 'Our group',
   },
   places: {
     title: 'Your places',
@@ -229,6 +243,8 @@ const en: Translations = {
   },
   events: {
     title: 'Events',
+    watchLive: 'Watch live',
+    watchLiveHint: 'What is on air now and what is coming',
     notifyOn: 'Turn off notifications for {{title}}',
     notifyOff: 'Turn on notifications for {{title}}',
     loading: 'Loading…',
@@ -349,7 +365,13 @@ const es: Translations = {
     latestAnnouncements: 'Últimos anuncios',
     seeAll: 'Ver todos',
     homeLabel: 'Inicio',
+    moreLabel: 'Más',
     switchPlace: 'Cambiar de lugar',
+  },
+  more: {
+    title: 'Más',
+    prayerRequests: 'Peticiones de oración',
+    community: 'Nuestro grupo',
   },
   places: {
     title: 'Tus lugares',
@@ -381,6 +403,8 @@ const es: Translations = {
   },
   events: {
     title: 'Eventos',
+    watchLive: 'Ver en vivo',
+    watchLiveHint: 'Lo que se emite ahora y lo que viene',
     notifyOn: 'Desactivar notificaciones de {{title}}',
     notifyOff: 'Activar notificaciones de {{title}}',
     loading: 'Cargando…',
@@ -501,7 +525,13 @@ const fr: Translations = {
     latestAnnouncements: 'Dernières annonces',
     seeAll: 'Tout voir',
     homeLabel: 'Accueil',
+    moreLabel: 'Plus',
     switchPlace: 'Changer de lieu',
+  },
+  more: {
+    title: 'Plus',
+    prayerRequests: 'Intentions de prière',
+    community: 'Notre groupe',
   },
   places: {
     title: 'Vos lieux',
@@ -533,6 +563,8 @@ const fr: Translations = {
   },
   events: {
     title: 'Événements',
+    watchLive: 'Regarder en direct',
+    watchLiveHint: "Ce qui est diffusé maintenant et ce qui arrive",
     notifyOn: 'Désactiver les notifications pour {{title}}',
     notifyOff: 'Activer les notifications pour {{title}}',
     loading: 'Chargement…',

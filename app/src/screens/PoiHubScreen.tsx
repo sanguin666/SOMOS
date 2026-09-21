@@ -7,10 +7,11 @@ import { ComposeAnnouncementScreen } from './ComposeAnnouncementScreen';
 import { DonateScreen } from './DonateScreen';
 import { EventsScreen } from './EventsScreen';
 import { LivestreamScreen } from './LivestreamScreen';
+import { MoreScreen } from './MoreScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
 import { PrayerRequestsScreen } from './PrayerRequestsScreen';
 import { getActiveModules } from '../api/pois';
-import type { ActiveModule, CommunityPost, Poi } from '../api/types';
+import type { ActiveModule, CommunityPost, ModuleType, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
@@ -26,10 +27,10 @@ type Drilldown =
   | { kind: 'community-thread'; post: CommunityPost };
 
 /**
- * Everything under one POI. The banner and the module tab bar live in
+ * Everything under one POI. The banner and the bottom menu live in
  * `PoiShell` and stay mounted for the whole visit: picking a module swaps
  * only what sits between them, so the chrome never moves and the selected
- * tab is the one thing that changes.
+ * button is the one thing that changes.
  */
 export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
@@ -57,6 +58,13 @@ export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
     setDrilldown({ kind: 'list' });
   }
 
+  function hasModule(type: ModuleType) {
+    return (
+      modules?.some((m) => m.moduleType === type && m.status !== 'expired' && m.status !== 'cancelled') ??
+      false
+    );
+  }
+
   return (
     <PoiShell
       poi={poi}
@@ -67,9 +75,18 @@ export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
     >
       {tab === 'home' && <PoiHomeScreen poi={poi} modules={modules} onSelectTab={selectTab} />}
 
+      {tab === 'more' && (
+        <MoreScreen poi={poi} modules={modules} onSelectTab={selectTab} onOpenPlaces={onOpenPlaces} />
+      )}
+
       {tab === 'donations' && <DonateScreen poi={poi} onDone={() => selectTab('home')} />}
 
-      {tab === 'events' && <EventsScreen poi={poi} />}
+      {tab === 'events' && (
+        <EventsScreen
+          poi={poi}
+          onWatchLive={hasModule('livestreams') ? () => setTab('livestreams') : undefined}
+        />
+      )}
 
       {tab === 'announcements' &&
         (drilldown.kind === 'compose-announcement' ? (
