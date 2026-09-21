@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 const TOKEN_STORAGE_KEY = 'ansae-admin-token';
 
 export function getToken(): string | null {
@@ -58,6 +58,12 @@ export function apiPost<T>(path: string, body?: unknown): Promise<T> {
     body: body !== undefined ? JSON.stringify(body) : undefined,
     headers: body !== undefined ? { 'Content-Type': 'application/json' } : {},
   });
+}
+
+// No Content-Type header here — fetch sets the multipart boundary itself
+// when the body is a FormData instance.
+export function apiPostForm<T>(path: string, formData: FormData): Promise<T> {
+  return request<T>(path, { method: 'POST', body: formData });
 }
 
 export function apiPatch<T>(path: string, body?: unknown): Promise<T> {

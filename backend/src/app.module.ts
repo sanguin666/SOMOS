@@ -16,6 +16,7 @@ import { CommunityModule } from './community/community.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { DonationsModule } from './donations/donations.module.js';
 import { PoiSettingsModule } from './poi-settings/poi-settings.module.js';
+import { PoiPageModule } from './poi-page/poi-page.module.js';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { PoiSettingsModule } from './poi-settings/poi-settings.module.js';
     AuthModule,
     DonationsModule,
     PoiSettingsModule,
+    PoiPageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

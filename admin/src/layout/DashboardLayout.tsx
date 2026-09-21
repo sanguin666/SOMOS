@@ -27,6 +27,7 @@ export function DashboardLayout() {
     { to: 'livestreams', label: t('layout.navLivestreams') },
     { to: 'prayer-requests', label: t('layout.navPrayerRequests') },
     { to: 'community', label: t('layout.navCommunity') },
+    { to: 'home-page', label: t('layout.navHomePage') },
     { to: 'my-qr', label: t('layout.navMyQr') },
     { to: 'settings', label: t('layout.navSettings') },
   ];

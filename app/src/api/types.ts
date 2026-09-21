@@ -28,6 +28,31 @@ export type ActiveModule = {
   expirationDate: string | null;
 };
 
+// The sections a POI stacks on its home page, in the order it chose. The
+// written ones (text, image) carry their own content; the rest pull live
+// content from a module and render nothing when it isn't active.
+export type PageBlockType =
+  | 'text'
+  | 'image'
+  | 'next_events'
+  | 'past_events'
+  | 'latest_announcements'
+  | 'next_livestream'
+  | 'donate';
+
+export type PoiPageBlock = {
+  id: string;
+  type: PageBlockType;
+  position: number;
+  title: string | null;
+  body: string | null;
+  // Relative path (e.g. /uploads/poi-pages/<file>.jpg) — prefix with
+  // API_BASE_URL (see api/client.ts) to get a loadable URL.
+  imageUrl: string | null;
+  // How many entries a live block shows.
+  itemCount: number;
+};
+
 export type Announcement = {
   id: string;
   title: string;
