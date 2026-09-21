@@ -4,15 +4,19 @@ import { useI18n } from '../i18n/I18nContext';
 import { getDonationStats, getRecentDonations } from '../api/donations';
 import type { DailyTotal, Donation, DonationStats } from '../api/types';
 
+// Must match the backend's DONATION_CURRENCY, which is what Stripe actually
+// charges in — see backend/src/donations/stripe.service.ts.
+const CURRENCY = import.meta.env.VITE_DONATION_CURRENCY ?? 'EUR';
+
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD',
+  currency: CURRENCY,
   maximumFractionDigits: 0,
 });
 
 const compactCurrencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD',
+  currency: CURRENCY,
   notation: 'compact',
   maximumFractionDigits: 1,
 });
@@ -39,7 +43,7 @@ function formatDateLong(dateKey: string): string {
 }
 
 // Round a chart-axis max up to a clean number (nearest 1/2/5 × a power of
-// ten) so gridline labels read as $50 / $100, never $87.
+// ten) so gridline labels read as €50 / €100, never €87.
 function niceCeil(value: number): number {
   if (value <= 0) return 10;
   const magnitude = 10 ** Math.floor(Math.log10(value));

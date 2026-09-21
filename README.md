@@ -157,7 +157,7 @@ Every new screen should reuse these components instead of raw `Text`/`Pressable`
 
 Each POI activates modules à la carte (`active_modules`). Currently built:
 
-- **Donations** — in-app donations (Stripe integration still to come), with a demo confirmation flow
+- **Donations** — in-app donations through Stripe Checkout (see [Donations & Stripe](#donations--stripe) below); without a Stripe key the screen falls back to a demo confirmation that records the gift without taking a payment
 - **Events** — Masses, baptisms, weddings, funerals, communions, etc. (`backend/src/events`); scheduling/editing is admin-only, the app only reads them (a reminder toggle per event is a local, device-only preference — there's no account yet to attach it to)
 - **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed; editing/deleting is admin-only, posting is still open from the app (no congregant login yet)
 - **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`); moderated (removed) from the admin dashboard
@@ -165,6 +165,50 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 - **Community** — a discussion board: posts with flat (non-nested) comment replies (`src/community`); moderated from the admin dashboard, posting is still open from the app
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).
+
+## Donations & Stripe
+
+The donate screen sends people to **Stripe Checkout** — Stripe's own hosted
+payment page, opened in the phone's browser — rather than collecting card
+details in the app. Nothing sensitive touches our code, and it works in Expo
+Go, in the APK and on the web target alike.
+
+Stripe is optional. With no `STRIPE_SECRET_KEY` in `backend/.env` the donate
+screen says "Demo mode · No payment will be taken" and records the gift
+anyway, so a fresh clone still demos end to end and the admin dashboard's
+graph has data.
+
+To take real (test) payments:
+
+1. Create a Stripe account and copy the **test** secret key (`sk_test_…`) from
+   the dashboard — test mode costs nothing and needs no account activation.
+2. Put it in `backend/.env` as `STRIPE_SECRET_KEY`, and restart the backend
+   (the key is read at startup).
+3. Donate from the app and pay with a [Stripe test card](https://docs.stripe.com/testing):
+   `4242 4242 4242 4242`, any future expiry, any CVC.
+
+Amounts are charged in `DONATION_CURRENCY` (`eur` by default); the admin
+dashboard formats its figures with `VITE_DONATION_CURRENCY`, which has to
+match.
+
+How a gift moves through the system:
+
+- `POST /pois/:poiId/donations/checkout` creates the `donations` row as
+  `pending` and returns Stripe's checkout URL (or `mode: 'demo'`).
+- The payer finishes on Stripe and lands on `/donations/return`, a plain page
+  telling them to go back to the app — Stripe only redirects to http(s) URLs,
+  so it can't reopen the app itself.
+- The app polls `GET /pois/:poiId/donations/:donationId/status`, which
+  re-checks the session with Stripe, and shows the thank-you screen once the
+  payment lands.
+- Only `completed` gifts count towards the admin dashboard's totals, so an
+  abandoned checkout never inflates a parish's figures.
+- `POST /stripe/webhook` does the same job from Stripe's side. It needs a
+  publicly reachable backend and `STRIPE_WEBHOOK_SECRET`, so the local demo
+  doesn't use it — polling covers that case.
+
+Going live later means swapping the test key for a live one; Stripe's fee in
+Spain is 1.5% + &euro;0.25 per European card.
 
 ## Languages
 
