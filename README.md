@@ -1,4 +1,4 @@
-# Ansae
+# ANSAE
 
 Mobile + web app for churches and other points of interest: donations, events, and future modules, with a strong focus on accessibility for a mostly elderly audience.
 
@@ -8,7 +8,7 @@ Mobile + web app for churches and other points of interest: donations, events, a
 backend/   NestJS API (Node.js + TypeORM + PostgreSQL)
 app/       Expo / React Native app (+ React Native Web) — the congregant-facing app
 admin/     React (Vite) admin dashboard for parish staff
-landing/   Static marketing site (no build step) advertising Ansae to churches
+landing/   Static marketing site (no build step) advertising ANSAE to churches
 docker-compose.yml   Local PostgreSQL for development
 ```
 
@@ -193,4 +193,4 @@ The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer 
 
 ## Marketing landing page
 
-`landing/` is a small static site (plain HTML/CSS/JS, no build step, no framework) advertising Ansae to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). It's one scrolling page: features, pricing, and the "join" flow are all sections of `index.html` (`#pricing`, `#join`), not separate pages. The `#join` section is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback (`landing/assets/main.js` reads it from the URL's `?token=` query param). Text is in Spanish by default, switchable to English/French via the header pills (`landing/assets/i18n.js`, persisted in `localStorage`). Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.
+`landing/` is a small static site (plain HTML/CSS/JS, no build step, no framework) advertising ANSAE to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). It's one scrolling page: features, pricing, and the "join" flow are all sections of `index.html` (`#pricing`, `#join`), not separate pages. The `#join` section is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback (`landing/assets/main.js` reads it from the URL's `?token=` query param). Text is in Spanish by default, switchable to English/French via the header pills (`landing/assets/i18n.js`, persisted in `localStorage`). Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.

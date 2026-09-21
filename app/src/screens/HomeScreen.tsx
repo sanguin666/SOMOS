@@ -49,7 +49,7 @@ export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
         <LogoMark size={40} />
-        <AccessibleText variant="title">Ansae</AccessibleText>
+        <AccessibleText variant="title">ANSAE</AccessibleText>
       </View>
       <AccessibleText variant="bodyLarge">{t('home.welcome')}</AccessibleText>
 
