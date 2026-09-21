@@ -1,36 +1,89 @@
 import { type ReactNode } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing } from '../theme/theme';
 
 type Props = {
   children: ReactNode;
   scroll?: boolean;
-  // A persistent bar pinned below the (scrollable) content — e.g. the
-  // hub screen's mini module menu. Sits inside the same SafeAreaView, so
-  // it still clears the bottom safe area (home indicator, etc).
+  // A bar pinned above the content — e.g. the hub's POI banner. It is the
+  // only thing allowed into the top inset: `headerStyle`'s background is
+  // painted edge to edge behind the status bar / camera cutout, while
+  // everything the bar renders is pushed below them.
+  header?: ReactNode;
+  headerStyle?: StyleProp<ViewStyle>;
+  // A bar pinned below the content — e.g. the hub's module tab bar. Same
+  // deal at the bottom, for the home indicator / gesture bar.
   footer?: ReactNode;
+  footerStyle?: StyleProp<ViewStyle>;
 };
 
 /**
  * Standard wrapper for every screen: high-contrast background, generous
- * margins, and respects the safe area (notch/system bars).
+ * margins, and safe-area handling.
+ *
+ * Safe areas are computed with react-native-safe-area-context rather than
+ * React Native's own SafeAreaView, which is iOS-only — on Android it is a
+ * plain View, so the banners ran under the camera cutout and the gesture
+ * bar. Android has been edge-to-edge by default since SDK 54, so these
+ * insets are the only thing keeping content clear of the system UI, on
+ * every edge of every screen.
  */
-export function Screen({ children, scroll = false, footer }: Props) {
+export function Screen({
+  children,
+  scroll = false,
+  header,
+  headerStyle,
+  footer,
+  footerStyle,
+}: Props) {
+  const insets = useSafeAreaInsets();
+
+  // Whichever element touches an edge absorbs that edge's inset: a bar if
+  // there is one, the content itself otherwise.
+  const contentInsets = {
+    paddingTop: (header ? 0 : insets.top) + spacing.lg,
+    paddingBottom: (footer ? 0 : insets.bottom) + spacing.lg,
+    paddingLeft: insets.left + spacing.lg,
+    paddingRight: insets.right + spacing.lg,
+  };
+
   const Content = scroll ? ScrollView : View;
   const contentProps = scroll
-    ? { contentContainerStyle: styles.content, style: styles.scrollFlex }
-    : { style: styles.content };
+    ? { contentContainerStyle: [styles.content, contentInsets], style: styles.scrollFlex }
+    : { style: [styles.content, contentInsets] };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.root}>
+      {header && (
+        <View
+          style={[
+            { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right },
+            headerStyle,
+          ]}
+        >
+          {header}
+        </View>
+      )}
+
       <Content {...contentProps}>{children}</Content>
-      {footer}
-    </SafeAreaView>
+
+      {footer && (
+        <View
+          style={[
+            { paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right },
+            footerStyle,
+          ]}
+        >
+          {footer}
+        </View>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
     backgroundColor: colors.background,
   },
@@ -39,7 +92,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    padding: spacing.lg,
     gap: spacing.md,
   },
 });

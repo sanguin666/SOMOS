@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
@@ -21,6 +22,9 @@ type Props = {
  */
 export function ScanQRScreen({ onBack, onFound }: Props) {
   const { t } = useI18n();
+  // The viewfinder fills the screen edge to edge, so the chrome over it
+  // is what has to stay clear of the camera cutout and the gesture bar.
+  const insets = useSafeAreaInsets();
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
 
   async function simulateScan() {
@@ -39,12 +43,12 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
         accessibilityRole="button"
         accessibilityLabel={t('common.back')}
         onPress={onBack}
-        style={styles.backButton}
+        style={[styles.backButton, { top: insets.top + spacing.sm, left: insets.left + spacing.lg }]}
       >
         <BackChevronIcon size={20} color="#FFFFFF" />
       </Pressable>
 
-      <View style={styles.header}>
+      <View style={[styles.header, { top: insets.top + 76, left: insets.left + spacing.lg, right: insets.right + spacing.lg }]}>
         <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.centerText}>
           {t('scan.title')}
         </AccessibleText>
@@ -60,7 +64,7 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
         <View style={[styles.corner, styles.cornerBottomRight]} />
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { bottom: insets.bottom + spacing.xl, left: insets.left + spacing.lg, right: insets.right + spacing.lg }]}>
         {status === 'error' && (
           <AccessibleText variant="caption" color="#FFB4A8" style={[styles.centerText, styles.errorText]}>
             {t('scan.error')}
@@ -86,8 +90,6 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 24,
-    left: 24,
     width: 44,
     height: 44,
     borderRadius: 9999,
@@ -98,9 +100,6 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: 100,
-    left: spacing.lg,
-    right: spacing.lg,
     gap: spacing.sm,
   },
   centerText: {
@@ -151,9 +150,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 48,
-    left: spacing.lg,
-    right: spacing.lg,
     gap: spacing.md,
   },
   errorText: {

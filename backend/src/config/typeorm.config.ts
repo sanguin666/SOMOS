@@ -19,9 +19,9 @@ export function buildTypeOrmConfig(
     type: 'postgres',
     host: configService.get<string>('DB_HOST', 'localhost'),
     port: configService.get<number>('DB_PORT', 5432),
-    username: configService.get<string>('DB_USERNAME', 'mypeople'),
-    password: configService.get<string>('DB_PASSWORD', 'mypeople'),
-    database: configService.get<string>('DB_NAME', 'mypeople'),
+    username: configService.get<string>('DB_USERNAME', 'ansae'),
+    password: configService.get<string>('DB_PASSWORD', 'ansae'),
+    database: configService.get<string>('DB_NAME', 'ansae'),
     entities: [
       User,
       Poi,

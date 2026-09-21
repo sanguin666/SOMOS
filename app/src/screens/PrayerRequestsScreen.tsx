@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
-import { BackChevronIcon, CandleIcon } from '../components/icons';
+import { CandleIcon } from '../components/icons';
 import { createPrayerRequest, getPrayerRequests, prayForRequest } from '../api/prayerRequests';
 import { useI18n } from '../i18n/I18nContext';
 import type { PrayerRequest, Poi } from '../api/types';
@@ -11,10 +10,9 @@ import { colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
 };
 
-export function PrayerRequestsScreen({ poi, onBack }: Props) {
+export function PrayerRequestsScreen({ poi }: Props) {
   const { t } = useI18n();
   const [requests, setRequests] = useState<PrayerRequest[] | null>(null);
   const [error, setError] = useState(false);
@@ -58,16 +56,9 @@ export function PrayerRequestsScreen({ poi, onBack }: Props) {
   }
 
   return (
-    <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
-        <BackChevronIcon size={20} color={colors.text} />
-      </Pressable>
-
+    <>
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('prayerRequests.title')}</AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {poi.name}
-        </AccessibleText>
       </View>
 
       <View style={styles.form}>
@@ -124,19 +115,11 @@ export function PrayerRequestsScreen({ poi, onBack }: Props) {
           </View>
         </View>
       ))}
-    </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 9999,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,

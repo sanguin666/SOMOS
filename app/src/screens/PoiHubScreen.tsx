@@ -1,23 +1,20 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Screen } from '../components/Screen';
+import { PoiShell, type HubTab } from '../components/PoiShell';
 import { AccessibleText } from '../components/AccessibleText';
-import {
-  BackChevronIcon,
-  BellIcon,
-  CalendarIcon,
-  CandleIcon,
-  ChatBubbleIcon,
-  ChevronRightIcon,
-  HeartIcon,
-  LogoMark,
-  MegaphoneIcon,
-  PlayIcon,
-} from '../components/icons';
+import { ChevronRightIcon } from '../components/icons';
+import { AnnouncementsScreen } from './AnnouncementsScreen';
+import { CommunityScreen } from './CommunityScreen';
+import { CommunityThreadScreen } from './CommunityThreadScreen';
+import { ComposeAnnouncementScreen } from './ComposeAnnouncementScreen';
+import { DonateScreen } from './DonateScreen';
+import { EventsScreen } from './EventsScreen';
+import { LivestreamScreen } from './LivestreamScreen';
+import { PrayerRequestsScreen } from './PrayerRequestsScreen';
 import { getActiveModules } from '../api/pois';
 import { getAnnouncements } from '../api/announcements';
 import { getEvents } from '../api/events';
-import type { ActiveModule, Announcement, Event, ModuleType, Poi } from '../api/types';
+import type { ActiveModule, Announcement, CommunityPost, Event, ModuleType, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
@@ -25,13 +22,15 @@ import { useI18n } from '../i18n/I18nContext';
 type Props = {
   poi: Poi;
   onBack: () => void;
-  onOpenDonate: () => void;
-  onOpenEvents: () => void;
-  onOpenAnnouncements: () => void;
-  onOpenPrayerRequests: () => void;
-  onOpenLivestream: () => void;
-  onOpenCommunity: () => void;
 };
+
+// A drill-down opened from within a tab. It replaces the tab's own content
+// while the banner and tab bar stay exactly where they are — selecting any
+// tab drops back to `list`.
+type Drilldown =
+  | { kind: 'list' }
+  | { kind: 'compose-announcement' }
+  | { kind: 'community-thread'; post: CommunityPost };
 
 const ALL_MODULE_TYPES: ModuleType[] = [
   'donations',
@@ -50,22 +49,17 @@ function formatAnnouncementDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-export function PoiHubScreen({
-  poi,
-  onBack,
-  onOpenDonate,
-  onOpenEvents,
-  onOpenAnnouncements,
-  onOpenPrayerRequests,
-  onOpenLivestream,
-  onOpenCommunity,
-}: Props) {
-  const { t } = useI18n();
+/**
+ * Everything under one POI. The banner and the module tab bar live in
+ * `PoiShell` and stay mounted for the whole visit: picking a module swaps
+ * only what sits between them, so the chrome never moves and the selected
+ * tab is the one thing that changes.
+ */
+export function PoiHubScreen({ poi, onBack }: Props) {
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState(false);
-  const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
-  const [nextEvent, setNextEvent] = useState<Event | null>(null);
-  const poiTheme = getPoiTheme(poi.type);
+  const [tab, setTab] = useState<HubTab>('home');
+  const [drilldown, setDrilldown] = useState<Drilldown>({ kind: 'list' });
 
   useEffect(() => {
     let cancelled = false;
@@ -81,6 +75,82 @@ export function PoiHubScreen({
     };
   }, [poi.id]);
 
+  function selectTab(next: HubTab) {
+    setTab(next);
+    setDrilldown({ kind: 'list' });
+  }
+
+  return (
+    <PoiShell
+      poi={poi}
+      modules={modules}
+      activeTab={tab}
+      onSelectTab={selectTab}
+      onBack={onBack}
+    >
+      {tab === 'home' && (
+        <HubFeed poi={poi} modules={modules} error={error} onSelectTab={selectTab} />
+      )}
+
+      {tab === 'donations' && <DonateScreen poi={poi} onDone={() => selectTab('home')} />}
+
+      {tab === 'events' && <EventsScreen poi={poi} />}
+
+      {tab === 'announcements' &&
+        (drilldown.kind === 'compose-announcement' ? (
+          <ComposeAnnouncementScreen
+            poi={poi}
+            onBack={() => setDrilldown({ kind: 'list' })}
+            onCreated={() => setDrilldown({ kind: 'list' })}
+          />
+        ) : (
+          <AnnouncementsScreen
+            poi={poi}
+            onCompose={() => setDrilldown({ kind: 'compose-announcement' })}
+          />
+        ))}
+
+      {tab === 'prayer_requests' && <PrayerRequestsScreen poi={poi} />}
+
+      {tab === 'livestreams' && <LivestreamScreen poi={poi} />}
+
+      {tab === 'community' &&
+        (drilldown.kind === 'community-thread' ? (
+          <CommunityThreadScreen
+            poi={poi}
+            post={drilldown.post}
+            onBack={() => setDrilldown({ kind: 'list' })}
+          />
+        ) : (
+          <CommunityScreen
+            poi={poi}
+            onOpenPost={(post) => setDrilldown({ kind: 'community-thread', post })}
+          />
+        ))}
+    </PoiShell>
+  );
+}
+
+/**
+ * The hub's landing feed: what's coming up and what was just posted, with
+ * everything else reachable from the tab bar below.
+ */
+function HubFeed({
+  poi,
+  modules,
+  error,
+  onSelectTab,
+}: {
+  poi: Poi;
+  modules: ActiveModule[] | null;
+  error: boolean;
+  onSelectTab: (tab: HubTab) => void;
+}) {
+  const { t } = useI18n();
+  const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
+  const [nextEvent, setNextEvent] = useState<Event | null>(null);
+  const poiTheme = getPoiTheme(poi.type);
+
   const hasModule = (type: ModuleType) =>
     modules?.some((m) => m.moduleType === type && m.status !== 'expired' && m.status !== 'cancelled') ?? false;
 
@@ -90,7 +160,7 @@ export function PoiHubScreen({
 
   // The landing feed's content is best-effort: a failed fetch here just
   // means that section doesn't show, since every module stays reachable
-  // from the pill row above regardless.
+  // from the tab bar regardless.
   useEffect(() => {
     if (!announcementsActive) return;
     let cancelled = false;
@@ -122,67 +192,8 @@ export function PoiHubScreen({
     };
   }, [poi.id, eventsActive]);
 
-  const tabBar =
-    modules !== null && !noModulesActive ? (
-      <View style={styles.tabBar}>
-        {hasModule('donations') && (
-          <TabBarItem icon={<HeartIcon size={24} color={poiTheme.accent} />} label={t('hub.donationsLabel')} onPress={onOpenDonate} />
-        )}
-        {hasModule('events') && (
-          <TabBarItem icon={<CalendarIcon size={24} color={poiTheme.accent} />} label={t('hub.eventsLabel')} onPress={onOpenEvents} />
-        )}
-        {hasModule('announcements') && (
-          <TabBarItem icon={<MegaphoneIcon size={24} color={poiTheme.accent} />} label={t('hub.announcementsLabel')} onPress={onOpenAnnouncements} />
-        )}
-        {hasModule('prayer_requests') && (
-          <TabBarItem icon={<CandleIcon size={24} color={poiTheme.accent} />} label={t('hub.prayerRequestsLabel')} onPress={onOpenPrayerRequests} />
-        )}
-        {hasModule('livestreams') && (
-          <TabBarItem icon={<PlayIcon size={24} color={poiTheme.accent} />} label={t('hub.livestreamLabel')} onPress={onOpenLivestream} />
-        )}
-        {hasModule('community') && (
-          <TabBarItem icon={<ChatBubbleIcon size={24} color={poiTheme.accent} />} label={t('hub.communityLabel')} onPress={onOpenCommunity} />
-        )}
-      </View>
-    ) : null;
-
   return (
-    <Screen scroll footer={tabBar}>
-      <View style={[styles.hero, { backgroundColor: poiTheme.accent }]}>
-        <LogoMark size={32} haloColor={colors.surface} />
-
-        <View style={styles.heroTitleBlock}>
-          <AccessibleText
-            variant="bodyLarge"
-            color={poiTheme.accentText}
-            numberOfLines={1}
-            style={styles.heroName}
-          >
-            {poi.name}
-          </AccessibleText>
-          <AccessibleText
-            variant="body"
-            color="rgba(255,255,255,0.85)"
-            numberOfLines={1}
-            style={styles.heroLocation}
-          >
-            {poi.city ?? t('hub.locationNotSet')}
-          </AccessibleText>
-        </View>
-
-        <View style={styles.iconButton}>
-          <BellIcon size={18} color="#FFFFFF" />
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('common.back')}
-          onPress={onBack}
-          style={styles.iconButton}
-        >
-          <BackChevronIcon size={16} color="#FFFFFF" />
-        </Pressable>
-      </View>
-
+    <>
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
           {t('hub.errorLoad')}
@@ -202,7 +213,12 @@ export function PoiHubScreen({
       )}
 
       {nextEvent && (
-        <Pressable accessibilityRole="button" accessibilityLabel={nextEvent.title} onPress={onOpenEvents} style={styles.eventCard}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={nextEvent.title}
+          onPress={() => onSelectTab('events')}
+          style={styles.eventCard}
+        >
           <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
             <AccessibleText variant="caption" color="#FFFFFF" style={styles.eventDateMonth}>
               {new Date(nextEvent.startsAt).toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
@@ -229,7 +245,7 @@ export function PoiHubScreen({
             <AccessibleText variant="caption" style={styles.sectionLabel}>
               {t('hub.latestAnnouncements')}
             </AccessibleText>
-            <Pressable accessibilityRole="button" onPress={onOpenAnnouncements} style={styles.seeAllButton}>
+            <Pressable accessibilityRole="button" onPress={() => onSelectTab('announcements')} style={styles.seeAllButton}>
               <AccessibleText variant="caption" color={poiTheme.accentStrong} style={styles.seeAllLabel}>
                 {t('hub.seeAll')}
               </AccessibleText>
@@ -242,7 +258,7 @@ export function PoiHubScreen({
               key={item.id}
               accessibilityRole="button"
               accessibilityLabel={item.title}
-              onPress={onOpenAnnouncements}
+              onPress={() => onSelectTab('announcements')}
               style={styles.feedCard}
             >
               <View style={styles.feedCardHeader}>
@@ -260,73 +276,15 @@ export function PoiHubScreen({
           ))}
         </View>
       )}
-    </Screen>
+    </>
   );
 }
-
-function TabBarItem({ icon, label, onPress }: { icon: ReactNode; label: string; onPress: () => void }) {
-  return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.tabBarItem}>
-      {icon}
-      <AccessibleText variant="caption" numberOfLines={1} style={styles.tabBarLabel}>
-        {label}
-      </AccessibleText>
-    </Pressable>
-  );
-}
-
-
 
 const styles = StyleSheet.create({
-  hero: {
-    marginTop: -spacing.lg,
-    marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderBottomLeftRadius: radii.lg,
-    borderBottomRightRadius: radii.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 9999,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroTitleBlock: {
-    flex: 1,
-  },
-  heroName: {
-    fontWeight: '800',
-  },
-  heroLocation: {
-    fontWeight: '700',
-  },
   sectionLabel: {
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.6,
-  },
-  tabBar: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.surface,
-    paddingTop: spacing.xs,
-  },
-  tabBarItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 3,
-    minHeight: 56,
-  },
-  tabBarLabel: {
-    fontWeight: '500',
   },
   eventCard: {
     flexDirection: 'row',

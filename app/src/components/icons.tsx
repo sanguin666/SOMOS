@@ -5,7 +5,7 @@ type IconProps = {
   color?: string;
 };
 
-// The SOMOS mark: a heart split into two colors that meet at the center in
+// The Ansae mark: a heart split into two colors that meet at the center in
 // an S. Fixed brand colors — not tinted via `color` like the other icons.
 // `haloColor`, when set, traces a thin outline just outside the heart's own
 // silhouette — for placing the mark on a background that's the same color

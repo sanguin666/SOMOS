@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-const TOKEN_STORAGE_KEY = 'somos-admin-token';
+const TOKEN_STORAGE_KEY = 'ansae-admin-token';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_STORAGE_KEY);

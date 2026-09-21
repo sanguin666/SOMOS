@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
-import { BackChevronIcon, HeartIcon } from '../components/icons';
+import { HeartIcon } from '../components/icons';
 import { createDonation } from '../api/donations';
 import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
@@ -11,7 +10,8 @@ import type { Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
+  // Leaves the donation flow once it is confirmed — back to the hub feed.
+  onDone: () => void;
 };
 
 const PRESET_AMOUNTS = [10, 25, 50, 100];
@@ -26,7 +26,7 @@ const PRESET_AMOUNTS = [10, 25, 50, 100];
  * has no effect at all on the web target (react-native-web doesn't
  * implement it), so a native-only confirmation would look broken there.
  */
-export function DonateScreen({ poi, onBack }: Props) {
+export function DonateScreen({ poi, onDone }: Props) {
   const { t } = useI18n();
   const [selected, setSelected] = useState<number>(50);
   const [customMode, setCustomMode] = useState(false);
@@ -51,7 +51,7 @@ export function DonateScreen({ poi, onBack }: Props) {
 
   if (donated) {
     return (
-      <Screen>
+      <>
         <View style={styles.confirmationIcon}>
           <HeartIcon size={32} color={colors.primary} />
         </View>
@@ -62,17 +62,13 @@ export function DonateScreen({ poi, onBack }: Props) {
           {t('donate.confirmation', { amount, poiName: poi.name })}
         </AccessibleText>
         <View style={styles.spacer} />
-        <AccessibleButton label={t('donate.doneButton')} onPress={onBack} />
-      </Screen>
+        <AccessibleButton label={t('donate.doneButton')} onPress={onDone} />
+      </>
     );
   }
 
   return (
-    <Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
-        <BackChevronIcon size={20} color={colors.text} />
-      </Pressable>
-
+    <>
       <View style={styles.titleBlock}>
         <AccessibleText variant="title" style={styles.title}>
           {t('donate.title', { poiName: poi.name })}
@@ -148,7 +144,7 @@ export function DonateScreen({ poi, onBack }: Props) {
       <AccessibleText variant="caption" style={styles.footnote}>
         {t('donate.footnote')}
       </AccessibleText>
-    </Screen>
+    </>
   );
 }
 
@@ -165,14 +161,6 @@ const styles = StyleSheet.create({
   },
   centerText: {
     textAlign: 'center',
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 9999,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   titleBlock: {
     gap: spacing.xs,
@@ -206,7 +194,7 @@ const styles = StyleSheet.create({
   amountCellSelected: {
     borderWidth: 3,
     borderColor: colors.primary,
-    backgroundColor: '#EAF0F8',
+    backgroundColor: colors.surface,
   },
   customButton: {
     minHeight: 64,

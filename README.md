@@ -1,4 +1,4 @@
-# SOMOS
+# Ansae
 
 Mobile + web app for churches and other points of interest: donations, events, and future modules, with a strong focus on accessibility for a mostly elderly audience.
 
@@ -8,7 +8,7 @@ Mobile + web app for churches and other points of interest: donations, events, a
 backend/   NestJS API (Node.js + TypeORM + PostgreSQL)
 app/       Expo / React Native app (+ React Native Web) — the congregant-facing app
 admin/     React (Vite) admin dashboard for parish staff
-landing/   Static marketing site (no build step) advertising SOMOS to churches
+landing/   Static marketing site (no build step) advertising Ansae to churches
 docker-compose.yml   Local PostgreSQL for development
 ```
 
@@ -40,9 +40,16 @@ With Docker (recommended):
 docker compose up -d
 ```
 
-This starts a local Postgres on `localhost:5432` (database `mypeople`, user `mypeople` / password `mypeople`).
+This starts a local Postgres on `localhost:5432` (database `ansae`, user `ansae` / password `ansae`).
 
-> No Docker handy? A local PostgreSQL install (`apt install postgresql`) also works: create a `mypeople` user and database matching `backend/.env.example`.
+> **Coming from the old `mypeople` database?** Postgres only creates the
+> database and role named in `docker-compose.yml` the first time its volume
+> is initialised, so an existing volume still holds `mypeople` and the
+> backend won't be able to connect. Run `docker compose down -v` once, then
+> `docker compose up -d` and re-run the seed below — everything in there is
+> demo data, so nothing real is lost.
+
+> No Docker handy? A local PostgreSQL install (`apt install postgresql`) also works: create an `ansae` user and database matching `backend/.env.example`.
 
 ### 2. Backend (NestJS)
 
@@ -186,4 +193,4 @@ The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer 
 
 ## Marketing landing page
 
-`landing/` is a small static site (plain HTML/CSS/JS, no build step, no framework) advertising SOMOS to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). It's one scrolling page: features, pricing, and the "join" flow are all sections of `index.html` (`#pricing`, `#join`), not separate pages. The `#join` section is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback (`landing/assets/main.js` reads it from the URL's `?token=` query param). Text is in Spanish by default, switchable to English/French via the header pills (`landing/assets/i18n.js`, persisted in `localStorage`). Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.
+`landing/` is a small static site (plain HTML/CSS/JS, no build step, no framework) advertising Ansae to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). It's one scrolling page: features, pricing, and the "join" flow are all sections of `index.html` (`#pricing`, `#join`), not separate pages. The `#join` section is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback (`landing/assets/main.js` reads it from the URL's `?token=` query param). Text is in Spanish by default, switchable to English/French via the header pills (`landing/assets/i18n.js`, persisted in `localStorage`). Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.

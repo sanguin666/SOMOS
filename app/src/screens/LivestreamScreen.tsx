@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
-import { BackChevronIcon, PlayIcon } from '../components/icons';
+import { PlayIcon } from '../components/icons';
 import { getLivestreams } from '../api/livestreams';
 import { useI18n } from '../i18n/I18nContext';
 import type { Livestream, Poi } from '../api/types';
@@ -10,7 +9,6 @@ import { colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
 };
 
 function formatDateTime(iso: string) {
@@ -18,7 +16,7 @@ function formatDateTime(iso: string) {
   return `${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
 }
 
-export function LivestreamScreen({ poi, onBack }: Props) {
+export function LivestreamScreen({ poi }: Props) {
   const { t } = useI18n();
   const [livestreams, setLivestreams] = useState<Livestream[] | null>(null);
   const [error, setError] = useState(false);
@@ -38,16 +36,9 @@ export function LivestreamScreen({ poi, onBack }: Props) {
   }, [poi.id]);
 
   return (
-    <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
-        <BackChevronIcon size={20} color={colors.text} />
-      </Pressable>
-
+    <>
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('livestream.title')}</AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {poi.name}
-        </AccessibleText>
       </View>
 
       {error && (
@@ -107,19 +98,11 @@ export function LivestreamScreen({ poi, onBack }: Props) {
           </View>
         );
       })}
-    </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 9999,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
