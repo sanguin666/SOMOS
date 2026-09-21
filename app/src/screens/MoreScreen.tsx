@@ -2,12 +2,16 @@ import { type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import {
+  CalendarIcon,
   CandleIcon,
   ChatBubbleIcon,
   ChevronRightIcon,
+  HeartIcon,
+  MegaphoneIcon,
   PinIcon,
+  PlayIcon,
 } from '../components/icons';
-import { moreMenuModules, type HubTab } from '../components/PoiShell';
+import { hubMenu, type HubTab } from '../components/PoiShell';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
@@ -38,10 +42,10 @@ export function MoreScreen({ poi, modules, onSelectTab, onOpenPlaces }: Props) {
   const { t, language, setLanguage } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
-  const rows = moreMenuModules(modules).map((type) => ({
+  const rows = hubMenu(poi, modules).inMore.map((type) => ({
     type,
     icon: moduleIcon(type),
-    label: type === 'prayer_requests' ? t('more.prayerRequests') : t('more.community'),
+    label: moduleLabel(type, t),
   }));
 
   return (
@@ -109,10 +113,40 @@ export function MoreScreen({ poi, modules, onSelectTab, onOpenPlaces }: Props) {
   );
 }
 
+// The list has room the tab bar's labels never do, so the modules are
+// named in full here.
+function moduleLabel(type: ModuleType, t: ReturnType<typeof useI18n>['t']): string {
+  switch (type) {
+    case 'prayer_requests':
+      return t('more.prayerRequests');
+    case 'community':
+      return t('more.community');
+    case 'livestreams':
+      return t('livestream.title');
+    case 'events':
+      return t('events.title');
+    case 'announcements':
+      return t('announcements.title');
+    case 'donations':
+      return t('hub.donationsLabel');
+  }
+}
+
 function moduleIcon(type: ModuleType): (color: string) => ReactNode {
-  return type === 'prayer_requests'
-    ? (color) => <CandleIcon size={26} color={color} />
-    : (color) => <ChatBubbleIcon size={26} color={color} />;
+  switch (type) {
+    case 'prayer_requests':
+      return (color) => <CandleIcon size={26} color={color} />;
+    case 'community':
+      return (color) => <ChatBubbleIcon size={26} color={color} />;
+    case 'livestreams':
+      return (color) => <PlayIcon size={26} color={color} />;
+    case 'events':
+      return (color) => <CalendarIcon size={26} color={color} />;
+    case 'announcements':
+      return (color) => <MegaphoneIcon size={26} color={color} />;
+    case 'donations':
+      return (color) => <HeartIcon size={26} color={color} />;
+  }
 }
 
 const styles = StyleSheet.create({

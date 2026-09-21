@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PoiShell, type HubTab } from '../components/PoiShell';
+import { PoiShell, hubMenu, type HubTab } from '../components/PoiShell';
 import { AnnouncementsScreen } from './AnnouncementsScreen';
 import { CommunityScreen } from './CommunityScreen';
 import { CommunityThreadScreen } from './CommunityThreadScreen';
@@ -11,7 +11,7 @@ import { MoreScreen } from './MoreScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
 import { PrayerRequestsScreen } from './PrayerRequestsScreen';
 import { getActiveModules } from '../api/pois';
-import type { ActiveModule, CommunityPost, ModuleType, Poi } from '../api/types';
+import type { ActiveModule, CommunityPost, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
@@ -58,13 +58,6 @@ export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
     setDrilldown({ kind: 'list' });
   }
 
-  function hasModule(type: ModuleType) {
-    return (
-      modules?.some((m) => m.moduleType === type && m.status !== 'expired' && m.status !== 'cancelled') ??
-      false
-    );
-  }
-
   return (
     <PoiShell
       poi={poi}
@@ -84,7 +77,9 @@ export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
       {tab === 'events' && (
         <EventsScreen
           poi={poi}
-          onWatchLive={hasModule('livestreams') ? () => setTab('livestreams') : undefined}
+          onWatchLive={
+            hubMenu(poi, modules).livestreamInEvents ? () => setTab('livestreams') : undefined
+          }
         />
       )}
 

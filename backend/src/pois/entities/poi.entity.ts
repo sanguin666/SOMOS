@@ -11,6 +11,7 @@ import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from '../../active-modules/entities/active-module.entity.js';
 import { PoiType } from '../../common/enums/poi-type.enum.js';
 import { Language } from '../../common/enums/language.enum.js';
+import { ModuleType } from '../../common/enums/module-type.enum.js';
 
 /**
  * A point of interest a user can join: a church today, potentially other
@@ -54,6 +55,13 @@ export class Poi {
 
   @Column('text', { name: 'qr_flyer_subtext', nullable: true })
   qrFlyerSubtext?: string;
+
+  // The order this POI wants its modules to appear in the app's bottom
+  // menu: the first few get a button of their own, the rest fall under
+  // More. Modules left out keep their default position at the end, so an
+  // empty list simply means "whatever the app defaults to".
+  @Column('text', { name: 'menu_order', array: true, default: () => "'{}'" })
+  menuOrder!: ModuleType[];
 
   @Column({ nullable: true })
   address?: string;

@@ -2,6 +2,7 @@ import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common';
 import { PoisService } from '../pois/pois.service.js';
 import { UpdateLanguageDto } from '../common/dto/update-language.dto.js';
 import { UpdatePoiProfileDto } from '../common/dto/update-poi-profile.dto.js';
+import { UpdateMenuOrderDto } from '../common/dto/update-menu-order.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
@@ -22,6 +23,15 @@ export class PoiSettingsController {
   @Patch('profile')
   @UseGuards(JwtAuthGuard, PoiAdminGuard)
   updateProfile(@Param('poiId') poiId: string, @Body() dto: UpdatePoiProfileDto) {
+    return this.poisService.update(poiId, dto);
+  }
+
+  // Which modules the app's bottom menu gives a button to, and in what
+  // order — the rest fall under More. This is how a POI decides what its
+  // people reach in one tap.
+  @Patch('menu-order')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  updateMenuOrder(@Param('poiId') poiId: string, @Body() dto: UpdateMenuOrderDto) {
     return this.poisService.update(poiId, dto);
   }
 }

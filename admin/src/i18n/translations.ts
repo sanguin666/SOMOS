@@ -164,6 +164,20 @@ export type Translations = {
     livestream: string;
     community: string;
   };
+  menuOrder: {
+    title: string;
+    subtitle: string;
+    onBar: string;
+    underMore: string;
+    insideEvents: string;
+    moveUp: string;
+    moveDown: string;
+    save: string;
+    saving: string;
+    saved: string;
+    saveError: string;
+    empty: string;
+  };
   poiInfo: {
     title: string;
     subtitle: string;
@@ -388,6 +402,21 @@ const en: Translations = {
     prayerRequests: 'Prayer Requests',
     livestream: 'Livestream',
     community: 'Community',
+  },
+  menuOrder: {
+    title: 'Bottom menu order',
+    subtitle:
+      'The app gives the first modules on this list a button of their own at the bottom of the screen and puts the rest under More. Put what your people use most at the top.',
+    onBar: 'On the menu',
+    underMore: 'Under More',
+    insideEvents: 'Inside Events',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    save: 'Save order',
+    saving: 'Saving…',
+    saved: 'Menu order saved.',
+    saveError: 'Could not save the menu order.',
+    empty: 'Activate a module below to arrange the menu.',
   },
   poiInfo: {
     title: 'Parish info',
@@ -614,6 +643,21 @@ const es: Translations = {
     livestream: 'Transmisión en vivo',
     community: 'Comunidad',
   },
+  menuOrder: {
+    title: 'Orden del menú inferior',
+    subtitle:
+      'La app da un botón propio a los primeros módulos de esta lista, en la parte inferior de la pantalla, y pone el resto en Más. Coloca arriba lo que más usa tu gente.',
+    onBar: 'En el menú',
+    underMore: 'En Más',
+    insideEvents: 'Dentro de Eventos',
+    moveUp: 'Subir',
+    moveDown: 'Bajar',
+    save: 'Guardar orden',
+    saving: 'Guardando…',
+    saved: 'Orden del menú guardado.',
+    saveError: 'No se pudo guardar el orden del menú.',
+    empty: 'Activa un módulo abajo para ordenar el menú.',
+  },
   poiInfo: {
     title: 'Información de la parroquia',
     subtitle: 'Se muestra a los feligreses en la app.',
@@ -838,6 +882,21 @@ const fr: Translations = {
     prayerRequests: 'Intentions de prière',
     livestream: 'Diffusion en direct',
     community: 'Communauté',
+  },
+  menuOrder: {
+    title: 'Ordre du menu du bas',
+    subtitle:
+      "L'app donne un bouton à part aux premiers modules de cette liste, en bas de l'écran, et met les autres dans Plus. Placez en haut ce que vos fidèles utilisent le plus.",
+    onBar: 'Dans le menu',
+    underMore: 'Dans Plus',
+    insideEvents: 'Dans Agenda',
+    moveUp: 'Monter',
+    moveDown: 'Descendre',
+    save: "Enregistrer l'ordre",
+    saving: 'Enregistrement…',
+    saved: "Ordre du menu enregistré.",
+    saveError: "Impossible d'enregistrer l'ordre du menu.",
+    empty: 'Activez un module ci-dessous pour organiser le menu.',
   },
   poiInfo: {
     title: 'Informations de la paroisse',

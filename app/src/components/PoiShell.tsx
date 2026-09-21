@@ -30,11 +30,22 @@ export type HubTab = 'home' | 'more' | ModuleType;
 // scroll sideways.
 const MAX_TABS = 5;
 
-// The modules that give up their button first when the bar is full, in
-// the order they appear under More. They go last because a place's
-// calendar, its notices and its donations are what people open the app
-// for; these two are what they come back to.
-const OVERFLOW_ORDER: ModuleType[] = ['prayer_requests', 'community'];
+// Home takes the first button, leaving four for the place's modules —
+// and when it has more than four, the last of them becomes More.
+const BAR_SLOTS = MAX_TABS - 1;
+
+// Where a module sits in a place that has not arranged its own menu:
+// the three things people open the app for, then the two they come back
+// to, and the livestream last because the events screen already offers
+// it. A place reorders this in the dashboard.
+const DEFAULT_MENU_ORDER: ModuleType[] = [
+  'events',
+  'announcements',
+  'donations',
+  'prayer_requests',
+  'community',
+  'livestreams',
+];
 
 function isLive(module: ActiveModule) {
   return module.status !== 'expired' && module.status !== 'cancelled';
@@ -48,29 +59,56 @@ function liveModules(modules: ActiveModule[] | null): Set<ModuleType> {
   return live;
 }
 
-/**
- * The buttons between Home and More, in bar order. The livestream rides
- * along with events rather than taking a button of its own — it only
- * gets one in a place that streams without keeping a calendar.
- */
-function primaryTabs(live: Set<ModuleType>): ModuleType[] {
-  const tabs: ModuleType[] = [];
-  if (live.has('events')) tabs.push('events');
-  else if (live.has('livestreams')) tabs.push('livestreams');
-  if (live.has('announcements')) tabs.push('announcements');
-  if (live.has('donations')) tabs.push('donations');
-  return tabs;
+// Everything the place has switched on, in its own order, with anything
+// it never arranged falling in behind in the default order.
+function orderedLiveModules(poi: Poi, live: Set<ModuleType>): ModuleType[] {
+  const chosen = (poi.menuOrder ?? []).filter((type) => live.has(type));
+  const rest = DEFAULT_MENU_ORDER.filter((type) => live.has(type) && !chosen.includes(type));
+  return [...chosen, ...rest];
 }
 
+// How many modules keep a button of their own: all of them when they
+// fit, one fewer than the slots when More has to take the last one.
+function barModuleCount(total: number): number {
+  return total <= BAR_SLOTS ? total : BAR_SLOTS - 1;
+}
+
+export type HubMenu = {
+  // The modules with a button of their own, in bar order.
+  onBar: ModuleType[];
+  // The modules the More screen lists. Empty means no More button: a
+  // place with few modules gets a shorter bar rather than a button
+  // hiding a single thing.
+  inMore: ModuleType[];
+  // Whether the livestream is reached from the top of the events screen
+  // instead of a button or a More row.
+  livestreamInEvents: boolean;
+};
+
 /**
- * Which modules the More screen lists. Empty when they all fit on the
- * bar, in which case no More button is drawn either: a place with few
- * modules just gets a shorter bar, never a button hiding one thing.
+ * Who goes where in the bottom menu, from the order the place set in the
+ * dashboard and the modules it currently has running.
  */
-export function moreMenuModules(modules: ActiveModule[] | null): ModuleType[] {
+export function hubMenu(poi: Poi, modules: ActiveModule[] | null): HubMenu {
   const live = liveModules(modules);
-  const overflow = OVERFLOW_ORDER.filter((type) => live.has(type));
-  return primaryTabs(live).length + overflow.length <= MAX_TABS - 1 ? [] : overflow;
+  const ordered = orderedLiveModules(poi, live);
+
+  // The livestream is the one module with somewhere else to live: the
+  // events screen carries it at the top. A place that did not lift it
+  // onto the bar gets it there rather than as one more row under More.
+  const livestreamInEvents =
+    live.has('livestreams') &&
+    live.has('events') &&
+    ordered.indexOf('livestreams') >= barModuleCount(ordered.length);
+
+  const placed = livestreamInEvents ? ordered.filter((type) => type !== 'livestreams') : ordered;
+  const onBarCount = barModuleCount(placed.length);
+
+  return {
+    onBar: placed.slice(0, onBarCount),
+    inMore: placed.slice(onBarCount),
+    livestreamInEvents,
+  };
 }
 
 /**
@@ -83,23 +121,20 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, c
   const { t } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
-  const live = liveModules(modules);
-  const primary = primaryTabs(live);
-  const overflow = OVERFLOW_ORDER.filter((type) => live.has(type));
-  const collapses = primary.length + overflow.length > MAX_TABS - 1;
+  const { onBar, inMore, livestreamInEvents } = hubMenu(poi, modules);
 
-  const tabs: HubTab[] = ['home', ...primary, ...(collapses ? (['more'] as HubTab[]) : overflow)];
+  const tabs: HubTab[] = ['home', ...onBar, ...(inMore.length > 0 ? (['more'] as HubTab[]) : [])];
 
   // Home alone is not a menu: a place with nothing switched on shows its
   // page and no bar at all.
-  const showTabBar = primary.length + overflow.length > 0;
+  const showTabBar = onBar.length > 0 || inMore.length > 0;
 
   // The button that lights up for the screen showing. A screen reached
   // from somewhere other than the bar still lights the button it lives
   // under, so the bar always says where you are.
   const highlighted: HubTab = tabs.includes(activeTab)
     ? activeTab
-    : activeTab === 'livestreams'
+    : activeTab === 'livestreams' && livestreamInEvents
       ? 'events'
       : 'more';
 

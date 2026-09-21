@@ -8,6 +8,10 @@ export type Poi = {
   city: string | null;
   postalCode: string | null;
   qrCodeToken: string;
+  // The order this place wants its modules in the bottom menu, set in the
+  // admin dashboard. Modules it leaves out fall in behind the ones it
+  // listed, in the app's own default order.
+  menuOrder: ModuleType[];
   createdAt: string;
   updatedAt: string;
 };
