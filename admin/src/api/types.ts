@@ -17,6 +17,30 @@ export type Poi = {
   qrCodeToken: string;
 };
 
+// The sections a POI stacks on its home page in the app, in the order it
+// chose. `text` and `image` carry their own content; the rest pull live
+// content from a module and render nothing when it isn't active.
+export type PageBlockType =
+  | 'text'
+  | 'image'
+  | 'next_events'
+  | 'past_events'
+  | 'latest_announcements'
+  | 'next_livestream'
+  | 'donate';
+
+export type PoiPageBlock = {
+  id: string;
+  type: PageBlockType;
+  position: number;
+  title: string | null;
+  body: string | null;
+  // Relative path (e.g. /uploads/poi-pages/<file>.jpg) — prefix with the
+  // API base URL to display it.
+  imageUrl: string | null;
+  itemCount: number;
+};
+
 export type CurrentUser = {
   id: string;
   email: string;

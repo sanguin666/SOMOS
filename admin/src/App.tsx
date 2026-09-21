@@ -11,6 +11,7 @@ import { PrayerRequestsPage } from './pages/PrayerRequestsPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { MyQrPage } from './pages/MyQrPage';
+import { PoiHomePage } from './pages/PoiHomePage';
 import { DonationsPage } from './pages/DonationsPage';
 
 // Reconciles the UI's language with the account's saved one on login.
@@ -89,6 +90,7 @@ function AppRoutes() {
         <Route path="prayer-requests" element={<PrayerRequestsPage />} />
         <Route path="community" element={<CommunityPage />} />
         <Route path="my-qr" element={<MyQrPage />} />
+        <Route path="home-page" element={<PoiHomePage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

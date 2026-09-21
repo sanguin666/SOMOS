@@ -37,6 +37,9 @@ export type Translations = {
     livestreamLabel: string;
     communityLabel: string;
     nextEvent: string;
+    upcomingEvents: string;
+    pastEvents: string;
+    nextLivestream: string;
     latestAnnouncements: string;
     seeAll: string;
   };
@@ -164,6 +167,9 @@ const en: Translations = {
     livestreamLabel: 'Live',
     communityLabel: 'Group',
     nextEvent: 'Next event',
+    upcomingEvents: 'Coming up',
+    pastEvents: 'Recently',
+    nextLivestream: 'Live services',
     latestAnnouncements: 'Latest',
     seeAll: 'See all',
   },
@@ -292,6 +298,9 @@ const es: Translations = {
     livestreamLabel: 'En vivo',
     communityLabel: 'Grupo',
     nextEvent: 'Próximo evento',
+    upcomingEvents: 'Próximamente',
+    pastEvents: 'Recientemente',
+    nextLivestream: 'Servicios en vivo',
     latestAnnouncements: 'Últimos anuncios',
     seeAll: 'Ver todos',
   },
@@ -420,6 +429,9 @@ const fr: Translations = {
     livestreamLabel: 'Direct',
     communityLabel: 'Groupe',
     nextEvent: 'Prochain événement',
+    upcomingEvents: 'À venir',
+    pastEvents: 'Récemment',
+    nextLivestream: 'Offices en direct',
     latestAnnouncements: 'Dernières annonces',
     seeAll: 'Tout voir',
   },

@@ -11,6 +11,7 @@ import { Livestream } from '../livestreams/entities/livestream.entity.js';
 import { CommunityPost } from '../community/entities/community-post.entity.js';
 import { CommunityComment } from '../community/entities/community-comment.entity.js';
 import { Donation } from '../donations/entities/donation.entity.js';
+import { PoiPageBlock } from '../poi-page/entities/poi-page-block.entity.js';
 
 export function buildTypeOrmConfig(
   configService: ConfigService,
@@ -34,6 +35,7 @@ export function buildTypeOrmConfig(
       CommunityPost,
       CommunityComment,
       Donation,
+      PoiPageBlock,
     ],
     // Convenient for the local demo: tables are created/updated automatically.
     // Switch to real migrations before any production use.

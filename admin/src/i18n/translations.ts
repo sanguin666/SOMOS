@@ -26,6 +26,7 @@ export type Translations = {
     navPrayerRequests: string;
     navCommunity: string;
     navMyQr: string;
+    navHomePage: string;
     navSettings: string;
     noAdminPois: string;
   };
@@ -177,6 +178,39 @@ export type Translations = {
     saveError: string;
     saveSuccess: string;
   };
+  homePage: {
+    title: string;
+    subtitle: string;
+    loading: string;
+    loadError: string;
+    saveError: string;
+    empty: string;
+    useDefault: string;
+    addSection: string;
+    moveUp: string;
+    moveDown: string;
+    delete: string;
+    save: string;
+    saving: string;
+    saved: string;
+    headingLabel: string;
+    captionLabel: string;
+    textLabel: string;
+    itemCountLabel: string;
+    imageLabel: string;
+    chooseImage: string;
+    uploading: string;
+    uploadError: string;
+    autoNote: string;
+    moduleOffNote: string;
+    blockText: string;
+    blockImage: string;
+    blockNextEvents: string;
+    blockPastEvents: string;
+    blockLatestAnnouncements: string;
+    blockNextLivestream: string;
+    blockDonate: string;
+  };
   qr: {
     title: string;
     subtitle: string;
@@ -217,6 +251,7 @@ const en: Translations = {
     navPrayerRequests: 'Prayer Requests',
     navCommunity: 'Community',
     navMyQr: 'My QR',
+    navHomePage: 'Home page',
     navSettings: 'Settings',
     noAdminPois: "Your account isn't an admin of any parish yet.",
   },
@@ -368,6 +403,39 @@ const en: Translations = {
     saveError: 'Could not save your changes.',
     saveSuccess: 'Saved.',
   },
+  homePage: {
+    title: 'Home page',
+    subtitle: 'What people see when they open your place, before they pick anything from the menu. Sections show in the order below.',
+    loading: 'Loading the page…',
+    loadError: "Couldn't load this page.",
+    saveError: "Couldn't save that change.",
+    empty: 'You have no sections yet, so people see a short default page: the next event and the latest announcements.',
+    useDefault: 'Start from the default page',
+    addSection: 'Add a section',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    delete: 'Remove',
+    save: 'Save',
+    saving: 'Saving…',
+    saved: 'Saved',
+    headingLabel: 'Heading (optional)',
+    captionLabel: 'Caption (optional)',
+    textLabel: 'Text',
+    itemCountLabel: 'How many to show',
+    imageLabel: 'Image',
+    chooseImage: 'Choose an image',
+    uploading: 'Uploading…',
+    uploadError: "Couldn't upload that image.",
+    autoNote: 'This section fills itself from what you publish — nothing to write here.',
+    moduleOffNote: "This module is off, so this section won't show in the app.",
+    blockText: 'Text',
+    blockImage: 'Photo',
+    blockNextEvents: 'Upcoming events',
+    blockPastEvents: 'Past events',
+    blockLatestAnnouncements: 'Latest announcements',
+    blockNextLivestream: 'Next livestream',
+    blockDonate: 'Donate button',
+  },
   qr: {
     title: 'My QR',
     subtitle: 'A printable flyer with your QR code — put it up anywhere congregants can scan it to get the app and join your parish.',
@@ -408,6 +476,7 @@ const es: Translations = {
     navPrayerRequests: 'Peticiones de oración',
     navCommunity: 'Comunidad',
     navMyQr: 'Mi código QR',
+    navHomePage: 'Página de inicio',
     navSettings: 'Configuración',
     noAdminPois: 'Tu cuenta todavía no es administradora de ninguna parroquia.',
   },
@@ -559,6 +628,39 @@ const es: Translations = {
     saveError: 'No se pudieron guardar los cambios.',
     saveSuccess: 'Guardado.',
   },
+  homePage: {
+    title: 'Página de inicio',
+    subtitle: 'Lo que ve la gente al abrir tu lugar, antes de elegir algo del menú. Las secciones aparecen en el orden de abajo.',
+    loading: 'Cargando la página…',
+    loadError: 'No se pudo cargar esta página.',
+    saveError: 'No se pudo guardar ese cambio.',
+    empty: 'Todavía no tienes secciones, así que la gente ve una página breve por defecto: el próximo evento y los últimos anuncios.',
+    useDefault: 'Empezar con la página por defecto',
+    addSection: 'Añadir una sección',
+    moveUp: 'Subir',
+    moveDown: 'Bajar',
+    delete: 'Quitar',
+    save: 'Guardar',
+    saving: 'Guardando…',
+    saved: 'Guardado',
+    headingLabel: 'Título (opcional)',
+    captionLabel: 'Pie de foto (opcional)',
+    textLabel: 'Texto',
+    itemCountLabel: 'Cuántos mostrar',
+    imageLabel: 'Imagen',
+    chooseImage: 'Elegir una imagen',
+    uploading: 'Subiendo…',
+    uploadError: 'No se pudo subir esa imagen.',
+    autoNote: 'Esta sección se rellena sola con lo que publicas: aquí no hay nada que escribir.',
+    moduleOffNote: 'Este módulo está desactivado, así que esta sección no aparecerá en la app.',
+    blockText: 'Texto',
+    blockImage: 'Foto',
+    blockNextEvents: 'Próximos eventos',
+    blockPastEvents: 'Eventos pasados',
+    blockLatestAnnouncements: 'Últimos anuncios',
+    blockNextLivestream: 'Próxima transmisión',
+    blockDonate: 'Botón de donar',
+  },
   qr: {
     title: 'Mi código QR',
     subtitle: 'Un folleto imprimible con tu código QR: colócalo donde los feligreses puedan escanearlo para obtener la app y unirse a tu parroquia.',
@@ -599,6 +701,7 @@ const fr: Translations = {
     navPrayerRequests: 'Intentions de prière',
     navCommunity: 'Communauté',
     navMyQr: 'Mon code QR',
+    navHomePage: "Page d'accueil",
     navSettings: 'Paramètres',
     noAdminPois: "Votre compte n'est encore administrateur d'aucune paroisse.",
   },
@@ -749,6 +852,39 @@ const fr: Translations = {
     saving: 'Enregistrement…',
     saveError: 'Impossible d’enregistrer les modifications.',
     saveSuccess: 'Enregistré.',
+  },
+  homePage: {
+    title: "Page d'accueil",
+    subtitle: "Ce que les gens voient en ouvrant votre lieu, avant de choisir quoi que ce soit dans le menu. Les sections s'affichent dans l'ordre ci-dessous.",
+    loading: 'Chargement de la page…',
+    loadError: 'Impossible de charger cette page.',
+    saveError: "Impossible d'enregistrer cette modification.",
+    empty: "Vous n'avez pas encore de sections, donc les gens voient une page courte par défaut : le prochain événement et les dernières annonces.",
+    useDefault: 'Partir de la page par défaut',
+    addSection: 'Ajouter une section',
+    moveUp: 'Monter',
+    moveDown: 'Descendre',
+    delete: 'Retirer',
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saved: 'Enregistré',
+    headingLabel: 'Titre (facultatif)',
+    captionLabel: 'Légende (facultative)',
+    textLabel: 'Texte',
+    itemCountLabel: 'Combien en afficher',
+    imageLabel: 'Image',
+    chooseImage: 'Choisir une image',
+    uploading: 'Envoi…',
+    uploadError: "Impossible d'envoyer cette image.",
+    autoNote: 'Cette section se remplit toute seule avec ce que vous publiez — rien à écrire ici.',
+    moduleOffNote: "Ce module est désactivé, donc cette section n'apparaîtra pas dans l'app.",
+    blockText: 'Texte',
+    blockImage: 'Photo',
+    blockNextEvents: 'Prochains événements',
+    blockPastEvents: 'Événements passés',
+    blockLatestAnnouncements: 'Dernières annonces',
+    blockNextLivestream: 'Prochaine diffusion',
+    blockDonate: 'Bouton de don',
   },
   qr: {
     title: 'Mon code QR',

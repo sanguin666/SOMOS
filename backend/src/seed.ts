@@ -11,12 +11,14 @@ import { Livestream } from './livestreams/entities/livestream.entity.js';
 import { CommunityPost } from './community/entities/community-post.entity.js';
 import { CommunityComment } from './community/entities/community-comment.entity.js';
 import { Donation } from './donations/entities/donation.entity.js';
+import { PoiPageBlock } from './poi-page/entities/poi-page-block.entity.js';
 import { ModuleType } from './common/enums/module-type.enum.js';
 import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
 import { PoiType } from './common/enums/poi-type.enum.js';
 import { MemberRole } from './common/enums/member-role.enum.js';
 import { Language } from './common/enums/language.enum.js';
+import { PageBlockType } from './common/enums/page-block-type.enum.js';
 
 /**
  * Seeds two demo POIs with fixed QR tokens, so the app has something real
@@ -49,6 +51,7 @@ const dataSource = new DataSource({
     CommunityPost,
     CommunityComment,
     Donation,
+    PoiPageBlock,
   ],
   synchronize: true,
 });
@@ -67,6 +70,7 @@ async function seed() {
   const communityPostRepository = dataSource.getRepository(CommunityPost);
   const communityCommentRepository = dataSource.getRepository(CommunityComment);
   const donationRepository = dataSource.getRepository(Donation);
+  const pageBlockRepository = dataSource.getRepository(PoiPageBlock);
 
   const DONOR_NAMES = ['Margaret', 'Robert', 'Linda', 'Tom', 'Susan', 'James', 'Patricia', 'David', 'Carol'];
   const GIFT_AMOUNTS = [10, 15, 20, 25, 30, 50, 75, 100];
@@ -390,6 +394,52 @@ async function seed() {
       }),
     ]);
     console.log('Seeded demo community posts');
+  }
+
+  // A worked example of a home page, so the demo shows what a POI can
+  // build for itself rather than the bare fallback. Only St. Mary's gets
+  // one — Holy Trinity is left empty on purpose, so both paths are
+  // visible side by side.
+  const pageBlockCount = await pageBlockRepository.count({
+    where: { poi: { id: poi.id } },
+  });
+  if (pageBlockCount === 0) {
+    await pageBlockRepository.save([
+      pageBlockRepository.create({
+        poi,
+        position: 0,
+        type: PageBlockType.TEXT,
+        title: 'Welcome to St. Mary’s',
+        body: 'A welcoming parish in the heart of Springfield. Whether you have been coming for fifty years or are walking in for the first time, there is a seat for you. Sunday Mass is at 10:00, and the doors open half an hour before.',
+      }),
+      pageBlockRepository.create({
+        poi,
+        position: 1,
+        type: PageBlockType.NEXT_EVENTS,
+        itemCount: 3,
+      }),
+      pageBlockRepository.create({
+        poi,
+        position: 2,
+        type: PageBlockType.LATEST_ANNOUNCEMENTS,
+        itemCount: 2,
+      }),
+      pageBlockRepository.create({
+        poi,
+        position: 3,
+        type: PageBlockType.TEXT,
+        title: 'Visiting us',
+        body: 'The parish office is open weekdays from 9am to 4pm. There is step-free access on the side entrance from the car park, and a hearing loop in the first four rows.',
+      }),
+      pageBlockRepository.create({
+        poi,
+        position: 4,
+        type: PageBlockType.DONATE,
+        title: 'Support the parish',
+        body: 'Every gift keeps the lights on, the food pantry stocked and the doors open.',
+      }),
+    ]);
+    console.log('Seeded a demo home page for St. Mary’s');
   }
 
   await seedDonations(poi, 1);
