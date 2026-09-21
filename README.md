@@ -134,6 +134,15 @@ For showing the app to someone off your network, a standalone build beats Expo G
 
    EAS returns a download link when the build finishes. Open it on the phone to install the APK.
 
+   **If the build fails on a git check** — either "git command not found", or the self-contradicting "git found, but `git --help` exited with status undefined" — build with version control disabled instead:
+
+   ```powershell
+   $env:EAS_NO_VCS=1
+   eas build --profile preview --platform android
+   ```
+
+   EAS only uses git to read the branch name and commit hash for build metadata. With `EAS_NO_VCS=1` it still respects `.gitignore`, so `node_modules` stays out of the upload and the resulting APK is the same.
+
 On the day, run `start-demo.bat` and open the app on the phone. Nothing to scan, nothing to type.
 
 Re-run the build only when the app code changes. Backend changes need nothing rebuilt, as long as the ngrok domain stays the same.
