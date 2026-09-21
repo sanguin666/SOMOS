@@ -2,7 +2,11 @@
 setlocal EnableDelayedExpansion
 title SOMOS launcher
 
-REM One-click dev launcher for Windows: starts Postgres (via Docker if
+REM One-click LOCAL dev launcher for Windows, for working at home with the
+REM phone on the same Wi-Fi and the app running in Expo Go. To demo the app
+REM away from this network, use start-demo.bat with the built APK instead.
+REM
+REM Starts Postgres (via Docker if
 REM available), installs/updates dependencies, seeds the demo data, and
 REM launches the backend, admin dashboard, and mobile app each in their
 REM own window. Re-run this file any time to restart everything - it
@@ -63,15 +67,18 @@ echo.
 REM --- Mobile app: env, install ---
 echo Setting up mobile app...
 pushd app
-if not exist .env (
-    copy .env.example .env >nul
-    call :detect_lan_ip
-    if defined LAN_IP (
-        powershell -NoProfile -Command "(Get-Content .env) -replace 'EXPO_PUBLIC_API_URL=.*', 'EXPO_PUBLIC_API_URL=http://!LAN_IP!:3000' | Set-Content .env" >nul
-        echo   Set EXPO_PUBLIC_API_URL to http://!LAN_IP!:3000 ^(this PC's network IP^)
-        echo   so Expo Go on a phone can reach the backend over Wi-Fi.
-        echo   Wrong network? Edit app\.env by hand, then re-run this file.
-    )
+if not exist .env copy .env.example .env >nul
+REM Always refresh the API URL to this PC's current network IP. This file is
+REM the local/Expo Go path, so app\.env should always point at the LAN - a
+REM leftover tunnel URL from a remote demo would otherwise silently persist.
+call :detect_lan_ip
+if defined LAN_IP (
+    powershell -NoProfile -Command "(Get-Content .env) -replace 'EXPO_PUBLIC_API_URL=.*', 'EXPO_PUBLIC_API_URL=http://!LAN_IP!:3000' | Set-Content .env" >nul
+    echo   Set EXPO_PUBLIC_API_URL to http://!LAN_IP!:3000 ^(this PC's network IP^)
+    echo   so Expo Go on a phone can reach the backend over Wi-Fi.
+) else (
+    echo   [!] Could not detect this PC's network IP - check EXPO_PUBLIC_API_URL
+    echo       in app\.env by hand before scanning the QR code.
 )
 call npm install
 popd
@@ -100,6 +107,9 @@ echo     Admin dashboard:  http://localhost:5173
 echo     Mobile app:       scan the QR code in its window
 echo.
 echo     Demo admin login: admin@stmarys.example / demo1234
+echo.
+echo   Phone must be on the same Wi-Fi as this PC. Demoing
+echo   somewhere else? Use start-demo.bat and the APK instead.
 echo.
 echo   Closing THIS window does not stop the 3 services -
 echo   close their own windows to stop them, or just re-run

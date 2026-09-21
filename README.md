@@ -21,7 +21,16 @@ docker-compose.yml   Local PostgreSQL for development
 
 ## Local demo (no cost)
 
-**Windows:** double-click `start.bat` to do all of the below in one go (installs/updates dependencies, starts Postgres if Docker is available, seeds demo data, and launches the backend, admin dashboard, and mobile app each in their own window). Re-run it any time for a full restart. Otherwise, follow the manual steps below.
+**Windows:** there are two one-click launchers at the root of the repo.
+
+| | `start.bat` | `start-demo.bat` |
+|---|---|---|
+| For | working at home | demoing anywhere |
+| Phone runs | Expo Go, via the QR code | the installed APK |
+| Phone needs | the same Wi-Fi as this PC | any internet connection |
+| Starts | Postgres, backend, admin, Expo | Postgres, backend, ngrok tunnel |
+
+`start.bat` also rewrites `EXPO_PUBLIC_API_URL` in `app/.env` to this PC's current network IP every time it runs, so Expo Go always points at the right place. Re-run either file any time for a clean restart — each closes the windows it opened last time. Otherwise, follow the manual steps below.
 
 ### 1. PostgreSQL database
 
@@ -103,7 +112,9 @@ For showing the app to someone off your network, a standalone build beats Expo G
    ngrok http 3000 --url https://<your-domain>.ngrok-free.dev
    ```
 
-2. Put that same URL in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build.
+   `start-demo.bat` does this for you along with the database and backend — set `NGROK_DOMAIN` at the top of that file.
+
+2. Put that same URL in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. It has to match the domain in `start-demo.bat`.
 3. Build and install:
 
    ```bash
@@ -115,6 +126,8 @@ For showing the app to someone off your network, a standalone build beats Expo G
    ```
 
    EAS returns a download link when the build finishes. Open it on the phone to install the APK.
+
+On the day, run `start-demo.bat` and open the app on the phone. Nothing to scan, nothing to type.
 
 Re-run the build only when the app code changes. Backend changes need nothing rebuilt, as long as the ngrok domain stays the same.
 
