@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-title SOMOS launcher
+title Ansae launcher
 
 REM One-click dev launcher for Windows: starts Postgres (via Docker if
 REM available), installs/updates dependencies, seeds the demo data, and
@@ -12,7 +12,7 @@ REM restart regardless of whether you closed them yourself.
 cd /d "%~dp0"
 
 echo ================================================
-echo   SOMOS - starting everything
+echo   Ansae - starting everything
 echo ================================================
 echo.
 
@@ -26,9 +26,9 @@ if errorlevel 1 (
 
 REM Close windows this script opened last time, so re-running it restarts
 REM everything instead of piling up duplicate dev servers.
-taskkill /F /FI "WINDOWTITLE eq SOMOS Backend*" >nul 2>&1
-taskkill /F /FI "WINDOWTITLE eq SOMOS Admin*"   >nul 2>&1
-taskkill /F /FI "WINDOWTITLE eq SOMOS App*"     >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq Ansae Backend*" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq Ansae Admin*"   >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq Ansae App*"     >nul 2>&1
 
 REM --- Database ---
 where docker >nul 2>&1
@@ -81,15 +81,15 @@ REM --- Launch everything, each in its own window ---
 echo Launching backend, admin dashboard, and mobile app...
 
 pushd backend
-start "SOMOS Backend" cmd /k npm run start:dev
+start "Ansae Backend" cmd /k npm run start:dev
 popd
 
 pushd admin
-start "SOMOS Admin" cmd /k npm run dev
+start "Ansae Admin" cmd /k npm run dev
 popd
 
 pushd app
-start "SOMOS App" cmd /k npm run start
+start "Ansae App" cmd /k npm run start
 popd
 
 echo.

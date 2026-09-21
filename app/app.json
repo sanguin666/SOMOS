@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "SOMOS",
-    "slug": "somos",
+    "name": "Ansae",
+    "slug": "ansae",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,7 +25,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Allow SOMOS to access your microphone to record a voice message."
+          "microphonePermission": "Allow Ansae to access your microphone to record a voice message."
         }
       ]
     ]

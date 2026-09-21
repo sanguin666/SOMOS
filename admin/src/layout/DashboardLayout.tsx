@@ -41,7 +41,7 @@ export function DashboardLayout() {
         <div className="sidebar-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <LogoMark size={28} />
-            <h1>SOMOS Admin</h1>
+            <h1>Ansae Admin</h1>
           </div>
           <p className="muted" style={{ fontSize: 13, margin: 0 }}>
             {user.firstName ?? user.email}
