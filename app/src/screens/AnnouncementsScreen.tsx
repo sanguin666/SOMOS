@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
-import { BackChevronIcon, PlayIcon, PlusIcon } from '../components/icons';
+import { PlayIcon, PlusIcon } from '../components/icons';
 import { getAnnouncements } from '../api/announcements';
 import { API_BASE_URL } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
@@ -12,7 +11,6 @@ import { colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
   onCompose: () => void;
 };
 
@@ -20,7 +18,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
+export function AnnouncementsScreen({ poi, onCompose }: Props) {
   const { t } = useI18n();
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
   const [error, setError] = useState(false);
@@ -41,11 +39,9 @@ export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
   }, [poi.id]);
 
   return (
-    <Screen scroll>
+    <>
       <View style={styles.headerRow}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
-          <BackChevronIcon size={20} color={colors.text} />
-        </Pressable>
+        <AccessibleText variant="title">{t('announcements.title')}</AccessibleText>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('announcements.newAria')}
@@ -54,13 +50,6 @@ export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
         >
           <PlusIcon size={20} color={colors.text} />
         </Pressable>
-      </View>
-
-      <View style={styles.titleBlock}>
-        <AccessibleText variant="title">{t('announcements.title')}</AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {poi.name}
-        </AccessibleText>
       </View>
 
       {error && (
@@ -89,7 +78,7 @@ export function AnnouncementsScreen({ poi, onBack, onCompose }: Props) {
           onToggleExpand={() => setExpandedId(expandedId === item.id ? null : item.id)}
         />
       ))}
-    </Screen>
+    </>
   );
 }
 
@@ -155,6 +144,8 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
   },
   iconButton: {
     width: 44,

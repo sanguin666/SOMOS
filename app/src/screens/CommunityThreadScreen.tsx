@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
@@ -50,7 +49,7 @@ export function CommunityThreadScreen({ poi, post, onBack }: Props) {
   }
 
   return (
-    <Screen scroll>
+    <>
       <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
@@ -109,7 +108,7 @@ export function CommunityThreadScreen({ poi, post, onBack }: Props) {
           disabled={submitting || !message.trim()}
         />
       </View>
-    </Screen>
+    </>
   );
 }
 

@@ -1,36 +1,21 @@
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { ScanQRScreen } from './src/screens/ScanQRScreen';
 import { PoiHubScreen } from './src/screens/PoiHubScreen';
-import { DonateScreen } from './src/screens/DonateScreen';
-import { EventsScreen } from './src/screens/EventsScreen';
-import { AnnouncementsScreen } from './src/screens/AnnouncementsScreen';
-import { ComposeAnnouncementScreen } from './src/screens/ComposeAnnouncementScreen';
-import { PrayerRequestsScreen } from './src/screens/PrayerRequestsScreen';
-import { LivestreamScreen } from './src/screens/LivestreamScreen';
-import { CommunityScreen } from './src/screens/CommunityScreen';
-import { CommunityThreadScreen } from './src/screens/CommunityThreadScreen';
 import { I18nProvider } from './src/i18n/I18nContext';
-import type { CommunityPost, Poi } from './src/api/types';
+import type { Poi } from './src/api/types';
 
-type Route =
-  | { name: 'home' }
-  | { name: 'scan' }
-  | { name: 'hub'; poi: Poi }
-  | { name: 'donate'; poi: Poi }
-  | { name: 'events'; poi: Poi }
-  | { name: 'announcements'; poi: Poi }
-  | { name: 'compose-announcement'; poi: Poi }
-  | { name: 'prayer-requests'; poi: Poi }
-  | { name: 'livestream'; poi: Poi }
-  | { name: 'community'; poi: Poi }
-  | { name: 'community-thread'; poi: Poi; post: CommunityPost };
+type Route = { name: 'home' } | { name: 'scan' } | { name: 'hub'; poi: Poi };
 
 /**
  * Small hand-rolled navigation stack instead of react-navigation: the app
  * only has a handful of screens so far, and this keeps native dependencies
  * to a minimum for the demo. Revisit if the screen count grows.
+ *
+ * Everything under a POI is one route — `PoiHubScreen` switches between
+ * the modules internally so its banner and tab bar never unmount.
  */
 export default function App() {
   const [stack, setStack] = useState<Route[]>([{ name: 'home' }]);
@@ -44,62 +29,25 @@ export default function App() {
     setStack((s) => (s.length > 1 ? s.slice(0, -1) : s));
   }
 
+  // The scan and hub screens both put a dark/colored band behind the
+  // status bar, so its text has to go light there.
+  const statusBarStyle = current.name === 'home' ? 'auto' : 'light';
+
   return (
-    <I18nProvider>
-      {current.name === 'home' && (
-        <HomeScreen onScanQR={() => push({ name: 'scan' })} onOpenPoi={(poi) => push({ name: 'hub', poi })} />
-      )}
+    <SafeAreaProvider>
+      <I18nProvider>
+        {current.name === 'home' && (
+          <HomeScreen onScanQR={() => push({ name: 'scan' })} onOpenPoi={(poi) => push({ name: 'hub', poi })} />
+        )}
 
-      {current.name === 'scan' && (
-        <ScanQRScreen onBack={pop} onFound={(poi) => push({ name: 'hub', poi })} />
-      )}
+        {current.name === 'scan' && (
+          <ScanQRScreen onBack={pop} onFound={(poi) => push({ name: 'hub', poi })} />
+        )}
 
-      {current.name === 'hub' && (
-        <PoiHubScreen
-          poi={current.poi}
-          onBack={pop}
-          onOpenDonate={() => push({ name: 'donate', poi: current.poi })}
-          onOpenEvents={() => push({ name: 'events', poi: current.poi })}
-          onOpenAnnouncements={() => push({ name: 'announcements', poi: current.poi })}
-          onOpenPrayerRequests={() => push({ name: 'prayer-requests', poi: current.poi })}
-          onOpenLivestream={() => push({ name: 'livestream', poi: current.poi })}
-          onOpenCommunity={() => push({ name: 'community', poi: current.poi })}
-        />
-      )}
+        {current.name === 'hub' && <PoiHubScreen poi={current.poi} onBack={pop} />}
 
-      {current.name === 'donate' && <DonateScreen poi={current.poi} onBack={pop} />}
-
-      {current.name === 'events' && <EventsScreen poi={current.poi} onBack={pop} />}
-
-      {current.name === 'announcements' && (
-        <AnnouncementsScreen
-          poi={current.poi}
-          onBack={pop}
-          onCompose={() => push({ name: 'compose-announcement', poi: current.poi })}
-        />
-      )}
-
-      {current.name === 'compose-announcement' && (
-        <ComposeAnnouncementScreen poi={current.poi} onBack={pop} onCreated={pop} />
-      )}
-
-      {current.name === 'prayer-requests' && <PrayerRequestsScreen poi={current.poi} onBack={pop} />}
-
-      {current.name === 'livestream' && <LivestreamScreen poi={current.poi} onBack={pop} />}
-
-      {current.name === 'community' && (
-        <CommunityScreen
-          poi={current.poi}
-          onBack={pop}
-          onOpenPost={(post) => push({ name: 'community-thread', poi: current.poi, post })}
-        />
-      )}
-
-      {current.name === 'community-thread' && (
-        <CommunityThreadScreen poi={current.poi} post={current.post} onBack={pop} />
-      )}
-
-      <StatusBar style="auto" />
-    </I18nProvider>
+        <StatusBar style={statusBarStyle} />
+      </I18nProvider>
+    </SafeAreaProvider>
   );
 }

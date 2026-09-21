@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
-import { BackChevronIcon, ChatBubbleIcon, ChevronRightIcon } from '../components/icons';
+import { ChatBubbleIcon, ChevronRightIcon } from '../components/icons';
 import { createCommunityPost, getCommunityPosts } from '../api/community';
 import { useI18n } from '../i18n/I18nContext';
 import type { CommunityPost, Poi } from '../api/types';
@@ -11,11 +10,10 @@ import { colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
   onOpenPost: (post: CommunityPost) => void;
 };
 
-export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
+export function CommunityScreen({ poi, onOpenPost }: Props) {
   const { t } = useI18n();
   const [posts, setPosts] = useState<CommunityPost[] | null>(null);
   const [error, setError] = useState(false);
@@ -50,16 +48,9 @@ export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
   }
 
   return (
-    <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
-        <BackChevronIcon size={20} color={colors.text} />
-      </Pressable>
-
+    <>
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('community.title')}</AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {poi.name}
-        </AccessibleText>
       </View>
 
       <View style={styles.form}>
@@ -118,19 +109,11 @@ export function CommunityScreen({ poi, onBack, onOpenPost }: Props) {
           <ChevronRightIcon size={20} color={colors.textMuted} />
         </Pressable>
       ))}
-    </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 9999,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
-import { BackChevronIcon, BellIcon } from '../components/icons';
+import { BellIcon } from '../components/icons';
 import { getEvents } from '../api/events';
 import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
@@ -10,7 +9,6 @@ import type { Event, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
-  onBack: () => void;
 };
 
 function formatDetails(event: Event): string {
@@ -21,7 +19,7 @@ function formatDetails(event: Event): string {
   return event.location ? `${time} · ${event.location}` : time;
 }
 
-export function EventsScreen({ poi, onBack }: Props) {
+export function EventsScreen({ poi }: Props) {
   const { t } = useI18n();
   const [events, setEvents] = useState<Event[] | null>(null);
   const [error, setError] = useState(false);
@@ -45,16 +43,9 @@ export function EventsScreen({ poi, onBack }: Props) {
   }
 
   return (
-    <Screen scroll>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
-        <BackChevronIcon size={20} color={colors.text} />
-      </Pressable>
-
+    <>
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('events.title')}</AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {poi.name}
-        </AccessibleText>
       </View>
 
       {error && (
@@ -111,19 +102,11 @@ export function EventsScreen({ poi, onBack }: Props) {
           </View>
         );
       })}
-    </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 9999,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,

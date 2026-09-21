@@ -8,7 +8,6 @@ import {
   useAudioRecorder,
   useAudioRecorderState,
 } from 'expo-audio';
-import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon, MicIcon, PlayIcon } from '../components/icons';
@@ -99,16 +98,13 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
   }
 
   return (
-    <Screen scroll>
+    <>
       <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={onBack} style={styles.iconButton}>
         <BackChevronIcon size={20} color={colors.text} />
       </Pressable>
 
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('composeAnnouncement.title')}</AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {poi.name}
-        </AccessibleText>
       </View>
 
       <TextInput
@@ -198,7 +194,7 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
         onPress={submit}
         disabled={submitting}
       />
-    </Screen>
+    </>
   );
 }
 
