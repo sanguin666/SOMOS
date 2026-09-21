@@ -1,13 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import type Stripe from 'stripe';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThanOrEqual, Repository } from 'typeorm';
-import { Donation } from './entities/donation.entity.js';
+import { Donation, DonationStatus } from './entities/donation.entity.js';
 import { PoisService } from '../pois/pois.service.js';
 import { CreateDonationDto } from './dto/create-donation.dto.js';
+import { StripeService } from './stripe.service.js';
 
 export type PeriodTotal = { total: number; count: number };
 
 export type DailyTotal = { date: string; total: number; count: number };
+
+/**
+ * What the app should do next after asking to donate. 'demo' means no Stripe
+ * key is configured, so the gift was recorded without a payment and the app
+ * can go straight to its thank-you screen.
+ */
+export type CheckoutResult =
+  | { mode: 'demo'; donationId: string }
+  | { mode: 'stripe'; donationId: string; checkoutUrl: string };
 
 export type DonationStats = {
   dailyTotals: DailyTotal[];
@@ -60,10 +71,13 @@ function round2(value: number): number {
 
 @Injectable()
 export class DonationsService {
+  private readonly logger = new Logger(DonationsService.name);
+
   constructor(
     @InjectRepository(Donation)
     private readonly donationsRepository: Repository<Donation>,
     private readonly poisService: PoisService,
+    private readonly stripeService: StripeService,
   ) {}
 
   async create(poiId: string, dto: CreateDonationDto): Promise<Donation> {
@@ -72,9 +86,108 @@ export class DonationsService {
     return this.donationsRepository.save(donation);
   }
 
+  /**
+   * Starts a gift. With Stripe configured the row is created PENDING and the
+   * caller is sent to Stripe's hosted checkout page; without it the gift is
+   * recorded straight away so the demo still works on a machine with no keys.
+   */
+  async startCheckout(
+    poiId: string,
+    dto: CreateDonationDto,
+    returnUrlBase: string,
+  ): Promise<CheckoutResult> {
+    const poi = await this.poisService.findOne(poiId);
+
+    if (!this.stripeService.isConfigured) {
+      const donation = await this.donationsRepository.save(
+        this.donationsRepository.create({ ...dto, poi, status: DonationStatus.COMPLETED }),
+      );
+      return { mode: 'demo', donationId: donation.id };
+    }
+
+    const donation = await this.donationsRepository.save(
+      this.donationsRepository.create({
+        ...dto,
+        poi,
+        currency: this.stripeService.currency,
+        status: DonationStatus.PENDING,
+      }),
+    );
+
+    let session: Stripe.Checkout.Session;
+    try {
+      session = await this.stripeService.createCheckoutSession({
+        amount: dto.amount,
+        poiName: poi.name,
+        donationId: donation.id,
+        poiId: poi.id,
+        successUrl: `${returnUrlBase}/donations/return?status=success`,
+        cancelUrl: `${returnUrlBase}/donations/return?status=cancelled`,
+      });
+    } catch (error) {
+      // A bad key or an unreachable Stripe shouldn't read as "the app is
+      // broken" in the logs — the pending row is simply never promoted.
+      this.logger.error(`Stripe checkout failed: ${(error as Error).message}`);
+      throw new ServiceUnavailableException('Could not start the payment');
+    }
+
+    donation.stripeSessionId = session.id;
+    await this.donationsRepository.save(donation);
+
+    if (!session.url) {
+      throw new ServiceUnavailableException('Stripe did not return a checkout URL');
+    }
+    return { mode: 'stripe', donationId: donation.id, checkoutUrl: session.url };
+  }
+
+  /**
+   * The app polls this after sending someone to Stripe. A still-pending gift
+   * is re-checked against Stripe itself rather than waiting on the webhook,
+   * so payments confirm even on a laptop Stripe can't reach.
+   */
+  async getStatus(poiId: string, donationId: string): Promise<{ status: DonationStatus; amount: number }> {
+    const donation = await this.donationsRepository.findOne({
+      where: { id: donationId, poi: { id: poiId } },
+    });
+    if (!donation) throw new NotFoundException('Donation not found');
+
+    if (donation.status === DonationStatus.PENDING && donation.stripeSessionId) {
+      const session = await this.stripeService.retrieveSession(donation.stripeSessionId);
+      await this.applySessionOutcome(donation, session.payment_status, session.status, session.payment_intent);
+    }
+
+    return { status: donation.status, amount: donation.amount };
+  }
+
+  /** Promotes (or fails) a pending gift from a Stripe session, webhook or poll. */
+  async applySessionOutcome(
+    donation: Donation,
+    paymentStatus: string | null | undefined,
+    sessionStatus: string | null | undefined,
+    paymentIntent: unknown,
+  ): Promise<void> {
+    if (donation.status !== DonationStatus.PENDING) return;
+
+    if (paymentStatus === 'paid') {
+      donation.status = DonationStatus.COMPLETED;
+      donation.stripePaymentIntentId =
+        typeof paymentIntent === 'string' ? paymentIntent : donation.stripePaymentIntentId;
+    } else if (sessionStatus === 'expired') {
+      donation.status = DonationStatus.FAILED;
+    } else {
+      // Still open — the payer hasn't finished yet, so leave it pending.
+      return;
+    }
+    await this.donationsRepository.save(donation);
+  }
+
+  async findBySessionId(sessionId: string): Promise<Donation | null> {
+    return this.donationsRepository.findOne({ where: { stripeSessionId: sessionId } });
+  }
+
   findForPoi(poiId: string, limit = 20): Promise<Donation[]> {
     return this.donationsRepository.find({
-      where: { poi: { id: poiId } },
+      where: { poi: { id: poiId }, status: DonationStatus.COMPLETED },
       order: { createdAt: 'DESC' },
       take: limit,
     });
@@ -90,8 +203,14 @@ export class DonationsService {
     // One query covers every window below: it's the earliest boundary we
     // need (last month, which always starts before last week).
     const rangeStart = lastMonthStart < lastWeekStart ? lastMonthStart : lastWeekStart;
+    // Abandoned checkouts stay PENDING forever, so the parish's totals only
+    // ever count gifts that actually went through.
     const donations = await this.donationsRepository.find({
-      where: { poi: { id: poiId }, createdAt: MoreThanOrEqual(rangeStart) },
+      where: {
+        poi: { id: poiId },
+        status: DonationStatus.COMPLETED,
+        createdAt: MoreThanOrEqual(rangeStart),
+      },
     });
 
     const sumInRange = (from: Date, to: Date): PeriodTotal => {

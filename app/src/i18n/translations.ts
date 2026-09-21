@@ -63,8 +63,16 @@ export type Translations = {
     donateButton: string;
     processingButton: string;
     footnote: string;
+    demoFootnote: string;
+    payingTitle: string;
+    payingMessage: string;
+    openPaymentButton: string;
+    checkingPayment: string;
+    cancelButton: string;
+    error: string;
     thankYou: string;
     confirmation: string;
+    demoConfirmation: string;
     doneButton: string;
   };
   events: {
@@ -202,12 +210,21 @@ const en: Translations = {
     subtitle: 'Every gift helps our community thrive.',
     chooseAmount: 'CHOOSE AN AMOUNT',
     customAmount: 'Custom amount',
-    donateButton: 'Donate ${{amount}}',
+    donateButton: 'Donate {{amount}}',
     processingButton: 'Processing…',
     footnote: 'Secure payment · Powered by Stripe',
+    demoFootnote: 'Demo mode · No payment will be taken',
+    payingTitle: 'Finish your donation',
+    payingMessage:
+      'Your payment page opened in the browser. Once you have paid, come back here. This screen updates on its own.',
+    openPaymentButton: 'Open the payment page',
+    checkingPayment: 'Waiting for your payment…',
+    cancelButton: 'Cancel',
+    error: "We couldn't start the payment. Please try again.",
     thankYou: 'Thank you!',
-    confirmation:
-      'This is a demo — no real payment was made. A ${{amount}} donation to {{poiName}} would be processed here once Stripe is connected.',
+    confirmation: 'Your donation of {{amount}} to {{poiName}} went through.',
+    demoConfirmation:
+      'This is a demo — no real payment was made. A donation of {{amount}} to {{poiName}} was recorded.',
     doneButton: 'Done',
   },
   events: {
@@ -345,12 +362,21 @@ const es: Translations = {
     subtitle: 'Cada donativo ayuda a nuestra comunidad a prosperar.',
     chooseAmount: 'ELIGE UN MONTO',
     customAmount: 'Monto personalizado',
-    donateButton: 'Donar ${{amount}}',
+    donateButton: 'Donar {{amount}}',
     processingButton: 'Procesando…',
     footnote: 'Pago seguro · Con la tecnología de Stripe',
+    demoFootnote: 'Modo demostración · No se cobrará nada',
+    payingTitle: 'Completa tu donativo',
+    payingMessage:
+      'La página de pago se abrió en el navegador. Cuando termines de pagar, vuelve aquí. Esta pantalla se actualiza sola.',
+    openPaymentButton: 'Abrir la página de pago',
+    checkingPayment: 'Esperando tu pago…',
+    cancelButton: 'Cancelar',
+    error: 'No pudimos iniciar el pago. Inténtalo de nuevo.',
     thankYou: '¡Gracias!',
-    confirmation:
-      'Esto es una demostración: no se realizó ningún pago real. Aquí se procesaría un donativo de ${{amount}} a {{poiName}} una vez que Stripe esté conectado.',
+    confirmation: 'Tu donativo de {{amount}} a {{poiName}} se completó.',
+    demoConfirmation:
+      'Esto es una demostración: no se realizó ningún pago real. Se registró un donativo de {{amount}} para {{poiName}}.',
     doneButton: 'Listo',
   },
   events: {
@@ -488,12 +514,21 @@ const fr: Translations = {
     subtitle: 'Chaque don aide notre communauté à s’épanouir.',
     chooseAmount: 'CHOISISSEZ UN MONTANT',
     customAmount: 'Montant personnalisé',
-    donateButton: 'Donner {{amount}} $',
+    donateButton: 'Donner {{amount}}',
     processingButton: 'Traitement…',
     footnote: 'Paiement sécurisé · Propulsé par Stripe',
+    demoFootnote: 'Mode démonstration · Aucun paiement ne sera prélevé',
+    payingTitle: 'Terminez votre don',
+    payingMessage:
+      'La page de paiement s’est ouverte dans le navigateur. Une fois le paiement effectué, revenez ici. Cet écran se met à jour tout seul.',
+    openPaymentButton: 'Ouvrir la page de paiement',
+    checkingPayment: 'En attente de votre paiement…',
+    cancelButton: 'Annuler',
+    error: 'Nous n’avons pas pu lancer le paiement. Veuillez réessayer.',
     thankYou: 'Merci !',
-    confirmation:
-      "Ceci est une démonstration — aucun paiement réel n'a été effectué. Un don de {{amount}} $ à {{poiName}} serait traité ici une fois Stripe connecté.",
+    confirmation: 'Votre don de {{amount}} à {{poiName}} a bien été effectué.',
+    demoConfirmation:
+      "Ceci est une démonstration — aucun paiement réel n'a été effectué. Un don de {{amount}} pour {{poiName}} a été enregistré.",
     doneButton: 'Terminé',
   },
   events: {
