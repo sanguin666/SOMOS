@@ -87,17 +87,45 @@ Opens on `http://localhost:5173`. Sign in with the demo admin account above. If 
 
 Content that's meant to come from parish staff (editing/deleting announcements and livestreams, moderating prayer requests and community posts, toggling modules) requires this admin login. Posting itself — an announcement, a prayer request, a community post — is still open from the congregant app with no login yet, matching the phone-based auth that isn't built.
 
-### 5. Access from a physical phone remotely
+### 5. Access from a physical phone
 
-The app needs to reach the backend's API. On the same Wi-Fi network, edit `app/.env` and set `EXPO_PUBLIC_API_URL` to your dev machine's LAN IP (e.g. `http://192.168.1.23:3000`) — a phone can't resolve `localhost` as your computer. See the comments in `app/.env.example` for how to find your IP.
+The app needs to reach the backend's API. On the same Wi-Fi network, edit `app/.env` and set `EXPO_PUBLIC_API_URL` to your dev machine's LAN IP (e.g. `http://192.168.1.23:3000`) — a phone can't resolve `localhost` as your computer. See the comments in `app/.env.example` for how to find your IP. `EXPO_PUBLIC_*` is inlined when the bundle is built, so restart Expo (`npx expo start --clear`) after changing it.
 
-If the phone isn't on the same network at all, temporarily expose the backend with a tunnel (e.g. [ngrok](https://ngrok.com/)):
+That covers development. For a demo away from your own network, build an APK instead — see below.
 
-```bash
-ngrok http 3000
-```
+### 6. Demo APK (Android, no laptop needed)
 
-Then set `EXPO_PUBLIC_API_URL` in `app/.env` to the URL ngrok provides.
+For showing the app to someone off your network, a standalone build beats Expo Go: the JavaScript ships inside the APK, so there's no Metro dev server, no QR code and no Expo Go login involved. The only thing that still has to be reachable is the backend.
+
+1. Expose the backend on a stable public URL. On [ngrok](https://ngrok.com/)'s free plan you get one assigned domain, so pin it:
+
+   ```bash
+   ngrok http 3000 --url https://<your-domain>.ngrok-free.dev
+   ```
+
+2. Put that same URL in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build.
+3. Build and install:
+
+   ```bash
+   cd app
+   npm install --global eas-cli
+   eas login
+   eas init          # adds your Expo project id to app.json
+   eas build --profile preview --platform android
+   ```
+
+   EAS returns a download link when the build finishes. Open it on the phone to install the APK.
+
+Re-run the build only when the app code changes. Backend changes need nothing rebuilt, as long as the ngrok domain stays the same.
+
+> **iOS:** the same flow needs a paid Apple Developer account to install on a physical device, so this route is Android-only for now.
+
+### Tunnelling the dev server instead (fiddly)
+
+If you really need live reload on a phone off your network, note that `ngrok http 3000` exposes only the **backend**. The QR code comes from the Expo dev server, a separate process on port 8081, which needs its own tunnel. Two things to know:
+
+- `npx expo start --tunnel` routes through a shared ngrok account run by Expo that carries no uptime guarantee and frequently fails. Prefer your own tunnel and point Expo at it with `EXPO_PACKAGER_PROXY_URL=https://<tunnel-host>`, then use **Enter URL manually** in Expo Go.
+- Don't put both services behind one ngrok URL with `--pooling-enabled`. Pooled endpoints are load balanced per request, so calls land on whichever of the two servers ngrok picks and the app breaks intermittently. Give each service its own hostname, using a second provider if needed (`cloudflared tunnel --url http://localhost:8081`).
 
 ## Accessibility (app)
 
