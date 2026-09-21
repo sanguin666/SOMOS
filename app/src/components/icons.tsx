@@ -319,3 +319,15 @@ export function PinIcon({ size = 24, color = '#111111' }: IconProps) {
     </Svg>
   );
 }
+
+// Three dots: the near-universal "there is more behind this" mark, kept
+// as filled circles so it stays legible at the tab bar's icon size.
+export function MoreDotsIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={5} cy={12} r={2} fill={color} />
+      <Circle cx={12} cy={12} r={2} fill={color} />
+      <Circle cx={19} cy={12} r={2} fill={color} />
+    </Svg>
+  );
+}

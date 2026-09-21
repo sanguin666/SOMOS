@@ -6,6 +6,7 @@ import { getPoi } from '../api/pois';
 import { updatePoiLanguage, updatePoiProfile } from '../api/poiSettings';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
+import { MenuOrderCard } from './MenuOrderCard';
 
 const LIVE_STATUSES = new Set(['trial', 'active']);
 
@@ -180,6 +181,10 @@ export function SettingsPage() {
           </div>
           {languageError && <p className="error-text">{languageError}</p>}
         </div>
+      )}
+
+      {poi && modules !== null && (
+        <MenuOrderCard poi={poi} modules={modules} onSaved={setPoi} />
       )}
 
       <h3 style={{ marginTop: 24 }}>{t('modules.modulesSectionTitle')}</h3>

@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Screen } from './Screen';
 import { AccessibleText } from './AccessibleText';
 import {
@@ -11,6 +11,7 @@ import {
   HomeIcon,
   LogoMark,
   MegaphoneIcon,
+  MoreDotsIcon,
   PlayIcon,
 } from './icons';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
@@ -18,67 +19,124 @@ import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
-// 'home' is the place's own landing page. It is a tab value but not a tab
-// button: the banner's home button is what returns to it, which keeps the
-// bar down to one button per module and their labels readable.
-export type HubTab = 'home' | ModuleType;
+// Every screen the hub can show. 'home' is the place's own landing page
+// and 'more' is the list of whatever the bar had no room for; the rest
+// are the modules themselves.
+export type HubTab = 'home' | 'more' | ModuleType;
 
-type Props = {
-  poi: Poi;
-  // null while the module list is still loading.
-  modules: ActiveModule[] | null;
-  activeTab: HubTab;
-  onSelectTab: (tab: HubTab) => void;
-  // Opens the place switcher; the banner only reports the tap so the
-  // switcher's state lives with whoever owns the place list.
-  onOpenPlaces: () => void;
-  children: ReactNode;
-};
+// The bar's ceiling. Split evenly across a 390pt phone that is 78pt per
+// button; a sixth would drop every button under `minTouchTarget` and
+// start truncating the labels, which is what used to force the bar to
+// scroll sideways.
+const MAX_TABS = 5;
 
-// Above this many tabs, splitting the width evenly would drop each one
-// below the app's minimum touch target and start truncating labels, so the
-// bar scrolls instead.
-const MAX_EVENLY_SPLIT_TABS = 6;
+// Home takes the first button, leaving four for the place's modules —
+// and when it has more than four, the last of them becomes More.
+const BAR_SLOTS = MAX_TABS - 1;
+
+// Where a module sits in a place that has not arranged its own menu:
+// the three things people open the app for, then the two they come back
+// to, and the livestream last because the events screen already offers
+// it. A place reorders this in the dashboard.
+const DEFAULT_MENU_ORDER: ModuleType[] = [
+  'events',
+  'announcements',
+  'donations',
+  'prayer_requests',
+  'community',
+  'livestreams',
+];
 
 function isLive(module: ActiveModule) {
   return module.status !== 'expired' && module.status !== 'cancelled';
 }
 
+function liveModules(modules: ActiveModule[] | null): Set<ModuleType> {
+  const live = new Set<ModuleType>();
+  for (const module of modules ?? []) {
+    if (isLive(module)) live.add(module.moduleType);
+  }
+  return live;
+}
+
+// Everything the place has switched on, in its own order, with anything
+// it never arranged falling in behind in the default order.
+function orderedLiveModules(poi: Poi, live: Set<ModuleType>): ModuleType[] {
+  const chosen = (poi.menuOrder ?? []).filter((type) => live.has(type));
+  const rest = DEFAULT_MENU_ORDER.filter((type) => live.has(type) && !chosen.includes(type));
+  return [...chosen, ...rest];
+}
+
+// How many modules keep a button of their own: all of them when they
+// fit, one fewer than the slots when More has to take the last one.
+function barModuleCount(total: number): number {
+  return total <= BAR_SLOTS ? total : BAR_SLOTS - 1;
+}
+
+export type HubMenu = {
+  // The modules with a button of their own, in bar order.
+  onBar: ModuleType[];
+  // The modules the More screen lists. Empty means no More button: a
+  // place with few modules gets a shorter bar rather than a button
+  // hiding a single thing.
+  inMore: ModuleType[];
+  // Whether the livestream is reached from the top of the events screen
+  // instead of a button or a More row.
+  livestreamInEvents: boolean;
+};
+
+/**
+ * Who goes where in the bottom menu, from the order the place set in the
+ * dashboard and the modules it currently has running.
+ */
+export function hubMenu(poi: Poi, modules: ActiveModule[] | null): HubMenu {
+  const live = liveModules(modules);
+  const ordered = orderedLiveModules(poi, live);
+
+  // The livestream is the one module with somewhere else to live: the
+  // events screen carries it at the top. A place that did not lift it
+  // onto the bar gets it there rather than as one more row under More.
+  const livestreamInEvents =
+    live.has('livestreams') &&
+    live.has('events') &&
+    ordered.indexOf('livestreams') >= barModuleCount(ordered.length);
+
+  const placed = livestreamInEvents ? ordered.filter((type) => type !== 'livestreams') : ordered;
+  const onBarCount = barModuleCount(placed.length);
+
+  return {
+    onBar: placed.slice(0, onBarCount),
+    inMore: placed.slice(onBarCount),
+    livestreamInEvents,
+  };
+}
+
 /**
  * Persistent chrome for everything under a POI: the banner on top and the
- * module tab bar at the bottom stay mounted while `children` swaps, so
- * neither one moves or flickers when a tab is selected — only the
- * highlight does. Both clear the device's system UI via `Screen`.
+ * menu at the bottom stay mounted while `children` swaps, so neither one
+ * moves or flickers when a button is pressed — only the highlight does.
+ * Both clear the device's system UI via `Screen`.
  */
 export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, children }: Props) {
   const { t } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
-  const has = (type: ModuleType) => modules?.some((m) => m.moduleType === type && isLive(m)) ?? false;
+  const { onBar, inMore, livestreamInEvents } = hubMenu(poi, modules);
 
-  const tabs: { tab: HubTab; icon: (color: string) => ReactNode; label: string }[] = [
-    ...(has('donations')
-      ? [{ tab: 'donations' as const, icon: (c: string) => <HeartIcon size={24} color={c} />, label: t('hub.donationsLabel') }]
-      : []),
-    ...(has('events')
-      ? [{ tab: 'events' as const, icon: (c: string) => <CalendarIcon size={24} color={c} />, label: t('hub.eventsLabel') }]
-      : []),
-    ...(has('announcements')
-      ? [{ tab: 'announcements' as const, icon: (c: string) => <MegaphoneIcon size={24} color={c} />, label: t('hub.announcementsLabel') }]
-      : []),
-    ...(has('prayer_requests')
-      ? [{ tab: 'prayer_requests' as const, icon: (c: string) => <CandleIcon size={24} color={c} />, label: t('hub.prayerRequestsLabel') }]
-      : []),
-    ...(has('livestreams')
-      ? [{ tab: 'livestreams' as const, icon: (c: string) => <PlayIcon size={24} color={c} />, label: t('hub.livestreamLabel') }]
-      : []),
-    ...(has('community')
-      ? [{ tab: 'community' as const, icon: (c: string) => <ChatBubbleIcon size={24} color={c} />, label: t('hub.communityLabel') }]
-      : []),
-  ];
+  const tabs: HubTab[] = ['home', ...onBar, ...(inMore.length > 0 ? (['more'] as HubTab[]) : [])];
 
-  const showTabBar = tabs.length > 0;
-  const scrolls = tabs.length > MAX_EVENLY_SPLIT_TABS;
+  // Home alone is not a menu: a place with nothing switched on shows its
+  // page and no bar at all.
+  const showTabBar = onBar.length > 0 || inMore.length > 0;
+
+  // The button that lights up for the screen showing. A screen reached
+  // from somewhere other than the bar still lights the button it lives
+  // under, so the bar always says where you are.
+  const highlighted: HubTab = tabs.includes(activeTab)
+    ? activeTab
+    : activeTab === 'livestreams' && livestreamInEvents
+      ? 'events'
+      : 'more';
 
   const header = (
     <View style={styles.hero}>
@@ -112,44 +170,26 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, c
           {poi.city ?? t('hub.locationNotSet')}
         </AccessibleText>
       </Pressable>
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('hub.homeLabel')}
-        onPress={() => onSelectTab('home')}
-        style={[styles.iconButton, activeTab === 'home' && styles.iconButtonActive]}
-      >
-        <HomeIcon size={22} color="#FFFFFF" />
-      </Pressable>
     </View>
   );
 
-  const items = tabs.map(({ tab, icon, label }) => (
-    <TabBarItem
-      key={tab}
-      icon={icon}
-      label={label}
-      active={tab === activeTab}
-      activeColor={poiTheme.accentStrong}
-      activeBackground={poiTheme.accentSoft}
-      fixedWidth={scrolls}
-      onPress={() => onSelectTab(tab)}
-    />
-  ));
-
   const footer = showTabBar ? (
-    scrolls ? (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tabBarScrollContent}
-        style={styles.tabBar}
-      >
-        {items}
-      </ScrollView>
-    ) : (
-      <View style={[styles.tabBar, styles.tabBarRow]}>{items}</View>
-    )
+    <View style={[styles.tabBar, styles.tabBarRow]}>
+      {tabs.map((tab) => {
+        const { icon, label } = describe(tab, t);
+        return (
+          <TabBarItem
+            key={tab}
+            icon={icon}
+            label={label}
+            active={tab === highlighted}
+            activeColor={poiTheme.accentStrong}
+            activeBackground={poiTheme.accentSoft}
+            onPress={() => onSelectTab(tab)}
+          />
+        );
+      })}
+    </View>
   ) : null;
 
   return (
@@ -165,13 +205,48 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, c
   );
 }
 
+type Props = {
+  poi: Poi;
+  // null while the module list is still loading.
+  modules: ActiveModule[] | null;
+  activeTab: HubTab;
+  onSelectTab: (tab: HubTab) => void;
+  // Opens the place switcher; the banner only reports the tap so the
+  // switcher's state lives with whoever owns the place list.
+  onOpenPlaces: () => void;
+  children: ReactNode;
+};
+
+type Described = { icon: (color: string) => ReactNode; label: string };
+type Translate = ReturnType<typeof useI18n>['t'];
+
+function describe(tab: HubTab, t: Translate): Described {
+  switch (tab) {
+    case 'home':
+      return { icon: (c) => <HomeIcon size={24} color={c} />, label: t('hub.homeLabel') };
+    case 'events':
+      return { icon: (c) => <CalendarIcon size={24} color={c} />, label: t('hub.eventsLabel') };
+    case 'livestreams':
+      return { icon: (c) => <PlayIcon size={24} color={c} />, label: t('hub.livestreamLabel') };
+    case 'announcements':
+      return { icon: (c) => <MegaphoneIcon size={24} color={c} />, label: t('hub.announcementsLabel') };
+    case 'donations':
+      return { icon: (c) => <HeartIcon size={24} color={c} />, label: t('hub.donationsLabel') };
+    case 'prayer_requests':
+      return { icon: (c) => <CandleIcon size={24} color={c} />, label: t('hub.prayerRequestsLabel') };
+    case 'community':
+      return { icon: (c) => <ChatBubbleIcon size={24} color={c} />, label: t('hub.communityLabel') };
+    case 'more':
+      return { icon: (c) => <MoreDotsIcon size={24} color={c} />, label: t('hub.moreLabel') };
+  }
+}
+
 function TabBarItem({
   icon,
   label,
   active,
   activeColor,
   activeBackground,
-  fixedWidth,
   onPress,
 }: {
   icon: (color: string) => ReactNode;
@@ -179,7 +254,6 @@ function TabBarItem({
   active: boolean;
   activeColor: string;
   activeBackground: string;
-  fixedWidth: boolean;
   onPress: () => void;
 }) {
   const color = active ? activeColor : colors.textMuted;
@@ -190,11 +264,7 @@ function TabBarItem({
       accessibilityState={{ selected: active }}
       accessibilityLabel={label}
       onPress={onPress}
-      style={[
-        styles.tabBarItem,
-        fixedWidth ? styles.tabBarItemFixed : styles.tabBarItemFlex,
-        active && { backgroundColor: activeBackground },
-      ]}
+      style={[styles.tabBarItem, active && { backgroundColor: activeBackground }]}
     >
       <View style={[styles.tabBarIndicator, active && { backgroundColor: activeColor }]} />
       {icon(color)}
@@ -217,19 +287,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 9999,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Brighter while the place's own page is showing, so the button reads
-  // as where you already are rather than somewhere else to go.
-  iconButtonActive: {
-    backgroundColor: 'rgba(255,255,255,0.38)',
   },
   heroTitleBlock: {
     flex: 1,
@@ -257,26 +314,18 @@ const styles = StyleSheet.create({
   tabBarRow: {
     flexDirection: 'row',
   },
-  tabBarScrollContent: {
-    flexGrow: 1,
-  },
   tabBarItem: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 3,
     minHeight: minTouchTarget,
-    // Kept tight so a bolded label still fits across six tabs on a narrow
-    // phone rather than truncating.
+    // Kept tight so a bolded label still fits across five buttons on a
+    // narrow phone rather than truncating.
     paddingHorizontal: 2,
     paddingBottom: spacing.xs,
   },
-  tabBarItemFlex: {
-    flex: 1,
-  },
-  tabBarItemFixed: {
-    minWidth: 76,
-  },
-  // Sits flush under the bar's top border so the selected tab reads as
+  // Sits flush under the bar's top border so the selected button reads as
   // focused at a glance, not only by color.
   tabBarIndicator: {
     position: 'absolute',

@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
-import { BellIcon } from '../components/icons';
+import { BellIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { getEvents } from '../api/events';
 import { useI18n } from '../i18n/I18nContext';
-import { colors, radii, spacing } from '../theme/theme';
+import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import type { Event, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
+  // Set only where the place also streams: the livestream has no button
+  // of its own in the bottom menu, it sits at the top of this screen.
+  onWatchLive?: () => void;
 };
 
 function formatDetails(event: Event): string {
@@ -19,7 +22,7 @@ function formatDetails(event: Event): string {
   return event.location ? `${time} · ${event.location}` : time;
 }
 
-export function EventsScreen({ poi }: Props) {
+export function EventsScreen({ poi, onWatchLive }: Props) {
   const { t } = useI18n();
   const [events, setEvents] = useState<Event[] | null>(null);
   const [error, setError] = useState(false);
@@ -47,6 +50,28 @@ export function EventsScreen({ poi }: Props) {
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('events.title')}</AccessibleText>
       </View>
+
+      {onWatchLive && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('events.watchLive')}
+          onPress={onWatchLive}
+          style={styles.liveCard}
+        >
+          <View style={styles.liveIcon}>
+            <PlayIcon size={28} color={colors.primaryStrong} />
+          </View>
+          <View style={styles.liveText}>
+            <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.liveTitle}>
+              {t('events.watchLive')}
+            </AccessibleText>
+            <AccessibleText variant="caption" color="rgba(255,255,255,0.9)">
+              {t('events.watchLiveHint')}
+            </AccessibleText>
+          </View>
+          <ChevronRightIcon size={22} color="#FFFFFF" />
+        </Pressable>
+      )}
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>
@@ -110,6 +135,30 @@ const styles = StyleSheet.create({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
+  },
+  liveCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    minHeight: minTouchTarget,
+    borderRadius: radii.lg,
+    backgroundColor: colors.primaryStrong,
+  },
+  liveIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 9999,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  liveText: {
+    flex: 1,
+    gap: 2,
+  },
+  liveTitle: {
+    fontWeight: '800',
   },
   eventRow: {
     flexDirection: 'row',

@@ -15,6 +15,10 @@ export type Poi = {
   city: string | null;
   postalCode: string | null;
   qrCodeToken: string;
+  // The order this parish wants its modules in the app's bottom menu.
+  // The app gives the first few a button and puts the rest under More;
+  // modules left out fall in behind in the app's default order.
+  menuOrder: ModuleType[];
 };
 
 // The sections a POI stacks on its home page in the app, in the order it
