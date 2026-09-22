@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
 import { getPoiByQrCode } from '../api/pois';
 import { ApiError } from '../api/client';
+import { extractPoiToken } from '../qr';
 import { DEMO_QR_TOKEN } from '../demo';
 import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
@@ -16,18 +18,30 @@ type Props = {
   onFound: (poi: Poi) => void;
 };
 
+type Status = 'idle' | 'loading' | 'error' | 'not-found' | 'unknown-code';
+
 /**
- * There's no real camera scanner wired up yet (that needs expo-camera and
- * permissions handling), so this screen mimics the mockup's viewfinder and
- * lets the demo proceed with a button instead of an actual scan.
+ * Points the camera at a flyer's QR code and opens the place it belongs to.
+ *
+ * Typing the code by hand stays on the screen underneath, and is not just a
+ * fallback for a refused permission: every flyer prints the code under the
+ * QR, and for an elderly audience holding a phone steady over a printed
+ * square is the part most likely to go wrong.
  */
 export function ScanQRScreen({ onBack, onFound }: Props) {
   const { t } = useI18n();
   // The viewfinder fills the screen edge to edge, so the chrome over it
   // is what has to stay clear of the camera cutout and the gesture bar.
   const insets = useSafeAreaInsets();
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'not-found'>('idle');
+  const [permission, requestPermission] = useCameraPermissions();
+  const [status, setStatus] = useState<Status>('idle');
   const [code, setCode] = useState('');
+
+  // onBarcodeScanned fires continuously while a code is in frame. Keeping
+  // the last payload we acted on stops one flyer becoming dozens of
+  // lookups, while still letting the user try a different code after a
+  // failure without leaving the screen.
+  const lastScanned = useRef<string | null>(null);
 
   async function open(token: string) {
     setStatus('loading');
@@ -40,8 +54,33 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
     }
   }
 
+  function handleScan(data: string) {
+    if (status === 'loading' || data === lastScanned.current) return;
+    lastScanned.current = data;
+
+    const token = extractPoiToken(data);
+    if (!token) {
+      // Something scannable, but not one of ours — a poster, a payment
+      // code, a website. Say so rather than asking the backend about it.
+      setStatus('unknown-code');
+      return;
+    }
+    void open(token);
+  }
+
+  const cameraReady = permission?.granted === true;
+
   return (
     <View style={styles.container}>
+      {cameraReady && (
+        <CameraView
+          style={StyleSheet.absoluteFill}
+          facing="back"
+          barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+          onBarcodeScanned={({ data }) => handleScan(data)}
+        />
+      )}
+
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('common.back')}
@@ -56,7 +95,7 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
           {t('scan.title')}
         </AccessibleText>
         <AccessibleText variant="caption" color="rgba(255,255,255,0.7)" style={styles.centerText}>
-          {t('scan.subtitle')}
+          {t(cameraReady ? 'scan.subtitle' : 'scan.cameraExplainer')}
         </AccessibleText>
       </View>
 
@@ -68,9 +107,15 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
       </View>
 
       <View style={[styles.footer, { bottom: insets.bottom + spacing.xl, left: insets.left + spacing.lg, right: insets.right + spacing.lg }]}>
-        {(status === 'error' || status === 'not-found') && (
+        {status !== 'idle' && status !== 'loading' && (
           <AccessibleText variant="caption" color="#FFB4A8" style={[styles.centerText, styles.errorText]}>
-            {t(status === 'not-found' ? 'scan.codeNotFound' : 'scan.error')}
+            {t(
+              status === 'not-found'
+                ? 'scan.codeNotFound'
+                : status === 'unknown-code'
+                  ? 'scan.unknownCode'
+                  : 'scan.error',
+            )}
           </AccessibleText>
         )}
 
@@ -80,12 +125,26 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
           </View>
         ) : (
           <>
-            <AccessibleButton label={t('scan.simulateButton')} onPress={() => open(DEMO_QR_TOKEN)} />
+            {/* `permission` is null only while the current status is still
+                being read; showing nothing for that moment avoids offering
+                a button that's about to disappear. */}
+            {permission && !permission.granted && (
+              <AccessibleButton
+                label={t('scan.enableCamera')}
+                onPress={() => {
+                  void requestPermission();
+                }}
+              />
+            )}
 
-            {/* Until the camera is wired up this is the only way to reach a
-                second place, and it stays useful afterwards: every flyer
-                prints the code under the QR for anyone whose camera won't
-                focus. */}
+            <AccessibleButton
+              label={t('scan.simulateButton')}
+              variant={cameraReady ? 'secondary' : 'primary'}
+              onPress={() => open(DEMO_QR_TOKEN)}
+            />
+
+            {/* Every flyer prints the code under the QR, for anyone whose
+                camera won't focus or who would rather type. */}
             <AccessibleText variant="caption" color="rgba(255,255,255,0.7)" style={styles.centerText}>
               {t('scan.codeLabel')}
             </AccessibleText>
@@ -144,6 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#FFFFFF',
     textAlign: 'center',
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   codeButtonDisabled: {
     opacity: 0.5,

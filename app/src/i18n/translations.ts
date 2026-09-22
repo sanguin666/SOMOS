@@ -49,6 +49,9 @@ export type Translations = {
     codePlaceholder: string;
     codeButton: string;
     codeNotFound: string;
+    unknownCode: string;
+    enableCamera: string;
+    cameraExplainer: string;
   };
   hub: {
     errorLoad: string;
@@ -227,6 +230,9 @@ const en: Translations = {
     codePlaceholder: 'Place code',
     codeButton: 'Open this place',
     codeNotFound: 'No place uses that code. Check it and try again.',
+    unknownCode: "That code isn't an Ansae place. Look for the QR on the parish's flyer.",
+    enableCamera: 'Use the camera',
+    cameraExplainer: 'Turn on the camera to scan, or type the code below.',
   },
   hub: {
     errorLoad: "Couldn't load what's available here. Pull up the app again to retry.",
@@ -407,6 +413,9 @@ const es: Translations = {
     codePlaceholder: 'Código del lugar',
     codeButton: 'Abrir este lugar',
     codeNotFound: 'Ningún lugar usa ese código. Revísalo e inténtalo de nuevo.',
+    unknownCode: 'Ese código no es un lugar de Ansae. Busca el QR en el cartel de la parroquia.',
+    enableCamera: 'Usar la cámara',
+    cameraExplainer: 'Activa la cámara para escanear, o escribe el código abajo.',
   },
   hub: {
     errorLoad: 'No se pudo cargar lo disponible aquí. Vuelve a abrir la app para reintentar.',
@@ -587,6 +596,9 @@ const fr: Translations = {
     codePlaceholder: 'Code du lieu',
     codeButton: 'Ouvrir ce lieu',
     codeNotFound: 'Aucun lieu n’utilise ce code. Vérifiez-le et réessayez.',
+    unknownCode: "Ce code n'est pas un lieu Ansae. Cherchez le QR code sur l'affiche de la paroisse.",
+    enableCamera: 'Utiliser la caméra',
+    cameraExplainer: 'Activez la caméra pour scanner, ou saisissez le code ci-dessous.',
   },
   hub: {
     errorLoad: "Impossible de charger le contenu disponible ici. Rouvrez l'app pour réessayer.",

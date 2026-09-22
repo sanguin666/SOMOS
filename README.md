@@ -88,7 +88,7 @@ Scan the QR code shown in the terminal with the **Expo Go** app (Android/iOS) to
 
 To test in a browser: `npm run web`.
 
-From the home screen, **"My places"** or **"Scan a place's QR code" → Simulate scan** both open the seeded demo POI, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens. From Announcements, the **+** button opens a compose screen where you can type a message and/or record a voice message (tap the microphone, speak, tap Stop, then Post) — works in `npm run web` too, with a normal browser microphone permission prompt.
+From the home screen, **"My places"** opens the place you were in last (or the seeded demo POI on a fresh device). **"Scan a place's QR code"** is a real scanner: tap **Use the camera**, point it at a flyer printed from the admin dashboard's **My QR** page, and it opens that parish. **Simulate scan** is still there for when there's no flyer to hand, and the code under the QR can always be typed in instead. All three land on the same hub, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens. From Announcements, the **+** button opens a compose screen where you can type a message and/or record a voice message (tap the microphone, speak, tap Stop, then Post) — works in `npm run web` too, with a normal browser microphone permission prompt.
 
 ### 4. Admin dashboard (parish staff)
 
@@ -155,6 +155,12 @@ If you really need live reload on a phone off your network, note that `ngrok htt
 
 - `npx expo start --tunnel` routes through a shared ngrok account run by Expo that carries no uptime guarantee and frequently fails. Prefer your own tunnel and point Expo at it with `EXPO_PACKAGER_PROXY_URL=https://<tunnel-host>`, then use **Enter URL manually** in Expo Go.
 - Don't put both services behind one ngrok URL with `--pooling-enabled`. Pooled endpoints are load balanced per request, so calls land on whichever of the two servers ngrok picks and the app breaks intermittently. Give each service its own hostname, using a second provider if needed (`cloudflared tunnel --url http://localhost:8081`).
+
+## Scanning a place's QR code
+
+The flyer encodes a link to the landing site (`https://<landing>/?token=<qrCodeToken>#join`), not the bare token, so that someone scanning it with their phone's own camera app lands on a page explaining what Ansae is. The in-app scanner (`app/src/screens/ScanQRScreen.tsx`) pulls the token back out of that link — see `app/src/qr.ts`, which also accepts a bare token and rejects QR codes that aren't ours rather than sending them to the backend as a lookup.
+
+Scanning uses `expo-camera`'s `CameraView` with `barcodeScannerEnabled` set in `app.json`. Permission is asked for on the screen itself, by a button, rather than on app start — an audience that mostly doesn't trust permission prompts should see what it's for first. A refused permission is not a dead end: typing the code printed under the QR does the same job, and that path is on the screen whether or not the camera works.
 
 ## Accessibility (app)
 
