@@ -50,9 +50,7 @@ export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
           },
         ]}
       >
-        <View style={styles.logoRing}>
-          <LogoMark size={184} />
-        </View>
+        <LogoMark size={184} />
 
         <AccessibleText variant="title" style={styles.wordmark}>
           ANSAE
@@ -85,15 +83,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  logoRing: {
-    width: 264,
-    height: 264,
-    borderRadius: 132,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
   },
   wordmark: {
     fontWeight: '800',
