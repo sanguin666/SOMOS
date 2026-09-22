@@ -1,10 +1,11 @@
-import { ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
+import { HaloBackdrop } from '../components/HaloBackdrop';
 import { LogoMark } from '../components/icons';
 import { useI18n } from '../i18n/I18nContext';
-import { colors, radii, spacing } from '../theme/theme';
+import { colors, spacing } from '../theme/theme';
 
 type Props = {
   onSignUp: () => void;
@@ -23,6 +24,7 @@ type Props = {
 export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
 
   return (
     /* The illustration is the screen, edge to edge and under the status
@@ -39,8 +41,11 @@ export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
       resizeMode="cover"
       style={styles.root}
     >
-      {/* The words and the buttons sit on their own panel rather than on
-          the illustration, so nothing is ever read against a figure. */}
+      {/* The words and the buttons sit in a patch of white light rather
+          than on the illustration, so nothing is ever read against a
+          figure. */}
+      <HaloBackdrop width={width} height={height} />
+
       <View
         style={[
           styles.panel,
@@ -76,10 +81,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   panel: {
+    // No background and no border: the light behind it is what separates
+    // these words from the crowd now.
     marginHorizontal: spacing.lg,
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg * 2,
-    paddingVertical: spacing.xl,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     gap: spacing.sm,
