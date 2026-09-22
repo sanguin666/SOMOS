@@ -532,41 +532,36 @@ select {
 
 /* ---------- Login: the app's welcome screen ---------- */
 
-/* The crowd illustration edge to edge, with the words and the form in a
-   patch of white light rather than on the picture, so nothing is ever
-   read against a figure. Opaque white out to 77% of the ellipse, then a
-   short fade — the app's HaloBackdrop. */
+/* The crowd illustration edge to edge, with the logo, the words and the
+   form in one white box in the middle — the same white box, with the
+   same light edge, as everywhere else. No halo, no fade (Seb, 22 Sep
+   2026: the gradient looked like a stain). */
 .login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 32px 16px;
-  background-color: var(--color-bg);
-  background-image:
-    radial-gradient(ellipse 34% 56% at 50% 50%, #fff 0%, #fff 77%, rgba(255, 255, 255, 0) 100%),
-    url('/onboarding-crowd.jpg');
-  background-size: 100% 100%, cover;
-  background-position: center, center;
-  background-repeat: no-repeat;
-}
-
-/* On a phone the halo has to be wide enough to hold the form. */
-@media (max-width: 720px) {
-  .login-page {
-    background-image:
-      radial-gradient(ellipse 75% 60% at 50% 50%, #fff 0%, #fff 77%, rgba(255, 255, 255, 0) 100%),
-      url('/onboarding-crowd.jpg');
-  }
+  background: var(--color-bg) url('/onboarding-crowd.jpg') center / cover no-repeat;
 }
 
 .login-panel {
   width: 100%;
-  max-width: 400px;
+  max-width: 560px;
+  padding: 56px 80px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .login-panel {
+    padding: 40px 24px;
+  }
 }
 
 .login-panel > * {
@@ -592,8 +587,21 @@ select {
   font-size: 18px;
 }
 
+/* The panel is the one white box, so the fields inside it are rows split
+   by hairlines rather than a second card, and the language row keeps no
+   edge of its own. */
 .login-panel .card {
   margin: 0;
+  padding: 0;
+  border: none;
+  border-top: 1px solid var(--color-card-border);
+  border-bottom: 1px solid var(--color-card-border);
+  border-radius: 0;
+}
+
+.login-panel .language-row {
+  border-color: transparent;
+  padding: 0 4px;
 }
 
 /* ---------- Community replies ---------- */
