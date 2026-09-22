@@ -8,11 +8,14 @@
  */
 
 export const colors = {
-  // The app's canvas: a warm beige, deep enough that a white box sitting
-  // on it reads as a card on its own. `cardSurface` below still pairs
-  // the white with a hairline, which is what keeps a box's edge crisp
-  // where it meets the page rather than fading into it.
-  background: '#EFE6D5',
+  // The app's canvas: a warm off-white, light enough to read as paper
+  // rather than as a colour, but still a shade below the boxes on it.
+  // That gap is small — about 1.09:1 against white — so `cardSurface`
+  // below pairs every white box with a hairline, and the hairline is
+  // what actually holds the edge on a phone in daylight. Going lighter
+  // than this closes the gap to nothing, which is the state Seb turned
+  // down once already.
+  background: '#FAF5EE',
   // Boxes, inputs, buttons, and the floating menus. Inside a white panel
   // the nesting goes the other way: a row or a field takes `background`,
   // so the beige is what separates it from the white around it.
