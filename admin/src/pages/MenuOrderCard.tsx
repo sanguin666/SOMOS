@@ -115,22 +115,11 @@ export function MenuOrderCard({ poi, modules, onSaved }: Props) {
           {t('menuOrder.empty')}
         </p>
       ) : (
-        <ol style={{ listStyle: 'none', padding: 0, margin: '12px 0 0', display: 'grid', gap: 8 }}>
+        <ol className="card-rows">
           {order.map((type, index) => (
-            <li
-              key={type}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                padding: '10px 12px',
-                border: '1px solid var(--border, #d8d8d8)',
-                borderRadius: 8,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontWeight: 600, minWidth: 20, textAlign: 'right' }}>{index + 1}</span>
+            <li key={type} className="card-row">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <span style={{ fontWeight: 700, minWidth: 20, textAlign: 'right' }}>{index + 1}</span>
                 <div>
                   <p className="card-title" style={{ margin: 0 }}>
                     {moduleName(type, t)}
@@ -140,10 +129,10 @@ export function MenuOrderCard({ poi, modules, onSaved }: Props) {
                   </span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
-                  className="btn"
+                  className="btn btn-icon"
                   aria-label={t('menuOrder.moveUp')}
                   disabled={index === 0}
                   onClick={() => move(index, -1)}
@@ -152,7 +141,7 @@ export function MenuOrderCard({ poi, modules, onSaved }: Props) {
                 </button>
                 <button
                   type="button"
-                  className="btn"
+                  className="btn btn-icon"
                   aria-label={t('menuOrder.moveDown')}
                   disabled={index === order.length - 1}
                   onClick={() => move(index, 1)}

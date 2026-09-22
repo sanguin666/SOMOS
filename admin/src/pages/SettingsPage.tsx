@@ -7,6 +7,7 @@ import { updatePoiLanguage, updatePoiProfile } from '../api/poiSettings';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 import { MenuOrderCard } from './MenuOrderCard';
+import { DestructiveButton } from '../components/DestructiveButton';
 
 const LIVE_STATUSES = new Set(['trial', 'active']);
 
@@ -117,7 +118,7 @@ export function SettingsPage() {
           <p className="muted" style={{ marginTop: 4 }}>
             {t('poiInfo.subtitle')}
           </p>
-          <div className="form" style={{ marginTop: 12 }}>
+          <div className="form" style={{ marginTop: 4 }}>
             <label>
               {t('poiInfo.nameLabel')}
               <input value={poi.name} disabled />
@@ -192,29 +193,43 @@ export function SettingsPage() {
       {error && <p className="error-text">{error}</p>}
       {modules === null && !error && <p className="muted">{t('modules.loading')}</p>}
 
-      {modules !== null &&
-        ALL_MODULE_TYPES.map(({ type, label }) => {
-          const existing = modules.find((m) => m.moduleType === type);
-          const isLive = existing ? LIVE_STATUSES.has(existing.status) : false;
-          return (
-            <div key={type} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <p className="card-title">{label}</p>
-                <span className={`badge ${isLive ? 'badge-active' : ''}`}>
-                  {existing ? existing.status : t('modules.notActivated')}
-                </span>
+      {/* One white card, one row per module — not a card each. */}
+      {modules !== null && (
+        <div className="card card-list">
+          {ALL_MODULE_TYPES.map(({ type, label }) => {
+            const existing = modules.find((m) => m.moduleType === type);
+            const isLive = existing ? LIVE_STATUSES.has(existing.status) : false;
+            return (
+              <div key={type} className="card-row">
+                <div>
+                  <p className="card-title">{label}</p>
+                  <span className={`badge ${isLive ? 'badge-active' : ''}`}>
+                    {existing ? existing.status : t('modules.notActivated')}
+                  </span>
+                </div>
+                <div className="card-actions" style={{ marginTop: 0 }}>
+                  {isLive ? (
+                    <DestructiveButton
+                      label={t('modules.deactivate')}
+                      disabled={pendingType === type}
+                      onConfirm={() => handleToggle(type, existing)}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      disabled={pendingType === type}
+                      onClick={() => handleToggle(type, existing)}
+                    >
+                      {t('modules.activate')}
+                    </button>
+                  )}
+                </div>
               </div>
-              <button
-                type="button"
-                className={isLive ? 'btn btn-danger' : 'btn btn-primary'}
-                disabled={pendingType === type}
-                onClick={() => handleToggle(type, existing)}
-              >
-                {isLive ? t('modules.deactivate') : t('modules.activate')}
-              </button>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

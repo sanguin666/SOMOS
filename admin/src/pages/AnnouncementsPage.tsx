@@ -8,6 +8,7 @@ import {
   updateAnnouncement,
 } from '../api/announcements';
 import type { Announcement } from '../api/types';
+import { DestructiveButton } from '../components/DestructiveButton';
 
 export function AnnouncementsPage() {
   const poiId = usePoiId();
@@ -128,9 +129,7 @@ export function AnnouncementsPage() {
               <button type="button" className="btn" onClick={() => startEdit(item)}>
                 {t('announcements.edit')}
               </button>
-              <button type="button" className="btn btn-danger" onClick={() => handleDelete(item.id)}>
-                {t('announcements.delete')}
-              </button>
+              <DestructiveButton label={t('announcements.delete')} onConfirm={() => handleDelete(item.id)} />
             </div>
           </div>
         ),

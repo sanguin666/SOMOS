@@ -1,18 +1,12 @@
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
-import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import { LogoMark } from '../components/LogoMark';
-
-const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
-  en: 'EN',
-  es: 'ES',
-  fr: 'FR',
-};
+import { LanguagePicker } from '../components/LanguagePicker';
 
 export function DashboardLayout() {
   const { user, logout } = useAuth();
-  const { t, language, setLanguage } = useI18n();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { poiId } = useParams<{ poiId: string }>();
 
@@ -39,21 +33,19 @@ export function DashboardLayout() {
   return (
     <div className="layout">
       <aside className="sidebar">
-        <div className="sidebar-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <LogoMark size={28} />
+        <div>
+          <div className="sidebar-brand">
+            <LogoMark size={30} />
             <h1>ANSAE Admin</h1>
           </div>
-          <p className="muted" style={{ fontSize: 13, margin: 0 }}>
-            {user.firstName ?? user.email}
-          </p>
+          <p className="sidebar-user">{user.firstName ?? user.email}</p>
         </div>
+
+        <hr className="menu-divider" />
 
         {user.adminPois.length > 1 ? (
           <div className="poi-switcher">
-            <label htmlFor="poi-select" style={{ fontSize: 13, fontWeight: 600 }}>
-              {t('layout.managing')}
-            </label>
+            <label htmlFor="poi-select">{t('layout.managing')}</label>
             <select
               id="poi-select"
               value={poiId}
@@ -67,8 +59,10 @@ export function DashboardLayout() {
             </select>
           </div>
         ) : (
-          currentPoi && <p style={{ fontWeight: 600 }}>{currentPoi.name}</p>
+          currentPoi && <p className="poi-name">{currentPoi.name}</p>
         )}
+
+        <hr className="menu-divider" />
 
         <nav>
           {navItems.map((item) => (
@@ -79,20 +73,9 @@ export function DashboardLayout() {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-lang-switcher" style={{ marginBottom: 12 }}>
-            {SUPPORTED_LANGUAGES.map((code) => (
-              <button
-                key={code}
-                type="button"
-                className={`lang-pill ${code === language ? 'lang-pill-active' : ''}`}
-                onClick={() => setLanguage(code)}
-                aria-label={LANGUAGE_LABELS[code]}
-              >
-                {LANGUAGE_LABELS[code]}
-              </button>
-            ))}
-          </div>
-          <button type="button" className="btn" onClick={logout} style={{ width: '100%' }}>
+          <hr className="menu-divider" />
+          <LanguagePicker />
+          <button type="button" className="btn btn-destructive btn-block" onClick={logout}>
             {t('layout.signOut')}
           </button>
         </div>

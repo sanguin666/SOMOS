@@ -2,19 +2,13 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
-import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import { ApiError } from '../api/client';
 import { LogoMark } from '../components/LogoMark';
-
-const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
-  en: 'EN',
-  es: 'ES',
-  fr: 'FR',
-};
+import { LanguagePicker } from '../components/LanguagePicker';
 
 export function LoginPage() {
   const { login } = useAuth();
-  const { t, language, setLanguage } = useI18n();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,15 +29,17 @@ export function LoginPage() {
     }
   }
 
+  // The app's welcome screen: the logo and the words in a patch of white
+  // light over the illustration, then one white form, the orange button
+  // and the language row — nothing else to read and nothing to get wrong.
   return (
     <div className="login-page">
-      <div className="login-card">
-        <LogoMark size={44} />
-        <h1>{t('login.heading')}</h1>
-        <p className="muted" style={{ marginBottom: 20 }}>
-          {t('login.subtitle')}
-        </p>
-        <form className="form" onSubmit={handleSubmit}>
+      <form className="login-panel" onSubmit={handleSubmit}>
+        <LogoMark size={120} />
+        <h1 className="login-wordmark">{t('login.heading')}</h1>
+        <p className="login-subtitle">{t('login.subtitle')}</p>
+
+        <div className="card form">
           <label>
             {t('login.emailLabel')}
             <input
@@ -64,25 +60,15 @@ export function LoginPage() {
               required
             />
           </label>
-          {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? t('login.signingIn') : t('login.signIn')}
-          </button>
-        </form>
-
-        <div className="login-language-switcher">
-          {SUPPORTED_LANGUAGES.map((code) => (
-            <button
-              key={code}
-              type="button"
-              className={`lang-pill ${code === language ? 'lang-pill-active' : ''}`}
-              onClick={() => setLanguage(code)}
-            >
-              {LANGUAGE_LABELS[code]}
-            </button>
-          ))}
         </div>
-      </div>
+
+        {error && <p className="error-text">{error}</p>}
+        <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+          {submitting ? t('login.signingIn') : t('login.signIn')}
+        </button>
+
+        <LanguagePicker />
+      </form>
     </div>
   );
 }
