@@ -83,6 +83,7 @@ export type Translations = {
     leaveConfirm: string;
     leaveCancel: string;
     leaveError: string;
+    chooseLanguage: string;
   };
   profile: {
     title: string;
@@ -300,6 +301,7 @@ const en: Translations = {
     leaveConfirm: 'Yes, leave',
     leaveCancel: 'No, stay',
     leaveError: "We couldn't do that. Please try again.",
+    chooseLanguage: 'Choose a language',
   },
   profile: {
     title: 'Your settings',
@@ -519,6 +521,7 @@ const es: Translations = {
     leaveConfirm: 'Sí, salir',
     leaveCancel: 'No, quedarme',
     leaveError: 'No hemos podido hacerlo. Inténtalo de nuevo.',
+    chooseLanguage: 'Elige un idioma',
   },
   profile: {
     title: 'Tus ajustes',
@@ -738,6 +741,7 @@ const fr: Translations = {
     leaveConfirm: 'Oui, quitter',
     leaveCancel: 'Non, rester',
     leaveError: 'Nous n’avons pas pu le faire. Réessayez.',
+    chooseLanguage: 'Choisissez une langue',
   },
   profile: {
     title: 'Vos réglages',

@@ -6,8 +6,10 @@ import {
   CalendarIcon,
   CandleIcon,
   ChatBubbleIcon,
+  CheckIcon,
   ChevronRightIcon,
   ExitIcon,
+  GlobeIcon,
   HeartIcon,
   MegaphoneIcon,
   PinIcon,
@@ -21,10 +23,15 @@ import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 
-const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
-  en: 'EN',
-  es: 'ES',
-  fr: 'FR',
+/**
+ * Each language written in itself, never translated. Somebody who opened
+ * the app in a language they cannot read is exactly who this list is for,
+ * and "Spanish" is no help to them where "Español" is.
+ */
+const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
 };
 
 type Props = {
@@ -55,6 +62,7 @@ export function MoreScreen({
 }: Props) {
   const { t, language, setLanguage } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
+  const [languageOpen, setLanguageOpen] = useState(false);
   const [confirmingLeave, setConfirmingLeave] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [leaveFailed, setLeaveFailed] = useState(false);
@@ -187,11 +195,39 @@ export function MoreScreen({
         </View>
       </Modal>
 
-      <View style={styles.languageBlock}>
-        <AccessibleText variant="caption" color={colors.textMuted}>
+      {/* One row carrying the language it is currently set to, rather
+          than three abbreviations side by side. The list itself only
+          appears once somebody asks for it. */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${t('home.languageLabel')}: ${LANGUAGE_NAMES[language]}`}
+        onPress={() => setLanguageOpen(true)}
+        style={styles.row}
+      >
+        <GlobeIcon size={26} color={colors.textMuted} />
+        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
           {t('home.languageLabel')}
         </AccessibleText>
-        <View style={styles.languageRow}>
+        <AccessibleText variant="body" color={colors.textMuted}>
+          {LANGUAGE_NAMES[language]}
+        </AccessibleText>
+        <ChevronRightIcon size={22} color={colors.textMuted} />
+      </Pressable>
+
+      <Modal
+        visible={languageOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setLanguageOpen(false)}
+      >
+        <Pressable
+          style={styles.scrim}
+          accessibilityLabel={t('places.close')}
+          onPress={() => setLanguageOpen(false)}
+        />
+        <View style={styles.sheet}>
+          <AccessibleText variant="title">{t('more.chooseLanguage')}</AccessibleText>
+
           {SUPPORTED_LANGUAGES.map((code) => {
             const selected = code === language;
             return (
@@ -199,18 +235,30 @@ export function MoreScreen({
                 key={code}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
-                accessibilityLabel={LANGUAGE_LABELS[code]}
-                onPress={() => setLanguage(code)}
-                style={[styles.languageButton, selected && styles.languageButtonSelected]}
+                accessibilityLabel={LANGUAGE_NAMES[code]}
+                onPress={() => {
+                  setLanguage(code);
+                  setLanguageOpen(false);
+                }}
+                style={[styles.languageOption, selected && styles.languageOptionSelected]}
               >
-                <AccessibleText variant="body" color={selected ? colors.primaryText : colors.text}>
-                  {LANGUAGE_LABELS[code]}
+                <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+                  {LANGUAGE_NAMES[code]}
                 </AccessibleText>
+                {/* A tick as well as the colour, so the choice is not
+                    carried by colour alone. */}
+                {selected && <CheckIcon size={24} color={colors.primaryStrong} />}
               </Pressable>
             );
           })}
+
+          <AccessibleButton
+            label={t('places.close')}
+            variant="secondary"
+            onPress={() => setLanguageOpen(false)}
+          />
         </View>
-      </View>
+      </Modal>
     </>
   );
 }
@@ -281,6 +329,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(17,17,17,0.45)',
   },
+  sheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radii.lg,
+    borderTopRightRadius: radii.lg,
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: minTouchTarget + 14,
+    paddingHorizontal: spacing.md,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+  },
+  languageOptionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+  },
   confirmSheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radii.lg,
@@ -292,28 +361,5 @@ const styles = StyleSheet.create({
     minHeight: minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  languageBlock: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-  },
-  languageRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  languageButton: {
-    minWidth: 72,
-    minHeight: minTouchTarget,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  languageButtonSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary,
   },
 });
