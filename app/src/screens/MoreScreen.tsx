@@ -145,7 +145,7 @@ export function MoreScreen({
           setLeaveFailed(false);
           setConfirmingLeave(true);
         }}
-        style={styles.row}
+        style={[styles.row, styles.rowDestructive]}
       >
         <ExitIcon size={26} color={colors.danger} />
         <AccessibleText variant="bodyLarge" color={colors.danger} style={styles.rowLabel}>
@@ -184,17 +184,16 @@ export function MoreScreen({
             </View>
           ) : (
             <>
-              {/* On a white sheet, so a white row would be a box inside
-                  a box: the confirm is a filled red button and the way
-                  out carries no box at all. */}
+              {/* The act is the orange button every other screen uses
+                  for its call to action; what the button says is what
+                  makes it serious, not a colour of its own. */}
               <AccessibleButton
                 label={t('more.leaveConfirm')}
-                variant="danger"
                 onPress={() => void leave()}
               />
               <AccessibleButton
                 label={t('more.leaveCancel')}
-                variant="quiet"
+                variant="secondary"
                 onPress={() => setConfirmingLeave(false)}
               />
             </>
@@ -235,8 +234,9 @@ export function MoreScreen({
         <View style={styles.sheet}>
           <AccessibleText variant="title">{t('more.chooseLanguage')}</AccessibleText>
 
-          {SUPPORTED_LANGUAGES.map((code) => {
+          {SUPPORTED_LANGUAGES.map((code, index) => {
             const selected = code === language;
+            const last = index === SUPPORTED_LANGUAGES.length - 1;
             return (
               <Pressable
                 key={code}
@@ -247,7 +247,13 @@ export function MoreScreen({
                   setLanguage(code);
                   setLanguageOpen(false);
                 }}
-                style={[styles.languageOption, selected && styles.languageOptionSelected]}
+                style={[
+                  styles.languageOption,
+                  selected && styles.languageOptionSelected,
+                  // A line under the last one would separate it from the
+                  // Close button, which is not one of the choices.
+                  last && styles.languageOptionLast,
+                ]}
               >
                 <AccessibleText
                   variant="bodyLarge"
@@ -265,7 +271,7 @@ export function MoreScreen({
 
           <AccessibleButton
             label={t('places.close')}
-            variant="quiet"
+            variant="secondary"
             onPress={() => setLanguageOpen(false)}
           />
         </View>
@@ -324,6 +330,12 @@ const styles = StyleSheet.create({
     ...cardSurface,
     borderRadius: radii.lg,
   },
+  // The one row that destroys something wears the same heavy edge as the
+  // Sign out button, so it never reads as one more place to tap through.
+  rowDestructive: {
+    borderWidth: 2,
+    borderColor: colors.border,
+  },
   rowLabel: {
     flex: 1,
     fontWeight: '700',
@@ -356,6 +368,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.primary,
   },
   languageOptionSelected: {},
+  languageOptionLast: {
+    borderBottomWidth: 0,
+  },
   confirmSheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radii.lg,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, BackHandler, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AddPlaceScreen } from './src/screens/AddPlaceScreen';
@@ -128,6 +128,25 @@ function AppRoutes() {
     setLanded(false);
   }
 
+  // Android's back button for everything outside a place: the switcher
+  // closes first, then the stack pops. Returning false at the bottom of
+  // the stack leaves the press to Android, which closes the app. The hub
+  // registers its own handler for the screens inside a place.
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (switcherOpen) {
+        closeSwitcher();
+        return true;
+      }
+      if (stack.length > 1) {
+        pop();
+        return true;
+      }
+      return false;
+    });
+    return () => subscription.remove();
+  }, [switcherOpen, stack.length]);
+
   function closeSwitcher() {
     setSwitcherOpen(false);
     setSwitchingTo(null);
@@ -216,10 +235,6 @@ function AppRoutes() {
           onAddPlace={() => {
             closeSwitcher();
             push({ name: 'scan' });
-          }}
-          onGoAppHome={() => {
-            closeSwitcher();
-            setStack([{ name: 'addPlace' }]);
           }}
           onClose={closeSwitcher}
         />

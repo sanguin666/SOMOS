@@ -3,18 +3,22 @@ import { AccessibleText } from './AccessibleText';
 import { colors, fontSizes, minTouchTarget, radii, spacing } from '../theme/theme';
 
 /**
- * `secondary` is the only one with a white fill and a border, which makes
- * it a box — so it belongs on the beige canvas and never inside a white
- * card or sheet, where it would read as a box within a box. Inside white,
- * use `primary` or `danger` for anything that acts, and `quiet` for the
- * way out (Cancel, Close), which has no box at all.
+ * Three buttons, and no fourth. A button is not a box, so all three are
+ * allowed inside a white card or sheet as well as on the beige canvas.
  *
- * `destructive` is the white row with a red label — the same look as
- * "Leave this place" in the More menu — for anything that undoes
- * something from the beige canvas. It is a box too, so inside white use
- * `danger`, which is the same meaning as a filled button.
+ * `primary` is the orange button, and it is every call to action in the
+ * app without exception — save, send, add a picture, and the confirm on
+ * a question, however serious the answer. What a button does is said by
+ * its label, not by giving it a colour of its own.
+ *
+ * `secondary` is white with the same heavy edge: the way out standing
+ * beside a primary (Cancel, Close, No, stay).
+ *
+ * `destructive` is that same white button with a red label — the look of
+ * "Leave this place" — for the thing that undoes something: signing out,
+ * leaving a place. It opens the question; `primary` answers it.
  */
-type Variant = 'primary' | 'secondary' | 'danger' | 'destructive' | 'quiet';
+type Variant = 'primary' | 'secondary' | 'destructive';
 
 type Props = Omit<PressableProps, 'style'> & {
   label: string;
@@ -78,15 +82,11 @@ const styles = StyleSheet.create({
 const containerStyles = StyleSheet.create({
   primary: { backgroundColor: colors.primary, borderColor: colors.primary },
   secondary: { backgroundColor: colors.surface, borderColor: colors.border },
-  danger: { backgroundColor: colors.danger, borderColor: colors.danger },
   destructive: { backgroundColor: colors.surface, borderColor: colors.border },
-  quiet: { backgroundColor: 'transparent', borderColor: 'transparent' },
 });
 
 const labelStyles = StyleSheet.create({
   primary: { color: colors.primaryText },
   secondary: { color: colors.text },
-  danger: { color: colors.dangerText },
   destructive: { color: colors.danger },
-  quiet: { color: colors.textMuted },
 });

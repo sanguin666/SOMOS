@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import { PoiShell, hubMenu, type HubTab } from '../components/PoiShell';
 import { AnnouncementsScreen } from './AnnouncementsScreen';
 import { CommunityScreen } from './CommunityScreen';
@@ -66,6 +67,37 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
     setDrilldown({ kind: 'list' });
   }
 
+  /**
+   * One step back, innermost first: the settings sheet, then a
+   * drill-down inside a tab, then the tab itself. Says whether it had
+   * anywhere to go, which is what Android's back button needs to know —
+   * false there lets the press fall through and close the app, which is
+   * what it should do from a place's home page.
+   */
+  const goBack = useCallback(() => {
+    if (profileOpen) {
+      setProfileOpen(false);
+      return true;
+    }
+    if (drilldown.kind !== 'list') {
+      setDrilldown({ kind: 'list' });
+      return true;
+    }
+    if (tab !== 'home') {
+      selectTab('home');
+      return true;
+    }
+    return false;
+  }, [profileOpen, drilldown.kind, tab]);
+
+  // The phone's own back button, which people who have used Android for
+  // years reach for before they look at the screen. Android only; the
+  // listener is a no-op elsewhere.
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', goBack);
+    return () => subscription.remove();
+  }, [goBack]);
+
   return (
     <PoiShell
       poi={poi}
@@ -73,6 +105,7 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
       me={me}
       activeTab={tab}
       onSelectTab={selectTab}
+      onBack={tab === 'home' && drilldown.kind === 'list' ? undefined : goBack}
       onOpenPlaces={onOpenPlaces}
       onOpenProfile={() => setProfileOpen(true)}
     >
