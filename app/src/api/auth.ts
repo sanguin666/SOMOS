@@ -19,6 +19,10 @@ export type Me = {
   // Relative path served by the backend (/uploads/avatars/…), or absent
   // for the many people who never set a picture.
   avatarUrl?: string;
+  // The place to reopen for somebody who belongs to more than one. May
+  // name a place they have since left, so it is a preference to check
+  // against `pois`, not an answer on its own.
+  lastActivePoiId?: string;
   language: string;
   adminPois: Poi[];
   pois: Poi[];
@@ -83,6 +87,15 @@ function extensionForMimeType(mimeType: string): string {
   if (mimeType.includes('png')) return 'png';
   if (mimeType.includes('webp')) return 'webp';
   return 'jpg';
+}
+
+/**
+ * Records where somebody is, as they enter a place. Fire and forget from
+ * the app's side: failing to remember is not worth interrupting anyone
+ * over, it only means the next launch falls back to their first place.
+ */
+export function setLastActivePoi(poiId: string): Promise<Me> {
+  return apiPatch<Me>('/auth/me/last-poi', { poiId });
 }
 
 // Called whenever a signed-in person opens a place, so "my places" follows

@@ -96,6 +96,12 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async updateLastActivePoi(id: string, poiId: string): Promise<User> {
+    const user = await this.findOne(id);
+    user.lastActivePoiId = poiId;
+    return this.usersRepository.save(user);
+  }
+
   async updateAvatar(id: string, avatarUrl: string): Promise<User> {
     const user = await this.findOne(id);
     user.avatarUrl = avatarUrl;

@@ -8,11 +8,16 @@ import { ConsoleSmsSender, SmsSender } from './sms/sms-sender.js';
 import { AuthGuardsModule } from './auth-guards.module.js';
 import { UsersModule } from '../users/users.module.js';
 import { UserPoisModule } from '../user-pois/user-pois.module.js';
+import { PoisModule } from '../pois/pois.module.js';
 
 @Module({
   imports: [
     UsersModule,
     UserPoisModule,
+    // Only for checking that a remembered place still exists. PoisModule
+    // depends on AuthGuardsModule rather than on this module, so there is
+    // no cycle here.
+    PoisModule,
     AuthGuardsModule,
     TypeOrmModule.forFeature([PhoneVerificationCode]),
   ],

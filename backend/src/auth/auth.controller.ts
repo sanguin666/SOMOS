@@ -22,6 +22,7 @@ import { RequestPhoneCodeDto } from './dto/request-phone-code.dto.js';
 import { VerifyPhoneCodeDto } from './dto/verify-phone-code.dto.js';
 import { UpdateLanguageDto } from '../common/dto/update-language.dto.js';
 import { UpdateProfileDto } from '../common/dto/update-profile.dto.js';
+import { SetLastActivePoiDto } from '../common/dto/set-last-active-poi.dto.js';
 import { localDiskStorage, publicUrlFor } from '../common/upload/multer-storage.js';
 import { JwtAuthGuard, type AuthenticatedRequest } from './guards/jwt-auth.guard.js';
 
@@ -96,6 +97,14 @@ export class AuthController {
       request.userId,
       publicUrlFor(AVATAR_SUBFOLDER, image.filename),
     );
+  }
+
+  // Called as the app enters a place, so someone who belongs to several
+  // reopens where they left off.
+  @Patch('me/last-poi')
+  @UseGuards(JwtAuthGuard)
+  setLastActivePoi(@Req() request: AuthenticatedRequest, @Body() dto: SetLastActivePoiDto) {
+    return this.authService.setLastActivePoi(request.userId, dto.poiId);
   }
 
   @Patch('me/language')

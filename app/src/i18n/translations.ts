@@ -99,6 +99,15 @@ export type Translations = {
     permissionDenied: string;
     error: string;
   };
+  onboarding: {
+    welcome: string;
+    signUp: string;
+    signIn: string;
+  };
+  addPlace: {
+    title: string;
+    codeLabel: string;
+  };
   places: {
     title: string;
     addPlace: string;
@@ -300,6 +309,15 @@ const en: Translations = {
     laterLabel: 'More settings are coming here later.',
     permissionDenied: 'ANSAE needs permission to open your photos. You can allow it in your phone settings.',
     error: "That didn't save. Please try again.",
+  },
+  onboarding: {
+    welcome: 'Welcome',
+    signUp: 'Sign up',
+    signIn: 'Sign in',
+  },
+  addPlace: {
+    title: 'Add the place you belong to.',
+    codeLabel: 'Or type the place number printed on the flyer',
   },
   places: {
     title: 'Your places',
@@ -505,6 +523,15 @@ const es: Translations = {
     permissionDenied: 'ANSAE necesita permiso para abrir tus fotos. Puedes darlo en los ajustes del teléfono.',
     error: 'No se pudo guardar. Inténtalo de nuevo.',
   },
+  onboarding: {
+    welcome: 'Bienvenido',
+    signUp: 'Crear cuenta',
+    signIn: 'Iniciar sesión',
+  },
+  addPlace: {
+    title: 'Añade el lugar al que perteneces.',
+    codeLabel: 'O escribe el número del lugar impreso en el folleto',
+  },
   places: {
     title: 'Tus lugares',
     addPlace: 'Añadir un lugar',
@@ -708,6 +735,15 @@ const fr: Translations = {
     laterLabel: 'D’autres réglages arriveront ici plus tard.',
     permissionDenied: 'ANSAE a besoin d’accéder à vos photos. Vous pouvez l’autoriser dans les réglages du téléphone.',
     error: 'L’enregistrement a échoué. Réessayez.',
+  },
+  onboarding: {
+    welcome: 'Bienvenue',
+    signUp: 'S’inscrire',
+    signIn: 'Se connecter',
+  },
+  addPlace: {
+    title: 'Ajoutez le lieu auquel vous appartenez.',
+    codeLabel: 'Ou saisissez le numéro du lieu imprimé sur le dépliant',
   },
   places: {
     title: 'Vos lieux',
