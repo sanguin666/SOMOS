@@ -1,15 +1,18 @@
-import { type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
 import {
   CalendarIcon,
   CandleIcon,
   ChatBubbleIcon,
   ChevronRightIcon,
+  ExitIcon,
   HeartIcon,
   MegaphoneIcon,
   PinIcon,
   PlayIcon,
+  PlusIcon,
 } from '../components/icons';
 import { hubMenu, type HubTab } from '../components/PoiShell';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
@@ -29,6 +32,10 @@ type Props = {
   modules: ActiveModule[] | null;
   onSelectTab: (tab: HubTab) => void;
   onOpenPlaces: () => void;
+  onAddPlace: () => void;
+  // Resolves once the membership is gone and the app has moved on, so
+  // this screen knows when to stop showing its spinner.
+  onLeavePlace: () => Promise<void>;
 };
 
 /**
@@ -38,9 +45,32 @@ type Props = {
  * with its name spelled out — the tab bar's labels are short by
  * necessity, this list has no such excuse.
  */
-export function MoreScreen({ poi, modules, onSelectTab, onOpenPlaces }: Props) {
+export function MoreScreen({
+  poi,
+  modules,
+  onSelectTab,
+  onOpenPlaces,
+  onAddPlace,
+  onLeavePlace,
+}: Props) {
   const { t, language, setLanguage } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
+  const [confirmingLeave, setConfirmingLeave] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [leaveFailed, setLeaveFailed] = useState(false);
+
+  async function leave() {
+    setLeaving(true);
+    setLeaveFailed(false);
+    try {
+      await onLeavePlace();
+      setConfirmingLeave(false);
+    } catch {
+      setLeaveFailed(true);
+    } finally {
+      setLeaving(false);
+    }
+  }
 
   const rows = hubMenu(poi, modules).inMore.map((type) => ({
     type,
@@ -84,6 +114,78 @@ export function MoreScreen({ poi, modules, onSelectTab, onOpenPlaces }: Props) {
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
       </Pressable>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('places.addPlace')}
+        onPress={onAddPlace}
+        style={styles.row}
+      >
+        <PlusIcon size={26} color={colors.textMuted} />
+        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+          {t('places.addPlace')}
+        </AccessibleText>
+        <ChevronRightIcon size={22} color={colors.textMuted} />
+      </Pressable>
+
+      {/* Last of the three, and the only one that undoes something, so it
+          is the one that asks before acting. */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('more.leavePlace')}
+        onPress={() => {
+          setLeaveFailed(false);
+          setConfirmingLeave(true);
+        }}
+        style={styles.row}
+      >
+        <ExitIcon size={26} color={colors.danger} />
+        <AccessibleText variant="bodyLarge" color={colors.danger} style={styles.rowLabel}>
+          {t('more.leavePlace')}
+        </AccessibleText>
+      </Pressable>
+
+      <Modal
+        visible={confirmingLeave}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setConfirmingLeave(false)}
+      >
+        <Pressable
+          style={styles.scrim}
+          accessibilityLabel={t('more.leaveCancel')}
+          onPress={() => !leaving && setConfirmingLeave(false)}
+        />
+        <View style={styles.confirmSheet}>
+          <AccessibleText variant="title">
+            {t('more.leaveQuestion', { poiName: poi.name })}
+          </AccessibleText>
+          <AccessibleText variant="body" color={colors.textMuted}>
+            {t('more.leaveExplainer')}
+          </AccessibleText>
+
+          {leaveFailed && (
+            <AccessibleText variant="body" color={colors.danger}>
+              {t('more.leaveError')}
+            </AccessibleText>
+          )}
+
+          {leaving ? (
+            <View style={styles.leavingRow}>
+              <ActivityIndicator color={colors.primaryStrong} size="large" />
+            </View>
+          ) : (
+            <>
+              <AccessibleButton label={t('more.leaveConfirm')} onPress={() => void leave()} />
+              <AccessibleButton
+                label={t('more.leaveCancel')}
+                variant="secondary"
+                onPress={() => setConfirmingLeave(false)}
+              />
+            </>
+          )}
+        </View>
+      </Modal>
 
       <View style={styles.languageBlock}>
         <AccessibleText variant="caption" color={colors.textMuted}>
@@ -174,6 +276,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
     opacity: 0.25,
     marginVertical: spacing.xs,
+  },
+  scrim: {
+    flex: 1,
+    backgroundColor: 'rgba(17,17,17,0.45)',
+  },
+  confirmSheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radii.lg,
+    borderTopRightRadius: radii.lg,
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  leavingRow: {
+    minHeight: minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   languageBlock: {
     gap: spacing.sm,

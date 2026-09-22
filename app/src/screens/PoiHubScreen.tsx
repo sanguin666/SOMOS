@@ -18,6 +18,8 @@ import type { ActiveModule, CommunityPost, Poi } from '../api/types';
 type Props = {
   poi: Poi;
   onOpenPlaces: () => void;
+  onAddPlace: () => void;
+  onLeavePlace: () => Promise<void>;
   onSignIn: () => void;
 };
 
@@ -35,7 +37,7 @@ type Drilldown =
  * only what sits between them, so the chrome never moves and the selected
  * button is the one thing that changes.
  */
-export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
+export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSignIn }: Props) {
   const { isAdminOf, me } = useAuth();
   const isStaff = isAdminOf(poi.id);
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
@@ -83,7 +85,14 @@ export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
       {tab === 'home' && <PoiHomeScreen poi={poi} modules={modules} onSelectTab={selectTab} />}
 
       {tab === 'more' && (
-        <MoreScreen poi={poi} modules={modules} onSelectTab={selectTab} onOpenPlaces={onOpenPlaces} />
+        <MoreScreen
+          poi={poi}
+          modules={modules}
+          onSelectTab={selectTab}
+          onOpenPlaces={onOpenPlaces}
+          onAddPlace={onAddPlace}
+          onLeavePlace={onLeavePlace}
+        />
       )}
 
       {tab === 'donations' && <DonateScreen poi={poi} onDone={() => selectTab('home')} />}

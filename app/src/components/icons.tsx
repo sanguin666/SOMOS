@@ -364,3 +364,25 @@ export function CameraIcon({ size = 24, color = '#111111' }: IconProps) {
     </Svg>
   );
 }
+
+export function ExitIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Three walls and an open side: a doorway being stepped out of. */}
+      <Path
+        d="M14 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h8"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M12 12h9m0 0-3.2-3.2M21 12l-3.2 3.2"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}

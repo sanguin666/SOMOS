@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { apiGet, apiPatch, apiPost, apiPostForm } from './client';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPostForm } from './client';
 import type { Poi } from './types';
 
 export type RequestCodeResult = {
@@ -103,4 +103,13 @@ export function setLastActivePoi(poiId: string): Promise<Me> {
 // is not an error — the backend returns the existing membership.
 export function joinPoi(qrCodeToken: string): Promise<unknown> {
   return apiPost<unknown>('/auth/me/pois', { qrCodeToken });
+}
+
+/**
+ * Leaves a place from the "More" menu. Nothing about the place itself is
+ * touched — this only ends this person's membership, and scanning its QR
+ * code again puts them straight back.
+ */
+export function leavePoi(poiId: string): Promise<void> {
+  return apiDelete(`/auth/me/pois/${poiId}`);
 }
