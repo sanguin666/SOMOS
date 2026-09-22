@@ -180,8 +180,8 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   input: {
-    borderWidth: 2,
-    borderColor: colors.border,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     borderRadius: radii.md,
     padding: spacing.md,
     minHeight: 64,

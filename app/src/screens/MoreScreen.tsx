@@ -18,7 +18,7 @@ import {
 } from '../components/icons';
 import { hubMenu, type HubTab } from '../components/PoiShell';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
-import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
@@ -321,10 +321,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: minTouchTarget + 14,
     paddingHorizontal: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    ...cardSurface,
     borderRadius: radii.lg,
-    backgroundColor: colors.surface,
   },
   rowLabel: {
     flex: 1,
