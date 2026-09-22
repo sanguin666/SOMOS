@@ -1,8 +1,7 @@
-import { useWindowDimensions, StyleSheet, View } from 'react-native';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
-import { CrowdBackdrop } from '../components/CrowdBackdrop';
 import { LogoMark } from '../components/icons';
 import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
@@ -24,18 +23,27 @@ type Props = {
 export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
-  const { width, height } = useWindowDimensions();
 
   return (
-    <View style={styles.root}>
-      <CrowdBackdrop width={width} height={height} />
-
+    /* The illustration is the screen, edge to edge and under the status
+       bar and the home indicator alike — hence ImageBackground as the
+       root rather than a sized layer behind it, which is what left a
+       band of nothing at the bottom. */
+    <ImageBackground
+      source={require('../../assets/onboarding-crowd.jpg')}
+      resizeMode="cover"
+      style={styles.root}
+      imageStyle={styles.image}
+    >
       {/* The words and the buttons sit on their own panel rather than on
           the illustration, so nothing is ever read against a figure. */}
       <View
         style={[
           styles.panel,
-          { marginTop: insets.top + spacing.lg, marginBottom: insets.bottom + spacing.lg },
+          {
+            marginTop: insets.top + spacing.lg,
+            marginBottom: insets.bottom + spacing.lg,
+          },
         ]}
       >
         <View style={styles.logoRing}>
@@ -54,7 +62,7 @@ export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
           <AccessibleButton label={t('onboarding.signIn')} variant="secondary" onPress={onSignIn} />
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -63,6 +71,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
+    // Shows only for the instant before the picture decodes, and behind
+    // it on any screen too wide for the crop.
+    backgroundColor: colors.background,
+  },
+  image: {
+    // The picture is taller than it is wide, so a wide phone crops the
+    // top and bottom rather than the sides, where the crowd thins out.
+    width: '100%',
+    height: '100%',
   },
   panel: {
     backgroundColor: colors.surface,
