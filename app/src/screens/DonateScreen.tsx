@@ -6,7 +6,7 @@ import { AccessibleButton } from '../components/AccessibleButton';
 import { HeartIcon } from '../components/icons';
 import { getDonationStatus, getDonationsConfig, startDonationCheckout } from '../api/donations';
 import { useI18n } from '../i18n/I18nContext';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 import { currencySymbol, formatAmount } from '../utils/currency';
 import type { Poi } from '../api/types';
 
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 9999,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -335,14 +335,14 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     // The beige surface, not the blue tint this screen used before the
     // SOMOS palette landed.
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primarySoft,
   },
   customButton: {
     minHeight: 64,
     borderRadius: radii.lg,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },

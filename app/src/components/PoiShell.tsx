@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Screen } from './Screen';
 import { AccessibleText } from './AccessibleText';
+import { Avatar } from './Avatar';
 import {
   CalendarIcon,
   CandleIcon,
@@ -15,7 +16,8 @@ import {
   PlayIcon,
 } from './icons';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
-import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import type { Me } from '../api/auth';
+import { colors, floatingShadow, minTouchTarget, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -117,7 +119,16 @@ export function hubMenu(poi: Poi, modules: ActiveModule[] | null): HubMenu {
  * moves or flickers when a button is pressed — only the highlight does.
  * Both clear the device's system UI via `Screen`.
  */
-export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, children }: Props) {
+export function PoiShell({
+  poi,
+  modules,
+  me,
+  activeTab,
+  onSelectTab,
+  onOpenPlaces,
+  onOpenProfile,
+  children,
+}: Props) {
   const { t } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
@@ -140,10 +151,11 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, c
 
   const header = (
     <View style={styles.hero}>
-      <LogoMark size={32} haloColor={colors.surface} />
+      <LogoMark size={30} />
 
-      {/* The whole name block is the switcher's target: it is the largest
-          thing in the banner, so it stays easy to hit. */}
+      {/* The name block is the switcher's target. It takes whatever width
+          is left over, so the profile circle beside it never gets pushed
+          off a narrow phone by a long parish name. */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${poi.name}. ${t('hub.switchPlace')}`}
@@ -151,30 +163,39 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, c
         style={styles.heroTitleBlock}
       >
         <View style={styles.heroNameRow}>
-          <AccessibleText
-            variant="bodyLarge"
-            color={poiTheme.accentText}
-            numberOfLines={1}
-            style={styles.heroName}
-          >
+          <AccessibleText variant="body" numberOfLines={1} style={styles.heroName}>
             {poi.name}
           </AccessibleText>
-          <ChevronDownIcon size={18} color={poiTheme.accentText} />
+          <ChevronDownIcon size={18} color={colors.text} />
         </View>
         <AccessibleText
-          variant="body"
-          color="rgba(255,255,255,0.85)"
+          variant="caption"
+          color={colors.textMuted}
           numberOfLines={1}
           style={styles.heroLocation}
         >
           {poi.city ?? t('hub.locationNotSet')}
         </AccessibleText>
       </Pressable>
+
+      {/* Signed in or not, the circle is in the same place and opens the
+          same screen — which offers signing in when there is no session,
+          rather than the button quietly disappearing. */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          me ? `${t('profile.title')}. ${displayName(me)}` : t('profile.openSignedOut')
+        }
+        onPress={onOpenProfile}
+        style={styles.profileButton}
+      >
+        <Avatar me={me} size={48} />
+      </Pressable>
     </View>
   );
 
   const footer = showTabBar ? (
-    <View style={[styles.tabBar, styles.tabBarRow]}>
+    <View style={styles.tabBar}>
       {tabs.map((tab) => {
         const { icon, label } = describe(tab, t);
         return (
@@ -196,7 +217,7 @@ export function PoiShell({ poi, modules, activeTab, onSelectTab, onOpenPlaces, c
     <Screen
       scroll
       header={header}
-      headerStyle={[styles.headerSlot, { backgroundColor: poiTheme.accent }]}
+      headerStyle={styles.headerSlot}
       footer={footer}
       footerStyle={styles.footerSlot}
     >
@@ -209,13 +230,23 @@ type Props = {
   poi: Poi;
   // null while the module list is still loading.
   modules: ActiveModule[] | null;
+  // The signed-in person, or null when nobody is — what the profile
+  // circle draws.
+  me: Me | null;
   activeTab: HubTab;
   onSelectTab: (tab: HubTab) => void;
   // Opens the place switcher; the banner only reports the tap so the
   // switcher's state lives with whoever owns the place list.
   onOpenPlaces: () => void;
+  // Opens the settings menu behind the profile circle, on the same terms.
+  onOpenProfile: () => void;
   children: ReactNode;
 };
+
+/** Whatever name someone has given, for the profile button's label. */
+function displayName(me: Me): string {
+  return [me.firstName, me.lastName].filter(Boolean).join(' ').trim() || (me.phone ?? '');
+}
 
 type Described = { icon: (color: string) => ReactNode; label: string };
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -266,7 +297,9 @@ function TabBarItem({
       onPress={onPress}
       style={[styles.tabBarItem, active && { backgroundColor: activeBackground }]}
     >
-      <View style={[styles.tabBarIndicator, active && { backgroundColor: activeColor }]} />
+      {/* Selection is a filled rounded pill plus a bolded, coral label —
+          the line that used to mark it ran along an edge the bar no
+          longer has. */}
       {icon(color)}
       <AccessibleText variant="caption" color={color} numberOfLines={1} style={active ? styles.tabBarLabelActive : styles.tabBarLabel}>
         {label}
@@ -276,17 +309,24 @@ function TabBarItem({
 }
 
 const styles = StyleSheet.create({
+  // The slot itself is only the page colour behind the status bar — the
+  // white card inside it is what people see as the top bar.
   headerSlot: {
-    borderBottomLeftRadius: radii.lg,
-    borderBottomRightRadius: radii.lg,
-    overflow: 'hidden',
+    backgroundColor: colors.background,
   },
   hero: {
-    paddingHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
     paddingVertical: spacing.sm,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: radii.pill,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    ...floatingShadow,
   },
   heroTitleBlock: {
     flex: 1,
@@ -303,16 +343,31 @@ const styles = StyleSheet.create({
   heroLocation: {
     fontWeight: '700',
   },
+  // A 48pt circle inside a full-size target, so the picture stays a
+  // picture rather than growing to fill the touch area.
+  profileButton: {
+    width: minTouchTarget,
+    height: minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   footerSlot: {
     backgroundColor: colors.background,
   },
+  // Lifted off the bottom on all four sides. The page ends above it
+  // rather than running underneath, so the last line of a screen is
+  // never hidden behind a button.
   tabBar: {
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
-  },
-  tabBarRow: {
     flexDirection: 'row',
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    // Clear of the bottom edge on a phone with no gesture bar to add its
+    // own inset.
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xs,
+    backgroundColor: colors.surface,
+    borderRadius: radii.pill,
+    ...floatingShadow,
   },
   tabBarItem: {
     flex: 1,
@@ -320,20 +375,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 3,
     minHeight: minTouchTarget,
+    borderRadius: radii.lg,
+    marginVertical: spacing.xs,
     // Kept tight so a bolded label still fits across five buttons on a
     // narrow phone rather than truncating.
     paddingHorizontal: 2,
-    paddingBottom: spacing.xs,
-  },
-  // Sits flush under the bar's top border so the selected button reads as
-  // focused at a glance, not only by color.
-  tabBarIndicator: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: 'transparent',
+    paddingVertical: spacing.xs,
   },
   tabBarLabel: {
     fontWeight: '500',

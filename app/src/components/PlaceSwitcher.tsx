@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(17,17,17,0.45)',
   },
   sheet: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: radii.lg,
     borderTopRightRadius: radii.lg,
     paddingTop: spacing.md,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
   },
   error: {
     paddingHorizontal: spacing.lg,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     minHeight: minTouchTarget,
     paddingHorizontal: spacing.md,
     borderRadius: radii.md,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
   },
   rowCurrent: {
     borderWidth: 2,

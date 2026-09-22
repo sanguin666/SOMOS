@@ -5,7 +5,7 @@ import { PlayIcon } from '../components/icons';
 import { getLivestreams } from '../api/livestreams';
 import { useI18n } from '../i18n/I18nContext';
 import type { Livestream, Poi } from '../api/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   badgeEnded: {
-    backgroundColor: colors.surface,
+    ...cardSurface,
   },
   badgeLive: {
     backgroundColor: colors.danger,

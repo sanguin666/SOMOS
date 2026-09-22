@@ -4,6 +4,15 @@
 // the dev machine's LAN IP here instead.
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
+/**
+ * A file the backend stored, turned into something an <Image> can load.
+ * Uploads come back as a relative path; anything already absolute (an
+ * admin pasting a link) is left alone.
+ */
+export function uploadUri(path: string): string {
+  return /^https?:\/\//.test(path) ? path : `${API_BASE_URL}${path}`;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -94,6 +103,14 @@ export function apiGet<T>(path: string): Promise<T> {
 export function apiPost<T>(path: string, body?: unknown): Promise<T> {
   return request<T>(path, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+}
+
+export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });

@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { ChevronRightIcon, PlayIcon } from '../components/icons';
-import { API_BASE_URL } from '../api/client';
+import { uploadUri } from '../api/client';
 import { getPoiPageBlocks } from '../api/poiPage';
 import { getAnnouncements } from '../api/announcements';
 import { getEvents } from '../api/events';
@@ -19,7 +19,7 @@ import type {
   PoiPageBlock,
 } from '../api/types';
 import type { HubTab } from '../components/PoiShell';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -61,12 +61,6 @@ const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
   next_livestream: 'livestreams',
   donate: 'donations',
 };
-
-function imageUri(path: string): string {
-  // Uploads come back as a relative path; anything already absolute (an
-  // admin pasting a link) is left alone.
-  return /^https?:\/\//.test(path) ? path : `${API_BASE_URL}${path}`;
-}
 
 function formatShortDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -207,7 +201,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
             return (
               <View key={block.id} style={styles.section}>
                 <Image
-                  source={{ uri: imageUri(block.imageUrl) }}
+                  source={{ uri: uploadUri(block.imageUrl) }}
                   style={styles.image}
                   resizeMode="cover"
                   accessibilityLabel={block.title || poi.name}
@@ -410,7 +404,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 16 / 9,
     borderRadius: radii.lg,
-    backgroundColor: colors.surface,
+    ...cardSurface,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -437,7 +431,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
     minHeight: 64,
@@ -469,7 +463,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   feedCard: {
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
     gap: spacing.sm,

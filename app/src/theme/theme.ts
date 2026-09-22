@@ -8,8 +8,15 @@
  */
 
 export const colors = {
-  background: '#FFFFFF',
-  surface: '#F7F1E7',
+  // The app's canvas: a very light warm beige, so a white box sitting on
+  // it reads as a card rather than as more page. The two are only 1.06:1
+  // apart, which is nowhere near enough on its own — `cardSurface` below
+  // is what actually draws the edge, and every white box should use it.
+  background: '#FBF8F4',
+  // Boxes, inputs, buttons, and the floating menus. Inside a white panel
+  // the nesting goes the other way: a row or a field takes `background`,
+  // so the beige is what separates it from the white around it.
+  surface: '#FFFFFF',
   text: '#111111',
   textMuted: '#3D3D3D',
   primary: '#E1663F',
@@ -22,10 +29,41 @@ export const colors = {
   // but not for anything smaller.
   primaryStrong: '#B8502E',
   primaryText: '#FFFFFF',
+  // A warm coral wash, for the one thing that is currently selected on a
+  // white surface — the menu button you are on, the donation amount you
+  // picked. Paired with a coral, bolded label, never carrying the meaning
+  // on its own.
+  primarySoft: '#F9DDD2',
   danger: '#B3261E',
   dangerText: '#FFFFFF',
   border: '#111111',
+  // Hairline for the edge of a white card on the beige page. Warm rather
+  // than grey so it reads as a shadow's edge instead of a drawn line.
+  cardBorder: 'rgba(92,70,44,0.16)',
   focus: '#E1663F',
+} as const;
+
+/**
+ * Every white box on the page: the fill plus the hairline that makes its
+ * edge visible. The page is only just off white, so a box without this
+ * has no edge at all — spread it instead of setting `backgroundColor`.
+ */
+export const cardSurface = {
+  backgroundColor: colors.surface,
+  borderWidth: 1,
+  borderColor: colors.cardBorder,
+} as const;
+
+/**
+ * The shadow under the two floating menus. Both platforms need their own
+ * half of this: `elevation` is Android's, the rest is iOS's.
+ */
+export const floatingShadow = {
+  shadowColor: '#3A2A14',
+  shadowOpacity: 0.16,
+  shadowRadius: 14,
+  shadowOffset: { width: 0, height: 5 },
+  elevation: 8,
 } as const;
 
 // Deliberately large size scale. React Native scales these values
@@ -54,6 +92,9 @@ export const minTouchTarget = 64;
 export const radii = {
   md: 12,
   lg: 16,
+  // The floating menus and the profile circle: round enough to read as
+  // lozenges rather than as boxes with the corners taken off.
+  pill: 26,
 } as const;
 
 export const theme = { colors, fontSizes, spacing, minTouchTarget, radii };

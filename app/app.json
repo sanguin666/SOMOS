@@ -35,6 +35,13 @@
           "cameraPermission": "Allow ANSAE to use the camera to scan a place’s QR code.",
           "barcodeScannerEnabled": true
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ANSAE to use your photos so you can choose a profile picture.",
+          "cameraPermission": "Allow ANSAE to use the camera so you can take a profile picture."
+        }
       ]
     ]
   }

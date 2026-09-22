@@ -89,9 +89,11 @@ function AppRoutes() {
     }
   }
 
-  // The scan and hub screens both put a dark/colored band behind the
-  // status bar, so its text has to go light there.
-  const statusBarStyle = current.name === 'home' ? 'auto' : 'light';
+  // Only the camera fills the screen behind the status bar, so only the
+  // scan screen needs light text up there. The hub's band used to be
+  // coral and now matches the page, so it takes the default like
+  // everything else.
+  const statusBarStyle = current.name === 'scan' ? 'light' : 'auto';
 
   return (
     <>

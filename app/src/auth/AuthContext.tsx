@@ -24,6 +24,12 @@ type AuthState = {
    * that would come back 403.
    */
   isAdminOf: (poiId: string) => boolean;
+  /**
+   * Replaces the session with a fresh `me` the backend just returned —
+   * what the settings menu does after saving a name or a picture, so the
+   * change shows immediately instead of after a round trip.
+   */
+  applyMe: (me: Me) => void;
   signIn: (accessToken: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -104,9 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [me],
   );
 
+  const applyMe = useCallback((updated: Me) => {
+    setMe(updated);
+  }, []);
+
   const value = useMemo(
-    () => ({ ready, me, isAdminOf, signIn, signOut, refresh }),
-    [ready, me, isAdminOf, signIn, signOut, refresh],
+    () => ({ ready, me, isAdminOf, applyMe, signIn, signOut, refresh }),
+    [ready, me, isAdminOf, applyMe, signIn, signOut, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

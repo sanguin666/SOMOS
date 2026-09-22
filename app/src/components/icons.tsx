@@ -331,3 +331,36 @@ export function MoreDotsIcon({ size = 24, color = '#111111' }: IconProps) {
     </Svg>
   );
 }
+
+// The stand-in for somebody who has neither a picture nor a name yet —
+// head and shoulders, drawn rather than photographic so it never reads as
+// a real person's face.
+export function PersonIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={8} r={3.6} stroke={color} strokeWidth={2} />
+      <Path
+        d="M4.5 20c0-4 3.4-6.2 7.5-6.2s7.5 2.2 7.5 6.2"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
+// Sits on the profile picture to say the picture is the thing you press
+// to change it.
+export function CameraIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3 8.5A2 2 0 015 6.5h1.8l1.3-2h7.8l1.3 2H19a2 2 0 012 2V18a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinejoin="round"
+      />
+      <Circle cx={12} cy={13} r={3.6} stroke={color} strokeWidth={2} />
+    </Svg>
+  );
+}

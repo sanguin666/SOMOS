@@ -8,7 +8,7 @@ import { SignInNotice } from '../components/SignInNotice';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import type { CommunityComment, CommunityPost, Poi } from '../api/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -125,14 +125,14 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 9999,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   postCard: {
     marginTop: spacing.sm,
     gap: spacing.sm,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
   },
@@ -143,14 +143,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   commentCard: {
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
     gap: spacing.xs,
   },
   form: {
     gap: spacing.sm,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
     marginTop: spacing.sm,

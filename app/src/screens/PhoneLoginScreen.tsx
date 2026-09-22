@@ -8,7 +8,7 @@ import { requestPhoneCode, verifyPhoneCode } from '../api/auth';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { ApiError } from '../api/client';
-import { colors, fontSizes, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, fontSizes, radii, spacing } from '../theme/theme';
 
 type Props = {
   onBack: () => void;
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     minHeight: 64,
     fontSize: fontSizes.body,
     color: colors.text,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
   // The code is short and typed from memory, so it gets the room to be
   // read back at a glance.
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   devCode: {
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.md,
     padding: spacing.md,
     gap: spacing.xs,

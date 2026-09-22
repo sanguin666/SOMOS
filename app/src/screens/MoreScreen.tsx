@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radii.lg,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
   rowLabel: {
     flex: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
   languageButtonSelected: {
     borderColor: colors.primary,

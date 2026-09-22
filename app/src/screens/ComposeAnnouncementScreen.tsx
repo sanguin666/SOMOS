@@ -14,7 +14,7 @@ import { BackChevronIcon, MicIcon, PlayIcon } from '../components/icons';
 import { createAnnouncement } from '../api/announcements';
 import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 9999,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
     fontSize: 20,
   },
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     padding: spacing.md,
     fontSize: 18,
     textAlignVertical: 'top',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
   pillLabel: {
     fontWeight: '700',
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: 64,
     borderRadius: radii.lg,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     paddingHorizontal: spacing.lg,
   },
   recordingDot: {
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: 64,
     borderRadius: radii.lg,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     paddingHorizontal: spacing.lg,
   },
   playButton: {

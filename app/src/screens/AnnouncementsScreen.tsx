@@ -7,7 +7,7 @@ import { getAnnouncements } from '../api/announcements';
 import { API_BASE_URL } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import type { Announcement, Poi } from '../api/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 9999,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   card: {
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
     gap: spacing.sm,

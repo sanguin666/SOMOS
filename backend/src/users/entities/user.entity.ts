@@ -39,6 +39,13 @@ export class User {
   @Column({ name: 'last_name', nullable: true })
   lastName?: string;
 
+  // Relative path (e.g. /uploads/avatars/<file>.jpg) to the picture this
+  // person chose for themselves, served statically like every other
+  // upload. Nullable because most people never set one — the app draws
+  // their initials instead.
+  @Column({ name: 'avatar_url', type: 'text', nullable: true })
+  avatarUrl?: string;
+
   // UI language for this user's own account. Meaningful today for admins
   // (who have a real session) — the admin dashboard reads/writes it.
   // Congregant users don't have a session yet, so the app's language
