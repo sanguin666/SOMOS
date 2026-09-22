@@ -332,8 +332,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
-    opacity: 0.25,
+    backgroundColor: colors.primary,
     marginVertical: spacing.xs,
   },
   scrim: {
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: minTouchTarget + 14,
     borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
+    borderBottomColor: colors.primary,
   },
   languageOptionSelected: {},
   confirmSheet: {

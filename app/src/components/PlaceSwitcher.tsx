@@ -183,8 +183,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     minHeight: minTouchTarget + 10,
+    // Coral rather than a grey hairline: on a white sheet it is the one
+    // line that says where one place ends and the next begins.
     borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
+    borderBottomColor: colors.primary,
   },
   rowCurrent: {},
   rowAction: {},

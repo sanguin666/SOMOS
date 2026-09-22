@@ -43,8 +43,9 @@ type FieldProps = Omit<TextInputProps, 'style'> & {
 };
 
 /**
- * One text field: its name in small type above what is being typed, and
- * a rule underneath that lights up while the field has focus.
+ * One text field: its name in small type above what is being typed. No
+ * rule under it — the card's own edge and the divider between rows are
+ * enough, and focus is said by the label turning coral and bold.
  *
  * The label stays put rather than floating into the field, so somebody
  * halfway through typing can still see what they are answering — which
@@ -70,9 +71,6 @@ export function FormField({ label, tall = false, ...rest }: FieldProps) {
         style={tall ? [styles.input, styles.inputTall] : styles.input}
         {...rest}
       />
-      {/* Two states of the same rule rather than one appearing: the row
-          keeps its height when focus arrives. */}
-      <View style={focused ? styles.ruleFocused : styles.rule} />
     </View>
   );
 }
@@ -96,6 +94,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   input: {
+    // Web only (react-native-web); native ignores it. Without it the
+    // browser draws its focus ring as a black box around the field,
+    // which is the one thing this card must not have. Focus is said by
+    // the label turning coral and bold instead.
+    ...({ outlineStyle: 'none' } as object),
     minHeight: minTouchTarget - spacing.sm,
     fontSize: fontSizes.bodyLarge,
     color: colors.text,
@@ -106,13 +109,5 @@ const styles = StyleSheet.create({
     minHeight: 96,
     textAlignVertical: 'top',
     paddingTop: spacing.xs,
-  },
-  rule: {
-    height: 2,
-    backgroundColor: colors.cardBorder,
-  },
-  ruleFocused: {
-    height: 2,
-    backgroundColor: colors.primary,
   },
 });
