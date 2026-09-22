@@ -19,6 +19,26 @@ export type Translations = {
     scanButton: string;
     myPlacesButton: string;
     languageLabel: string;
+    signInButton: string;
+    signOutButton: string;
+    signedInAs: string;
+  };
+  signIn: {
+    title: string;
+    phoneExplainer: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    sendCode: string;
+    sending: string;
+    codeExplainer: string;
+    devCodeLabel: string;
+    confirm: string;
+    checking: string;
+    changeNumber: string;
+    genericError: string;
+    requiredToPost: string;
   };
   scan: {
     title: string;
@@ -177,6 +197,26 @@ const en: Translations = {
     scanButton: "Scan a place's QR code",
     myPlacesButton: 'My places',
     languageLabel: 'Language',
+    signInButton: 'Sign in',
+    signOutButton: 'Sign out',
+    signedInAs: 'Signed in as {{name}}',
+  },
+  signIn: {
+    title: 'Sign in',
+    phoneExplainer: 'Enter your phone number and we’ll text you a 6-digit code. There is no password to remember.',
+    phoneLabel: 'Phone number',
+    phonePlaceholder: '+34 600 00 00 00',
+    nameLabel: 'Your name (optional)',
+    namePlaceholder: 'Shown next to what you post',
+    sendCode: 'Send me a code',
+    sending: 'Sending…',
+    codeExplainer: 'Enter the 6-digit code sent to {{phone}}.',
+    devCodeLabel: 'No text message service is set up, so here is your code:',
+    confirm: 'Sign in',
+    checking: 'Checking…',
+    changeNumber: 'Use a different number',
+    genericError: 'Something went wrong. Please try again.',
+    requiredToPost: 'Sign in to post here.',
   },
   scan: {
     title: 'Scan the QR code',
@@ -337,6 +377,26 @@ const es: Translations = {
     scanButton: 'Escanear el código QR de un lugar',
     myPlacesButton: 'Mis lugares',
     languageLabel: 'Idioma',
+    signInButton: 'Iniciar sesión',
+    signOutButton: 'Cerrar sesión',
+    signedInAs: 'Sesión iniciada como {{name}}',
+  },
+  signIn: {
+    title: 'Iniciar sesión',
+    phoneExplainer: 'Escribe tu número de teléfono y te enviaremos un código de 6 dígitos por SMS. No hay contraseña que recordar.',
+    phoneLabel: 'Número de teléfono',
+    phonePlaceholder: '+34 600 00 00 00',
+    nameLabel: 'Tu nombre (opcional)',
+    namePlaceholder: 'Aparecerá junto a lo que publiques',
+    sendCode: 'Envíame un código',
+    sending: 'Enviando…',
+    codeExplainer: 'Escribe el código de 6 dígitos enviado a {{phone}}.',
+    devCodeLabel: 'No hay servicio de SMS configurado, así que aquí tienes tu código:',
+    confirm: 'Entrar',
+    checking: 'Comprobando…',
+    changeNumber: 'Usar otro número',
+    genericError: 'Algo ha salido mal. Inténtalo de nuevo.',
+    requiredToPost: 'Inicia sesión para publicar aquí.',
   },
   scan: {
     title: 'Escanea el código QR',
@@ -497,6 +557,26 @@ const fr: Translations = {
     scanButton: "Scanner le QR code d'un lieu",
     myPlacesButton: 'Mes lieux',
     languageLabel: 'Langue',
+    signInButton: 'Se connecter',
+    signOutButton: 'Se déconnecter',
+    signedInAs: 'Connecté en tant que {{name}}',
+  },
+  signIn: {
+    title: 'Se connecter',
+    phoneExplainer: 'Saisissez votre numéro de téléphone et nous vous enverrons un code à 6 chiffres par SMS. Aucun mot de passe à retenir.',
+    phoneLabel: 'Numéro de téléphone',
+    phonePlaceholder: '+33 6 00 00 00 00',
+    nameLabel: 'Votre nom (facultatif)',
+    namePlaceholder: 'Affiché à côté de vos publications',
+    sendCode: 'Envoyez-moi un code',
+    sending: 'Envoi…',
+    codeExplainer: 'Saisissez le code à 6 chiffres envoyé au {{phone}}.',
+    devCodeLabel: "Aucun service SMS n'est configuré, voici donc votre code :",
+    confirm: 'Se connecter',
+    checking: 'Vérification…',
+    changeNumber: 'Utiliser un autre numéro',
+    genericError: "Une erreur s'est produite. Veuillez réessayer.",
+    requiredToPost: 'Connectez-vous pour publier ici.',
   },
   scan: {
     title: 'Scannez le QR code',

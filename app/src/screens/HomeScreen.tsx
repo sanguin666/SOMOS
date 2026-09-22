@@ -6,6 +6,7 @@ import { AccessibleButton } from '../components/AccessibleButton';
 import { LogoMark } from '../components/icons';
 import { getPoi, getPoiByQrCode } from '../api/pois';
 import { getSavedPlaces } from '../storage/savedPlaces';
+import { useAuth } from '../auth/AuthContext';
 import { DEMO_QR_TOKEN } from '../demo';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
@@ -20,21 +21,31 @@ const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
 
 type Props = {
   onScanQR: () => void;
+  onSignIn: () => void;
   onOpenPoi: (poi: Poi) => void;
 };
 
-export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
+export function HomeScreen({ onScanQR, onSignIn, onOpenPoi }: Props) {
   const { t, language, setLanguage } = useI18n();
+  const { me, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  // Re-opens the place this device was in last. Until a congregant can
-  // sign in, the demo POI stands in for anyone who has never scanned
-  // anything, so the button always leads somewhere.
+  /**
+   * Re-opens the place the person was in last. A signed-in account's own
+   * places come first — they follow the person across devices — then this
+   * device's history, then the demo POI, so the button always leads
+   * somewhere even on a phone that has never scanned anything.
+   */
   async function openMyPlaces() {
     setLoading(true);
     setError(false);
     try {
+      const [mine] = me?.pois ?? [];
+      if (mine) {
+        onOpenPoi(await getPoi(mine.id));
+        return;
+      }
       const [mostRecent] = await getSavedPlaces();
       const poi = mostRecent ? await getPoi(mostRecent.id) : await getPoiByQrCode(DEMO_QR_TOKEN);
       onOpenPoi(poi);
@@ -71,6 +82,28 @@ export function HomeScreen({ onScanQR, onOpenPoi }: Props) {
         </View>
       ) : (
         <AccessibleButton label={t('home.myPlacesButton')} variant="secondary" onPress={openMyPlaces} />
+      )}
+
+      {me ? (
+        <View style={{ marginTop: spacing.lg, gap: spacing.sm }}>
+          <AccessibleText variant="caption" color={colors.textMuted}>
+            {t('home.signedInAs', { name: me.firstName ?? me.phone ?? '' })}
+          </AccessibleText>
+          <AccessibleButton
+            label={t('home.signOutButton')}
+            variant="secondary"
+            onPress={() => {
+              void signOut();
+            }}
+          />
+        </View>
+      ) : (
+        <AccessibleButton
+          label={t('home.signInButton')}
+          variant="secondary"
+          onPress={onSignIn}
+          style={{ marginTop: spacing.lg }}
+        />
       )}
 
       <View style={{ marginTop: spacing.xl, alignItems: 'center', gap: spacing.sm }}>

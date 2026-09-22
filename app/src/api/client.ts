@@ -28,12 +28,48 @@ async function readErrorMessage(response: Response): Promise<string | null> {
   }
 }
 
+/**
+ * The signed-in congregant's token, mirrored here by AuthContext so every
+ * call carries it without each api/ module having to thread it through.
+ * Null when signed out, which is a normal state: reading content needs no
+ * account, only posting does.
+ */
+let authToken: string | null = null;
+
+export function setAuthToken(token: string | null): void {
+  authToken = token;
+}
+
+// Called when the backend rejects the token — a week-old session, or one
+// signed with a secret that has since changed. AuthContext registers a
+// handler that signs the user out instead of leaving them stuck with a
+// token every request will refuse.
+let onUnauthorized: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
+function withAuth(init?: RequestInit): RequestInit | undefined {
+  if (!authToken) return init;
+  return {
+    ...init,
+    headers: { ...init?.headers, Authorization: `Bearer ${authToken}` },
+  };
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, init);
+    response = await fetch(`${API_BASE_URL}${path}`, withAuth(init));
   } catch (error) {
     throw new ApiError("Couldn't reach the server. Check your connection.", error);
+  }
+
+  // Only meaningful while we thought we were signed in: a 401 on a call
+  // made with no token just means this route needs one.
+  if (response.status === 401 && authToken) {
+    onUnauthorized?.();
   }
 
   if (!response.ok) {

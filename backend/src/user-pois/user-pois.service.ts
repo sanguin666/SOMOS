@@ -32,6 +32,16 @@ export class UserPoisService {
     return this.membershipRepository.save(membership);
   }
 
+  // The membership someone already has for the place behind a QR token —
+  // what "join" should hand back when they're a member already.
+  async findMembership(userId: string, qrCodeToken: string): Promise<UserPoi | null> {
+    const poi = await this.poisService.findByQrCodeToken(qrCodeToken);
+    return this.membershipRepository.findOne({
+      where: { user: { id: userId }, poi: { id: poi.id } },
+      relations: { poi: true },
+    });
+  }
+
   findPoisForUser(userId: string): Promise<UserPoi[]> {
     return this.membershipRepository.find({
       where: { user: { id: userId } },

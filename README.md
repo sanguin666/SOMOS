@@ -14,7 +14,7 @@ docker-compose.yml   Local PostgreSQL for development
 
 ## Base data model
 
-- `users` — either a congregant (identified by phone number — the SMS login flow itself isn't built yet) or a parish admin (identified by email + password, used by the admin dashboard); each has a `language` (`en`/`es`/`fr`) for their own UI
+- `users` — either a congregant (identified by phone number, signing in with a code sent by SMS) or a parish admin (identified by email + password, used by the admin dashboard); each has a `language` (`en`/`es`/`fr`) for their own UI
 - `pois` — a point of interest a user can join, with a name, `type` (only `church` for now — the name stays generic since other kinds of venues/organizations may be supported later), `language` (the language this POI publishes content in), address, and the QR code token used for onboarding
 - `user_pois` — many-to-many join table: a user can belong to several POIs, with a `role` (`member` or `admin`) per POI — an admin user can manage several churches this way
 - `active_modules` — the product modules subscribed to by a POI (e.g. `donations`, `events`), with subscription status and expiration date
@@ -236,7 +236,18 @@ The app and admin dashboard UI (menus, buttons, labels, error messages — every
 
 ## Admin auth
 
-The admin dashboard (`admin/`) uses a real email + password login (`POST /auth/login`, JWT), separate from the congregant app which has no working login yet. A `PoiAdminGuard` (`backend/src/auth/guards`) checks the caller has an `admin` `user_pois` row for the `:poiId` in the URL before allowing an admin-only action — see `backend/src/auth` for the guard and `backend/src/user-pois/user-pois.service.ts` for the membership lookups it uses.
+The admin dashboard (`admin/`) uses a real email + password login (`POST /auth/login`, JWT), separate from the congregant app's phone login below. A `PoiAdminGuard` (`backend/src/auth/guards`) checks the caller has an `admin` `user_pois` row for the `:poiId` in the URL before allowing an admin-only action — see `backend/src/auth` for the guard and `backend/src/user-pois/user-pois.service.ts` for the membership lookups it uses.
+
+## Congregant login (phone + SMS code)
+
+The app signs someone in with a phone number and a 6-digit code — no password, which is deliberate for an audience that mostly doesn't want to manage one.
+
+- `POST /auth/phone/request-code` `{ phone }` — sends a code, valid 10 minutes. One code per number per minute, five per hour, five wrong guesses before the code is burnt. Only a bcrypt hash of the code is stored (`phone_verification_codes`).
+- `POST /auth/phone/verify` `{ phone, code, firstName? }` — returns `{ accessToken }` (the same 7-day JWT the admin dashboard uses). A number that verifies for the first time gets an account right there; `firstName` is only written on that first sign-in.
+- `GET /auth/me` now also returns `phone` and `pois` (every place the person belongs to), so "my places" follows the account instead of the device.
+- `POST /auth/me/pois` / `DELETE /auth/me/pois/:poiId` — join or leave a place as whoever the token belongs to. The app calls join every time a signed-in person opens a place.
+
+**There is no SMS account wired up.** `ConsoleSmsSender` (`backend/src/auth/sms/sms-sender.ts`) logs the code instead of sending it, and because nothing is really delivered the request endpoint hands the code back as `devCode` — the login screen displays it, so the flow is usable on a laptop with no phone involved. Both of those stop the moment a real sender is configured, and `devCode` is never returned when `NODE_ENV=production`. Adding Twilio is a new `SmsSender` subclass and one line in `auth.module.ts`; nothing else in the flow changes.
 
 ## Settings & the QR flyer
 

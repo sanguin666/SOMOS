@@ -38,6 +38,23 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  /**
+   * The congregant side of signing in: a phone number that verifies for the
+   * first time becomes an account right there, with no separate sign-up
+   * step. `firstName` is only written on that first sign-in — someone who
+   * already has an account keeps the name they set, so re-verifying on a
+   * new phone can't quietly rename them.
+   */
+  async findOrCreateByPhone(phone: string, firstName?: string): Promise<User> {
+    const existing = await this.findByPhone(phone);
+    if (existing) {
+      return existing;
+    }
+    return this.usersRepository.save(
+      this.usersRepository.create({ phone, firstName }),
+    );
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     Object.assign(user, updateUserDto);
