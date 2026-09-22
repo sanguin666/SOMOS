@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { HomeScreen } from './src/screens/HomeScreen';
+import { AddPlaceScreen } from './src/screens/AddPlaceScreen';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { ScanQRScreen } from './src/screens/ScanQRScreen';
 import { PoiHubScreen } from './src/screens/PoiHubScreen';
 import { PhoneLoginScreen } from './src/screens/PhoneLoginScreen';
 import { PlaceSwitcher } from './src/components/PlaceSwitcher';
 import { I18nProvider } from './src/i18n/I18nContext';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
-import { joinPoi } from './src/api/auth';
+import { joinPoi, setLastActivePoi } from './src/api/auth';
 import { getPoi } from './src/api/pois';
 import { getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
+import { landingPoi } from './src/landing';
+import { colors } from './src/theme/theme';
 import type { Poi } from './src/api/types';
 
 type Route =
-  | { name: 'home' }
+  | { name: 'addPlace' }
   | { name: 'scan' }
   | { name: 'signIn' }
   | { name: 'hub'; poi: Poi };
@@ -24,23 +28,60 @@ type Route =
  * only has a handful of screens so far, and this keeps native dependencies
  * to a minimum for the demo. Revisit if the screen count grows.
  *
- * Everything under a POI is one route — `PoiHubScreen` switches between
- * the modules internally so its banner and tab bar never unmount.
+ * Signing in comes before everything else now. Nobody reaches a place, or
+ * the scanner, without an account — so the stack below only ever exists
+ * for somebody signed in, and signing out empties it back to the welcome
+ * screen.
  */
 function AppRoutes() {
-  const { me, refresh } = useAuth();
-  const [stack, setStack] = useState<Route[]>([{ name: 'home' }]);
+  const { ready, me, refresh } = useAuth();
+  const [stack, setStack] = useState<Route[]>([]);
+  // Whether the opening route has been worked out for this session. The
+  // stack alone can't say: "empty" is also what signing out leaves.
+  const [landed, setLanded] = useState(false);
   const current = stack[stack.length - 1];
 
-  // The places this device has visited, behind the banner's place name.
+  // The places this device has visited, merged under the ones the account
+  // carries, so the switcher shows both.
   const [places, setPlaces] = useState<SavedPlace[]>([]);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [switchingTo, setSwitchingTo] = useState<string | null>(null);
   const [switchFailed, setSwitchFailed] = useState(false);
 
   useEffect(() => {
-    getSavedPlaces().then(setPlaces);
-  }, []);
+    let cancelled = false;
+    getSavedPlaces().then((saved) => {
+      if (cancelled) return;
+      const fromAccount: SavedPlace[] = (me?.pois ?? []).map((poi) => ({
+        id: poi.id,
+        name: poi.name,
+        city: poi.city,
+        qrCodeToken: poi.qrCodeToken,
+      }));
+      const extra = saved.filter((place) => !fromAccount.some((mine) => mine.id === place.id));
+      setPlaces([...fromAccount, ...extra]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [me]);
+
+  // Where the app opens. Runs once the stored session has been checked,
+  // and again after signing in or out, since both change the answer.
+  useEffect(() => {
+    if (!ready) return;
+
+    if (!me) {
+      setStack([]);
+      setLanded(false);
+      return;
+    }
+    if (landed) return;
+
+    const poi = landingPoi(me);
+    setStack(poi ? [{ name: 'hub', poi }] : [{ name: 'addPlace' }]);
+    setLanded(true);
+  }, [ready, me, landed]);
 
   function push(route: Route) {
     setStack((s) => [...s, route]);
@@ -57,16 +98,15 @@ function AppRoutes() {
    */
   function openPoi(poi: Poi) {
     rememberPlace(poi).then(setPlaces);
-    // For a signed-in person, entering a place is also joining it, so "my
-    // places" follows the account rather than the device. A failure here is
-    // harmless: the device list above still remembers the place, exactly as
-    // it did before there were accounts.
-    if (me) {
-      joinPoi(poi.qrCodeToken)
-        .then(() => refresh())
-        .catch(() => undefined);
-    }
-    setStack([{ name: 'home' }, { name: 'hub', poi }]);
+    // Entering a place is also joining it and marking it as where this
+    // person was last, so both follow the account rather than the device.
+    // Either failing is harmless — the device list below still remembers
+    // the place, exactly as it did before there were accounts.
+    joinPoi(poi.qrCodeToken)
+      .then(() => setLastActivePoi(poi.id))
+      .then(() => refresh())
+      .catch(() => undefined);
+    setStack([{ name: 'hub', poi }]);
     closeSwitcher();
   }
 
@@ -90,50 +130,74 @@ function AppRoutes() {
   }
 
   // Only the camera fills the screen behind the status bar, so only the
-  // scan screen needs light text up there. The hub's band used to be
-  // coral and now matches the page, so it takes the default like
-  // everything else.
-  const statusBarStyle = current.name === 'scan' ? 'light' : 'auto';
+  // scan screen needs light text up there.
+  const statusBarStyle = current?.name === 'scan' ? 'light' : 'auto';
 
   return (
     <>
-      {current.name === 'home' && (
-        <HomeScreen
-          onScanQR={() => push({ name: 'scan' })}
+      {/* Nothing is decided until the stored session has been read back;
+          flashing the welcome screen at somebody who is signed in is
+          worse than a moment of nothing. */}
+      {!ready && (
+        <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center' }}>
+          <ActivityIndicator color={colors.primary} size="large" />
+        </View>
+      )}
+
+      {ready && !me && current?.name !== 'signIn' && (
+        <OnboardingScreen
+          onSignUp={() => push({ name: 'signIn' })}
           onSignIn={() => push({ name: 'signIn' })}
-          onOpenPoi={openPoi}
         />
       )}
 
-      {current.name === 'scan' && <ScanQRScreen onBack={pop} onFound={openPoi} />}
+      {ready && current?.name === 'signIn' && (
+        <PhoneLoginScreen
+          onBack={() => setStack((s) => s.filter((route) => route.name !== 'signIn'))}
+          // Where to go next is not this screen's business: signing in
+          // changes `me`, and the effect above lands the app.
+          onSignedIn={() => setStack([])}
+        />
+      )}
 
-      {current.name === 'signIn' && <PhoneLoginScreen onBack={pop} onSignedIn={pop} />}
+      {ready && me && current?.name === 'addPlace' && (
+        <AddPlaceScreen
+          onScanQR={() => push({ name: 'scan' })}
+          onOpenPoi={openPoi}
+          onBack={places.length > 0 ? () => setSwitcherOpen(true) : undefined}
+        />
+      )}
 
-      {current.name === 'hub' && (
-        <>
-          <PoiHubScreen
-            poi={current.poi}
-            onOpenPlaces={() => setSwitcherOpen(true)}
-            onSignIn={() => push({ name: 'signIn' })}
-          />
-          <PlaceSwitcher
-            visible={switcherOpen}
-            places={places}
-            currentPoiId={current.poi.id}
-            busyPlaceId={switchingTo}
-            failed={switchFailed}
-            onSelect={selectPlace}
-            onAddPlace={() => {
-              closeSwitcher();
-              push({ name: 'scan' });
-            }}
-            onGoAppHome={() => {
-              closeSwitcher();
-              setStack([{ name: 'home' }]);
-            }}
-            onClose={closeSwitcher}
-          />
-        </>
+      {ready && current?.name === 'scan' && <ScanQRScreen onBack={pop} onFound={openPoi} />}
+
+      {ready && current?.name === 'hub' && (
+        <PoiHubScreen
+          poi={current.poi}
+          onOpenPlaces={() => setSwitcherOpen(true)}
+          onSignIn={() => push({ name: 'signIn' })}
+        />
+      )}
+
+      {/* Reachable from the hub's banner and from the add-a-place screen
+          alike, so it lives outside both rather than inside either. */}
+      {ready && me && (
+        <PlaceSwitcher
+          visible={switcherOpen}
+          places={places}
+          currentPoiId={current?.name === 'hub' ? current.poi.id : ''}
+          busyPlaceId={switchingTo}
+          failed={switchFailed}
+          onSelect={selectPlace}
+          onAddPlace={() => {
+            closeSwitcher();
+            push({ name: 'scan' });
+          }}
+          onGoAppHome={() => {
+            closeSwitcher();
+            setStack([{ name: 'addPlace' }]);
+          }}
+          onClose={closeSwitcher}
+        />
       )}
 
       <StatusBar style={statusBarStyle} />

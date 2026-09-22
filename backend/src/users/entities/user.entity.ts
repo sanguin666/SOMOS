@@ -46,6 +46,14 @@ export class User {
   @Column({ name: 'avatar_url', type: 'text', nullable: true })
   avatarUrl?: string;
 
+  // The place this person was in last, so the app can reopen it instead
+  // of asking again. Deliberately a plain id rather than a relation: a
+  // foreign key back to Poi would close a circle through UserPoi, and a
+  // place that disappears should leave someone with a stale id the app
+  // quietly falls back from, not a failed delete.
+  @Column({ name: 'last_active_poi_id', type: 'uuid', nullable: true })
+  lastActivePoiId?: string;
+
   // UI language for this user's own account. Meaningful today for admins
   // (who have a real session) — the admin dashboard reads/writes it.
   // Congregant users don't have a session yet, so the app's language

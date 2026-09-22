@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service.js';
 import { UserPoisService } from '../user-pois/user-pois.service.js';
+import { PoisService } from '../pois/pois.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { JoinPoiDto } from '../user-pois/dto/join-poi.dto.js';
 import type { Language } from '../common/enums/language.enum.js';
@@ -12,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly userPoisService: UserPoisService,
+    private readonly poisService: PoisService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -38,6 +40,10 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       avatarUrl: user.avatarUrl,
+      // Where the app reopens for someone who belongs to more than one
+      // place. Can point at a place they have since left or that has been
+      // deleted, so the app treats it as a preference, not a guarantee.
+      lastActivePoiId: user.lastActivePoiId,
       language: user.language,
       adminPois,
       // Every place this person belongs to, admin or not — the app's "my
@@ -70,6 +76,19 @@ export class AuthService {
    * app can drop the answer straight into its session. */
   async updateMyProfile(userId: string, profile: { firstName?: string; lastName?: string }) {
     await this.usersService.updateProfile(userId, profile);
+    return this.me(userId);
+  }
+
+  /**
+   * Remembers where somebody was, every time they open a place. The POI
+   * has to exist — a typo'd id would otherwise be stored and then quietly
+   * ignored forever — but membership is not checked: the app records this
+   * as it enters, and joining is a separate call that may still be in
+   * flight.
+   */
+  async setLastActivePoi(userId: string, poiId: string) {
+    await this.poisService.findOne(poiId);
+    await this.usersService.updateLastActivePoi(userId, poiId);
     return this.me(userId);
   }
 
