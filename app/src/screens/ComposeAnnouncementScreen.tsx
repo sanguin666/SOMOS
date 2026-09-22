@@ -30,9 +30,12 @@ function formatDuration(ms: number) {
 }
 
 /**
- * This screen would normally be staff-only (the priest/parish office, not
- * every visitor) — there's no auth/role system yet to gate it behind, so
- * for the demo it's reachable from the Announcements screen for anyone.
+ * Reaching this screen needs a session (the hub sends a signed-out visitor
+ * to sign in first), and the backend requires one too. It is not yet
+ * staff-only: posting an announcement asks for an account, not for a parish
+ * admin account, so a congregant can still record a voice message. See the
+ * POST route in the backend's announcements controller for how to tighten
+ * that if parishes want it.
  */
 export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
   const { t } = useI18n();

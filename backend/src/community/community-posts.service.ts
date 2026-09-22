@@ -5,6 +5,7 @@ import { CommunityPost } from './entities/community-post.entity.js';
 import { CommunityComment } from './entities/community-comment.entity.js';
 import { PoisService } from '../pois/pois.service.js';
 import { CreateCommunityPostDto } from './dto/create-community-post.dto.js';
+import { UsersService } from '../users/users.service.js';
 
 export type CommunityPostWithCommentCount = CommunityPost & {
   commentCount: number;
@@ -18,14 +19,24 @@ export class CommunityPostsService {
     @InjectRepository(CommunityComment)
     private readonly commentsRepository: Repository<CommunityComment>,
     private readonly poisService: PoisService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(
     poiId: string,
+    authorId: string,
     dto: CreateCommunityPostDto,
   ): Promise<CommunityPost> {
-    const poi = await this.poisService.findOne(poiId);
-    const post = this.postsRepository.create({ ...dto, poi });
+    const [poi, author] = await Promise.all([
+      this.poisService.findOne(poiId),
+      this.usersService.findOne(authorId),
+    ]);
+    const post = this.postsRepository.create({
+      ...dto,
+      poi,
+      author: { id: author.id },
+      authorName: dto.authorName ?? author.firstName,
+    });
     return this.postsRepository.save(post);
   }
 

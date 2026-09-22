@@ -4,6 +4,8 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
 import { createComment, getComments } from '../api/community';
+import { SignInNotice } from '../components/SignInNotice';
+import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import type { CommunityComment, CommunityPost, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
@@ -12,10 +14,12 @@ type Props = {
   poi: Poi;
   post: CommunityPost;
   onBack: () => void;
+  onSignIn: () => void;
 };
 
-export function CommunityThreadScreen({ poi, post, onBack }: Props) {
+export function CommunityThreadScreen({ poi, post, onBack, onSignIn }: Props) {
   const { t } = useI18n();
+  const { me } = useAuth();
   const [comments, setComments] = useState<CommunityComment[] | null>(null);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
@@ -88,26 +92,30 @@ export function CommunityThreadScreen({ poi, post, onBack }: Props) {
         </View>
       ))}
 
-      <View style={styles.form}>
-        <TextInput
-          value={message}
-          onChangeText={setMessage}
-          placeholder={t('communityThread.messagePlaceholder')}
-          multiline
-          style={styles.messageInput}
-        />
-        <TextInput
-          value={authorName}
-          onChangeText={setAuthorName}
-          placeholder={t('communityThread.namePlaceholder')}
-          style={styles.nameInput}
-        />
-        <AccessibleButton
-          label={submitting ? t('communityThread.replyingButton') : t('communityThread.replyButton')}
-          onPress={submit}
-          disabled={submitting || !message.trim()}
-        />
-      </View>
+      {me ? (
+        <View style={styles.form}>
+          <TextInput
+            value={message}
+            onChangeText={setMessage}
+            placeholder={t('communityThread.messagePlaceholder')}
+            multiline
+            style={styles.messageInput}
+          />
+          <TextInput
+            value={authorName}
+            onChangeText={setAuthorName}
+            placeholder={t('communityThread.namePlaceholder')}
+            style={styles.nameInput}
+          />
+          <AccessibleButton
+            label={submitting ? t('communityThread.replyingButton') : t('communityThread.replyButton')}
+            onPress={submit}
+            disabled={submitting || !message.trim()}
+          />
+        </View>
+      ) : (
+        <SignInNotice onSignIn={onSignIn} />
+      )}
     </>
   );
 }

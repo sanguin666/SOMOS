@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { CommunityPost } from './community-post.entity.js';
+import { User } from '../../users/entities/user.entity.js';
 
 @Entity('community_comments')
 export class CommunityComment {
@@ -20,6 +21,12 @@ export class CommunityComment {
 
   @Column({ name: 'author_name', nullable: true })
   authorName?: string;
+
+  // Who posted it, when they were signed in. Nullable because rows created
+  // before there was a congregant login have no author to point at.
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'author_id' })
+  author?: Relation<User> | null;
 
   @Column('text')
   message!: string;

@@ -26,7 +26,11 @@ export class User {
   @Column({ unique: true, nullable: true })
   email?: string;
 
-  @Column({ name: 'password_hash', nullable: true })
+  // `select: false` so the hash is left out of every query that doesn't
+  // ask for it by name. Without it, any endpoint returning a User — or a
+  // relation that loads one — hands out the parish admin's password hash.
+  // Only UsersService.findByEmailForLogin selects it.
+  @Column({ name: 'password_hash', nullable: true, select: false })
   passwordHash?: string;
 
   @Column({ name: 'first_name', nullable: true })

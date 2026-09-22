@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CommunityComment } from './entities/community-comment.entity.js';
 import { CommunityPostsService } from './community-posts.service.js';
 import { CreateCommunityCommentDto } from './dto/create-community-comment.dto.js';
+import { UsersService } from '../users/users.service.js';
 
 @Injectable()
 export class CommunityCommentsService {
@@ -11,14 +12,24 @@ export class CommunityCommentsService {
     @InjectRepository(CommunityComment)
     private readonly commentsRepository: Repository<CommunityComment>,
     private readonly postsService: CommunityPostsService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(
     postId: string,
+    authorId: string,
     dto: CreateCommunityCommentDto,
   ): Promise<CommunityComment> {
-    const post = await this.postsService.findOne(postId);
-    const comment = this.commentsRepository.create({ ...dto, post });
+    const [post, author] = await Promise.all([
+      this.postsService.findOne(postId),
+      this.usersService.findOne(authorId),
+    ]);
+    const comment = this.commentsRepository.create({
+      ...dto,
+      post,
+      author: { id: author.id },
+      authorName: dto.authorName ?? author.firstName,
+    });
     return this.commentsRepository.save(comment);
   }
 

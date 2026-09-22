@@ -4,16 +4,20 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { CandleIcon } from '../components/icons';
 import { createPrayerRequest, getPrayerRequests, prayForRequest } from '../api/prayerRequests';
+import { SignInNotice } from '../components/SignInNotice';
+import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import type { PrayerRequest, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
+  onSignIn: () => void;
 };
 
-export function PrayerRequestsScreen({ poi }: Props) {
+export function PrayerRequestsScreen({ poi, onSignIn }: Props) {
   const { t } = useI18n();
+  const { me } = useAuth();
   const [requests, setRequests] = useState<PrayerRequest[] | null>(null);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
@@ -47,6 +51,12 @@ export function PrayerRequestsScreen({ poi }: Props) {
   }
 
   async function pray(id: string) {
+    // The counter is behind a session too, so send them to sign in rather
+    // than letting the tap fail silently.
+    if (!me) {
+      onSignIn();
+      return;
+    }
     try {
       const updated = await prayForRequest(poi.id, id);
       setRequests((current) => current?.map((r) => (r.id === id ? updated : r)) ?? null);
@@ -61,26 +71,30 @@ export function PrayerRequestsScreen({ poi }: Props) {
         <AccessibleText variant="title">{t('prayerRequests.title')}</AccessibleText>
       </View>
 
-      <View style={styles.form}>
-        <TextInput
-          value={message}
-          onChangeText={setMessage}
-          placeholder={t('prayerRequests.messagePlaceholder')}
-          multiline
-          style={styles.messageInput}
-        />
-        <TextInput
-          value={authorName}
-          onChangeText={setAuthorName}
-          placeholder={t('prayerRequests.namePlaceholder')}
-          style={styles.nameInput}
-        />
-        <AccessibleButton
-          label={submitting ? t('prayerRequests.sharingButton') : t('prayerRequests.shareButton')}
-          onPress={submit}
-          disabled={submitting || !message.trim()}
-        />
-      </View>
+      {me ? (
+        <View style={styles.form}>
+          <TextInput
+            value={message}
+            onChangeText={setMessage}
+            placeholder={t('prayerRequests.messagePlaceholder')}
+            multiline
+            style={styles.messageInput}
+          />
+          <TextInput
+            value={authorName}
+            onChangeText={setAuthorName}
+            placeholder={t('prayerRequests.namePlaceholder')}
+            style={styles.nameInput}
+          />
+          <AccessibleButton
+            label={submitting ? t('prayerRequests.sharingButton') : t('prayerRequests.shareButton')}
+            onPress={submit}
+            disabled={submitting || !message.trim()}
+          />
+        </View>
+      ) : (
+        <SignInNotice onSignIn={onSignIn} />
+      )}
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>

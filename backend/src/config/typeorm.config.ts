@@ -11,10 +11,14 @@ import { Livestream } from '../livestreams/entities/livestream.entity.js';
 import { CommunityPost } from '../community/entities/community-post.entity.js';
 import { CommunityComment } from '../community/entities/community-comment.entity.js';
 import { Donation } from '../donations/entities/donation.entity.js';
+import { PhoneVerificationCode } from '../auth/entities/phone-verification-code.entity.js';
 import { PoiPageBlock } from '../poi-page/entities/poi-page-block.entity.js';
 
 // Every entity the app maps. Exported so the metadata check in
-// typeorm.config.spec.ts sees exactly the same list the app runs with.
+// typeorm.config.spec.ts, and data-source.ts (which the TypeORM CLI loads
+// to generate and run migrations), both see exactly the same list the app
+// runs with — a CLI missing an entity would generate a migration dropping
+// the table it can't see.
 export const ENTITIES = [
   User,
   Poi,
@@ -28,11 +32,14 @@ export const ENTITIES = [
   CommunityComment,
   Donation,
   PoiPageBlock,
+  PhoneVerificationCode,
 ];
 
 export function buildTypeOrmConfig(
   configService: ConfigService,
 ): TypeOrmModuleOptions {
+  const isProduction =
+    configService.get<string>('NODE_ENV', 'development') === 'production';
   return {
     type: 'postgres',
     host: configService.get<string>('DB_HOST', 'localhost'),
@@ -41,8 +48,16 @@ export function buildTypeOrmConfig(
     password: configService.get<string>('DB_PASSWORD', 'ansae'),
     database: configService.get<string>('DB_NAME', 'ansae'),
     entities: ENTITIES,
-    // Convenient for the local demo: tables are created/updated automatically.
-    // Switch to real migrations before any production use.
-    synchronize: configService.get<string>('NODE_ENV', 'development') !== 'production',
+    migrations: ['dist/migrations/*.js'],
+    // Development keeps building the schema straight from the entities, so
+    // the demo starts with no migration step and an entity edit shows up on
+    // the next save.
+    //
+    // Production does the opposite: it applies the checked-in migrations on
+    // boot and never lets TypeORM reshape the schema on its own. `synchronize`
+    // against real data is how a renamed column silently becomes a dropped
+    // one. See `npm run migration:generate` in package.json.
+    synchronize: !isProduction,
+    migrationsRun: isProduction,
   };
 }

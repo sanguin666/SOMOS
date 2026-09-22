@@ -12,6 +12,13 @@ import { ENTITIES } from './typeorm.config.js';
 describe('TypeORM entity metadata', () => {
   it('maps every column to a type Postgres supports', async () => {
     const dataSource = new DataSource({ type: 'postgres', entities: ENTITIES });
-    await expect(dataSource.buildMetadatas()).resolves.not.toThrow();
+    // buildMetadatas() is protected. Building the metadata is exactly what
+    // this test needs, and every public route to it also opens a
+    // connection, so reach it through a cast rather than requiring a
+    // database to catch a mapping mistake.
+    const buildMetadatas = (
+      dataSource as unknown as { buildMetadatas(): Promise<void> }
+    ).buildMetadatas.bind(dataSource);
+    await expect(buildMetadatas()).resolves.not.toThrow();
   });
 });

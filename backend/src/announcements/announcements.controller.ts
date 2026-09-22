@@ -27,7 +27,12 @@ export class AnnouncementsController {
 
   // Accepts multipart/form-data: `title`, optional `body`, optional `audio`
   // file field (a recorded voice message — see the app's ComposeAnnouncementScreen).
+  //
+  // Staff only: an announcement is the parish speaking to its members, so
+  // posting one is an admin action like editing or deleting it. Congregants
+  // write in the community module instead.
   @Post()
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
   @UseInterceptors(
     FileInterceptor('audio', {
       storage: localDiskStorage('announcements'),

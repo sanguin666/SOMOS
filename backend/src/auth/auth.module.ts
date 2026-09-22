@@ -1,31 +1,31 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
-import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
-import { PoiAdminGuard } from './guards/poi-admin.guard.js';
+import { PhoneAuthService } from './phone-auth.service.js';
+import { PhoneVerificationCode } from './entities/phone-verification-code.entity.js';
+import { ConsoleSmsSender, SmsSender } from './sms/sms-sender.js';
+import { AuthGuardsModule } from './auth-guards.module.js';
 import { UsersModule } from '../users/users.module.js';
 import { UserPoisModule } from '../user-pois/user-pois.module.js';
 
-const jwtModule = JwtModule.registerAsync({
-  imports: [ConfigModule],
-  inject: [ConfigService],
-  useFactory: (configService: ConfigService) => ({
-    // Fine for the local demo — set a real JWT_SECRET before any
-    // production use.
-    secret: configService.get<string>('JWT_SECRET', 'dev-only-insecure-secret'),
-    signOptions: { expiresIn: '7d' },
-  }),
-});
-
 @Module({
-  imports: [UsersModule, UserPoisModule, jwtModule],
+  imports: [
+    UsersModule,
+    UserPoisModule,
+    AuthGuardsModule,
+    TypeOrmModule.forFeature([PhoneVerificationCode]),
+  ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, PoiAdminGuard],
-  // Re-export JwtModule and UserPoisModule too: the guards depend on
-  // JwtService and UserPoisService, and Nest needs those visible wherever
-  // the guards are used, not just here.
-  exports: [JwtAuthGuard, PoiAdminGuard, jwtModule, UserPoisModule],
+  providers: [
+    AuthService,
+    PhoneAuthService,
+    // Swap this provider for a Twilio-backed SmsSender to send real codes;
+    // nothing else in the login flow needs to change.
+    { provide: SmsSender, useClass: ConsoleSmsSender },
+  ],
+  // Re-exported so the modules that already import AuthModule for its
+  // guards keep working unchanged.
+  exports: [AuthGuardsModule, UserPoisModule],
 })
 export class AuthModule {}

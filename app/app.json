@@ -28,6 +28,13 @@
         {
           "microphonePermission": "Allow ANSAE to access your microphone to record a voice message."
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow ANSAE to use the camera to scan a place’s QR code.",
+          "barcodeScannerEnabled": true
+        }
       ]
     ]
   }
