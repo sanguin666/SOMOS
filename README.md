@@ -101,7 +101,7 @@ npm run dev
 
 Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: schedule Events, publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), print a QR flyer from **My QR**, and manage **Settings** — active modules plus the parish's own info (description, picture) shown in the app.
 
-Content that's meant to come from parish staff (editing/deleting announcements and livestreams, moderating prayer requests and community posts, toggling modules) requires this admin login. Posting itself — an announcement, a prayer request, a community post — is still open from the congregant app with no login yet, matching the phone-based auth that isn't built.
+Content that's meant to come from parish staff (editing/deleting announcements and livestreams, moderating prayer requests and community posts, toggling modules) requires this admin login. Posting itself — an announcement, a prayer request, a community post, a "praying" tap — requires a congregant session (see the phone login below), but not an admin one, so anyone signed in can still post. Reading needs no account at all.
 
 ### 5. Access from a physical phone
 
@@ -175,10 +175,10 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 
 - **Donations** — in-app donations through Stripe Checkout (see [Donations & Stripe](#donations--stripe) below); without a Stripe key the screen falls back to a demo confirmation that records the gift without taking a payment
 - **Events** — Masses, baptisms, weddings, funerals, communions, etc. (`backend/src/events`); scheduling/editing is admin-only, the app only reads them (a reminder toggle per event is a local, device-only preference — there's no account yet to attach it to)
-- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed; editing/deleting is admin-only, posting is still open from the app (no congregant login yet)
-- **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`); moderated (removed) from the admin dashboard
+- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed; editing/deleting is admin-only, posting needs any signed-in congregant (tightening that to admin-only is noted in the controller)
+- **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`); posting and the counter need a signed-in congregant, moderation (removal) is admin-only from the dashboard
 - **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`); scheduling/editing is admin-only
-- **Community** — a discussion board: posts with flat (non-nested) comment replies (`src/community`); moderated from the admin dashboard, posting is still open from the app
+- **Community** — a discussion board: posts with flat (non-nested) comment replies (`src/community`); posting and replying need a signed-in congregant, moderation is admin-only from the dashboard
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).
 
@@ -237,6 +237,25 @@ The app and admin dashboard UI (menus, buttons, labels, error messages — every
 ## Admin auth
 
 The admin dashboard (`admin/`) uses a real email + password login (`POST /auth/login`, JWT), separate from the congregant app's phone login below. A `PoiAdminGuard` (`backend/src/auth/guards`) checks the caller has an `admin` `user_pois` row for the `:poiId` in the URL before allowing an admin-only action — see `backend/src/auth` for the guard and `backend/src/user-pois/user-pois.service.ts` for the membership lookups it uses.
+
+## Who can call what
+
+Every write route is behind something now. The rules, in one place:
+
+| Route | Who |
+| --- | --- |
+| `GET` on places, events, announcements, prayer requests, community, livestreams, page blocks | anyone |
+| `POST` a prayer request, a "praying" tap, a community post or reply, an announcement | any signed-in congregant |
+| `POST /pois` (create a place) | any signed-in user, who becomes that place's first admin |
+| `PATCH`/`DELETE` a place, its modules, its settings, its page, and all moderation | an admin of *that* place (`PoiAdminGuard`) |
+| anything under `/users/:id` or `/users/:userId/pois` | that user, and only that user (`SelfGuard`) |
+| `POST` a donation, and the Stripe webhook | anyone (a gift doesn't need an account; the webhook verifies Stripe's signature) |
+
+Three things changed shape rather than just gaining a guard:
+
+- `GET /users` (which returned every account, password hashes included, to anyone who asked) and `POST /users` are **gone**. Accounts are created by signing in, and nothing in the app or dashboard ever called either route.
+- `User.passwordHash` is now `select: false`, so no query returns it unless it asks by name — only `UsersService.findByEmailForLogin` does.
+- The guards live in `auth/auth-guards.module.ts` rather than `AuthModule`, and `PoiAdminGuard` reads the `user_pois` table directly. `AuthModule` needs `users`, `user-pois` and `pois`, so guards living there made every guarded module's imports circular.
 
 ## Congregant login (phone + SMS code)
 

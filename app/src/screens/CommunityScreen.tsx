@@ -4,6 +4,8 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { ChatBubbleIcon, ChevronRightIcon } from '../components/icons';
 import { createCommunityPost, getCommunityPosts } from '../api/community';
+import { SignInNotice } from '../components/SignInNotice';
+import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import type { CommunityPost, Poi } from '../api/types';
 import { colors, radii, spacing } from '../theme/theme';
@@ -11,10 +13,12 @@ import { colors, radii, spacing } from '../theme/theme';
 type Props = {
   poi: Poi;
   onOpenPost: (post: CommunityPost) => void;
+  onSignIn: () => void;
 };
 
-export function CommunityScreen({ poi, onOpenPost }: Props) {
+export function CommunityScreen({ poi, onOpenPost, onSignIn }: Props) {
   const { t } = useI18n();
+  const { me } = useAuth();
   const [posts, setPosts] = useState<CommunityPost[] | null>(null);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
@@ -53,26 +57,30 @@ export function CommunityScreen({ poi, onOpenPost }: Props) {
         <AccessibleText variant="title">{t('community.title')}</AccessibleText>
       </View>
 
-      <View style={styles.form}>
-        <TextInput
-          value={message}
-          onChangeText={setMessage}
-          placeholder={t('community.messagePlaceholder')}
-          multiline
-          style={styles.messageInput}
-        />
-        <TextInput
-          value={authorName}
-          onChangeText={setAuthorName}
-          placeholder={t('community.namePlaceholder')}
-          style={styles.nameInput}
-        />
-        <AccessibleButton
-          label={submitting ? t('community.postingButton') : t('community.postButton')}
-          onPress={submit}
-          disabled={submitting || !message.trim()}
-        />
-      </View>
+      {me ? (
+        <View style={styles.form}>
+          <TextInput
+            value={message}
+            onChangeText={setMessage}
+            placeholder={t('community.messagePlaceholder')}
+            multiline
+            style={styles.messageInput}
+          />
+          <TextInput
+            value={authorName}
+            onChangeText={setAuthorName}
+            placeholder={t('community.namePlaceholder')}
+            style={styles.nameInput}
+          />
+          <AccessibleButton
+            label={submitting ? t('community.postingButton') : t('community.postButton')}
+            onPress={submit}
+            disabled={submitting || !message.trim()}
+          />
+        </View>
+      ) : (
+        <SignInNotice onSignIn={onSignIn} />
+      )}
 
       {error && (
         <AccessibleText variant="body" color={colors.danger}>

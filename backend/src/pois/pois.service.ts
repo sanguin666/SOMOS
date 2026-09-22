@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'node:crypto';
 import { Poi } from './entities/poi.entity.js';
+import { UserPoi } from '../user-pois/entities/user-poi.entity.js';
+import { MemberRole } from '../common/enums/member-role.enum.js';
 import { CreatePoiDto } from './dto/create-poi.dto.js';
 import { UpdatePoiDto } from './dto/update-poi.dto.js';
 
@@ -11,6 +13,11 @@ export class PoisService {
   constructor(
     @InjectRepository(Poi)
     private readonly poisRepository: Repository<Poi>,
+    // The membership table directly, rather than UserPoisService: that
+    // service depends on this one, so injecting it would make the two
+    // modules circular. See auth/auth-guards.module.ts for the same reason.
+    @InjectRepository(UserPoi)
+    private readonly membershipRepository: Repository<UserPoi>,
   ) {}
 
   create(createPoiDto: CreatePoiDto): Promise<Poi> {
@@ -20,6 +27,23 @@ export class PoisService {
       qrCodeToken: randomUUID(),
     });
     return this.poisRepository.save(poi);
+  }
+
+  /**
+   * Creates a place and makes the creator its admin in one go, so a new
+   * parish is manageable from the moment it exists. Without this the only
+   * way to get an admin onto a place would be editing the database by hand.
+   */
+  async createOwnedBy(userId: string, createPoiDto: CreatePoiDto): Promise<Poi> {
+    const poi = await this.create(createPoiDto);
+    await this.membershipRepository.save(
+      this.membershipRepository.create({
+        user: { id: userId },
+        poi: { id: poi.id },
+        role: MemberRole.ADMIN,
+      }),
+    );
+    return poi;
   }
 
   findAll(): Promise<Poi[]> {

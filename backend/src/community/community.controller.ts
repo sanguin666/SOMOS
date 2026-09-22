@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { CommunityPostsService } from './community-posts.service.js';
 import { CommunityCommentsService } from './community-comments.service.js';
 import { CreateCommunityPostDto } from './dto/create-community-post.dto.js';
 import { CreateCommunityCommentDto } from './dto/create-community-comment.dto.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import {
+  JwtAuthGuard,
+  type AuthenticatedRequest,
+} from '../auth/guards/jwt-auth.guard.js';
 import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
 @Controller('pois/:poiId/community-posts')
@@ -13,9 +16,15 @@ export class CommunityController {
     private readonly commentsService: CommunityCommentsService,
   ) {}
 
+  // Posting and replying need an account; reading the board doesn't.
   @Post()
-  create(@Param('poiId') poiId: string, @Body() dto: CreateCommunityPostDto) {
-    return this.postsService.create(poiId, dto);
+  @UseGuards(JwtAuthGuard)
+  create(
+    @Req() request: AuthenticatedRequest,
+    @Param('poiId') poiId: string,
+    @Body() dto: CreateCommunityPostDto,
+  ) {
+    return this.postsService.create(poiId, request.userId, dto);
   }
 
   @Get()
@@ -29,11 +38,13 @@ export class CommunityController {
   }
 
   @Post(':postId/comments')
+  @UseGuards(JwtAuthGuard)
   createComment(
+    @Req() request: AuthenticatedRequest,
     @Param('postId') postId: string,
     @Body() dto: CreateCommunityCommentDto,
   ) {
-    return this.commentsService.create(postId, dto);
+    return this.commentsService.create(postId, request.userId, dto);
   }
 
   @Get(':postId/comments')

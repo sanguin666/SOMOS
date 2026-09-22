@@ -10,12 +10,14 @@ import { LivestreamScreen } from './LivestreamScreen';
 import { MoreScreen } from './MoreScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
 import { PrayerRequestsScreen } from './PrayerRequestsScreen';
+import { useAuth } from '../auth/AuthContext';
 import { getActiveModules } from '../api/pois';
 import type { ActiveModule, CommunityPost, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
   onOpenPlaces: () => void;
+  onSignIn: () => void;
 };
 
 // A drill-down opened from within a tab. It replaces the tab's own content
@@ -32,7 +34,8 @@ type Drilldown =
  * only what sits between them, so the chrome never moves and the selected
  * button is the one thing that changes.
  */
-export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
+export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
+  const { me } = useAuth();
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [tab, setTab] = useState<HubTab>('home');
   const [drilldown, setDrilldown] = useState<Drilldown>({ kind: 'list' });
@@ -93,11 +96,13 @@ export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
         ) : (
           <AnnouncementsScreen
             poi={poi}
-            onCompose={() => setDrilldown({ kind: 'compose-announcement' })}
+            onCompose={() =>
+              me ? setDrilldown({ kind: 'compose-announcement' }) : onSignIn()
+            }
           />
         ))}
 
-      {tab === 'prayer_requests' && <PrayerRequestsScreen poi={poi} />}
+      {tab === 'prayer_requests' && <PrayerRequestsScreen poi={poi} onSignIn={onSignIn} />}
 
       {tab === 'livestreams' && <LivestreamScreen poi={poi} />}
 
@@ -107,11 +112,13 @@ export function PoiHubScreen({ poi, onOpenPlaces }: Props) {
             poi={poi}
             post={drilldown.post}
             onBack={() => setDrilldown({ kind: 'list' })}
+            onSignIn={onSignIn}
           />
         ) : (
           <CommunityScreen
             poi={poi}
             onOpenPost={(post) => setDrilldown({ kind: 'community-thread', post })}
+            onSignIn={onSignIn}
           />
         ))}
     </PoiShell>

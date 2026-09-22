@@ -27,7 +27,14 @@ export class AnnouncementsController {
 
   // Accepts multipart/form-data: `title`, optional `body`, optional `audio`
   // file field (a recorded voice message — see the app's ComposeAnnouncementScreen).
+  //
+  // Needs a session but not an admin one, so the app's compose screen (and
+  // its voice recording) stays usable by a congregant. Editing and deleting
+  // are still admin-only below. Tightening this to PoiAdminGuard, so only
+  // parish staff can post, is one added guard here and a check in the app's
+  // hub to hide the + button.
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('audio', {
       storage: localDiskStorage('announcements'),

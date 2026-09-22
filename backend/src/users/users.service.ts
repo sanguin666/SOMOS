@@ -38,6 +38,15 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  // The one place the password hash is read. Everything else gets a User
+  // without it — see the column's `select: false`.
+  findByEmailForLogin(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { email },
+      select: { id: true, email: true, passwordHash: true },
+    });
+  }
+
   /**
    * The congregant side of signing in: a phone number that verifies for the
    * first time becomes an account right there, with no separate sign-up

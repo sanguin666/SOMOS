@@ -109,7 +109,11 @@ function AppRoutes() {
 
       {current.name === 'hub' && (
         <>
-          <PoiHubScreen poi={current.poi} onOpenPlaces={() => setSwitcherOpen(true)} />
+          <PoiHubScreen
+            poi={current.poi}
+            onOpenPlaces={() => setSwitcherOpen(true)}
+            onSignIn={() => push({ name: 'signIn' })}
+          />
           <PlaceSwitcher
             visible={switcherOpen}
             places={places}

@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto): Promise<{ accessToken: string }> {
-    const user = await this.usersService.findByEmail(dto.email);
+    const user = await this.usersService.findByEmailForLogin(dto.email);
     if (!user?.passwordHash || !(await bcrypt.compare(dto.password, user.passwordHash))) {
       throw new UnauthorizedException('Invalid email or password');
     }
