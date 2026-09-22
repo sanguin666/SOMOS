@@ -217,8 +217,8 @@ const styles = StyleSheet.create({
   titleInput: {
     minHeight: 56,
     borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
     fontSize: 20,
@@ -226,8 +226,8 @@ const styles = StyleSheet.create({
   bodyInput: {
     minHeight: 100,
     borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     backgroundColor: colors.surface,
     padding: spacing.md,
     fontSize: 18,
