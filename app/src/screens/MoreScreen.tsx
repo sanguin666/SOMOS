@@ -184,10 +184,17 @@ export function MoreScreen({
             </View>
           ) : (
             <>
-              <AccessibleButton label={t('more.leaveConfirm')} onPress={() => void leave()} />
+              {/* On a white sheet, so a white row would be a box inside
+                  a box: the confirm is a filled red button and the way
+                  out carries no box at all. */}
+              <AccessibleButton
+                label={t('more.leaveConfirm')}
+                variant="danger"
+                onPress={() => void leave()}
+              />
               <AccessibleButton
                 label={t('more.leaveCancel')}
-                variant="secondary"
+                variant="quiet"
                 onPress={() => setConfirmingLeave(false)}
               />
             </>
@@ -242,7 +249,11 @@ export function MoreScreen({
                 }}
                 style={[styles.languageOption, selected && styles.languageOptionSelected]}
               >
-                <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+                <AccessibleText
+                  variant="bodyLarge"
+                  color={selected ? colors.primaryStrong : colors.text}
+                  style={styles.rowLabel}
+                >
                   {LANGUAGE_NAMES[code]}
                 </AccessibleText>
                 {/* A tick as well as the colour, so the choice is not
@@ -254,7 +265,7 @@ export function MoreScreen({
 
           <AccessibleButton
             label={t('places.close')}
-            variant="secondary"
+            variant="quiet"
             onPress={() => setLanguageOpen(false)}
           />
         </View>
@@ -334,22 +345,20 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radii.lg,
     borderTopRightRadius: radii.lg,
     padding: spacing.lg,
-    gap: spacing.md,
+    gap: spacing.sm,
   },
+  // On the white sheet, so the options are rows told apart by a hairline
+  // rather than boxes: the one in use is named by its colour and its
+  // tick, not by a frame around it.
   languageOption: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     minHeight: minTouchTarget + 14,
-    paddingHorizontal: spacing.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: radii.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
   },
-  languageOptionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-  },
+  languageOptionSelected: {},
   confirmSheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radii.lg,

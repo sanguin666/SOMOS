@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
+import { FormCard, FormField } from '../components/FormCard';
 import { LogoMark } from '../components/icons';
 import { getPoiByQrCode } from '../api/pois';
 import { ApiError } from '../api/client';
@@ -67,37 +68,32 @@ export function AddPlaceScreen({ onScanQR, onOpenPoi, onBack }: Props) {
 
       <AccessibleButton label={t('home.scanButton')} onPress={onScanQR} />
 
-      <View style={styles.card}>
-        <AccessibleText variant="caption" color={colors.textMuted}>
-          {t('addPlace.codeLabel')}
-        </AccessibleText>
-        <TextInput
+      <FormCard>
+        <FormField
+          label={t('addPlace.codeLabel')}
           value={code}
           onChangeText={(value) => {
             setCode(value);
             setError(null);
           }}
-          placeholder={t('scan.codePlaceholder')}
-          placeholderTextColor={colors.textMuted}
           autoCapitalize="characters"
           autoCorrect={false}
-          accessibilityLabel={t('addPlace.codeLabel')}
           onSubmitEditing={() => code.trim() && void openByCode()}
-          style={styles.input}
         />
-        {busy ? (
-          <View style={styles.busy}>
-            <ActivityIndicator color={colors.primaryStrong} size="large" />
-          </View>
-        ) : (
-          <AccessibleButton
-            label={t('scan.codeButton')}
-            variant={code.trim() ? 'primary' : 'secondary'}
-            disabled={code.trim().length === 0}
-            onPress={() => void openByCode()}
-          />
-        )}
-      </View>
+      </FormCard>
+
+      {busy ? (
+        <View style={styles.busy}>
+          <ActivityIndicator color={colors.primaryStrong} size="large" />
+        </View>
+      ) : (
+        <AccessibleButton
+          label={t('scan.codeButton')}
+          disabled={code.trim().length === 0}
+          style={code.trim() ? undefined : styles.buttonDisabled}
+          onPress={() => void openByCode()}
+        />
+      )}
 
       {onBack && (
         <AccessibleButton label={t('common.back')} variant="secondary" onPress={onBack} />
@@ -119,22 +115,8 @@ const styles = StyleSheet.create({
   lead: {
     marginBottom: spacing.sm,
   },
-  card: {
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  input: {
-    minHeight: minTouchTarget,
-    fontSize: fontSizes.body,
-    color: colors.text,
-    letterSpacing: 1,
-    paddingHorizontal: spacing.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    backgroundColor: colors.background,
+  buttonDisabled: {
+    opacity: 0.45,
   },
   busy: {
     minHeight: minTouchTarget,

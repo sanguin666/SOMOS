@@ -2,7 +2,19 @@ import { Pressable, StyleSheet, type PressableProps, type ViewStyle } from 'reac
 import { AccessibleText } from './AccessibleText';
 import { colors, fontSizes, minTouchTarget, radii, spacing } from '../theme/theme';
 
-type Variant = 'primary' | 'secondary' | 'danger';
+/**
+ * `secondary` is the only one with a white fill and a border, which makes
+ * it a box — so it belongs on the beige canvas and never inside a white
+ * card or sheet, where it would read as a box within a box. Inside white,
+ * use `primary` or `danger` for anything that acts, and `quiet` for the
+ * way out (Cancel, Close), which has no box at all.
+ *
+ * `destructive` is the white row with a red label — the same look as
+ * "Leave this place" in the More menu — for anything that undoes
+ * something from the beige canvas. It is a box too, so inside white use
+ * `danger`, which is the same meaning as a filled button.
+ */
+type Variant = 'primary' | 'secondary' | 'danger' | 'destructive' | 'quiet';
 
 type Props = Omit<PressableProps, 'style'> & {
   label: string;
@@ -67,10 +79,14 @@ const containerStyles = StyleSheet.create({
   primary: { backgroundColor: colors.primary, borderColor: colors.primary },
   secondary: { backgroundColor: colors.surface, borderColor: colors.border },
   danger: { backgroundColor: colors.danger, borderColor: colors.danger },
+  destructive: { backgroundColor: colors.surface, borderColor: colors.border },
+  quiet: { backgroundColor: 'transparent', borderColor: 'transparent' },
 });
 
 const labelStyles = StyleSheet.create({
   primary: { color: colors.primaryText },
   secondary: { color: colors.text },
   danger: { color: colors.dangerText },
+  destructive: { color: colors.danger },
+  quiet: { color: colors.textMuted },
 });

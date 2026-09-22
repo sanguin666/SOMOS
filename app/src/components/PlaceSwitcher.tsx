@@ -163,7 +163,6 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
   },
   error: {
     paddingHorizontal: spacing.lg,
@@ -175,26 +174,20 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
-    gap: spacing.sm,
   },
+  // Rows in a white sheet, so they carry no fill and no border of their
+  // own — a hairline between them is all the separation they need, and
+  // anything more would be a box inside a box.
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    minHeight: minTouchTarget,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    backgroundColor: colors.background,
+    minHeight: minTouchTarget + 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
   },
-  rowCurrent: {
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  rowAction: {
-    backgroundColor: colors.background,
-    borderWidth: 2,
-    borderColor: colors.border,
-  },
+  rowCurrent: {},
+  rowAction: {},
   rowText: {
     flex: 1,
     paddingVertical: spacing.sm,

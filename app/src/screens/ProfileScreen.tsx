@@ -1,18 +1,11 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
 import { Avatar } from '../components/Avatar';
+import { FormCard, FormDivider, FormField, FormRow } from '../components/FormCard';
 import { CameraIcon, CloseIcon } from '../components/icons';
 import { updateMyProfile, uploadMyAvatar } from '../api/auth';
 import { useAuth } from '../auth/AuthContext';
@@ -141,102 +134,98 @@ export function ProfileScreen({ visible, onClose, onSignIn }: Props) {
           ]}
         >
           {!me ? (
-            <View style={styles.card}>
-              <AccessibleText variant="body">{t('profile.signedOutExplainer')}</AccessibleText>
-              <AccessibleButton
-                label={t('home.signInButton')}
-                onPress={() => {
-                  onClose();
-                  onSignIn();
-                }}
-              />
-            </View>
+            <FormCard>
+              <FormRow label={t('profile.title')}>
+                <AccessibleText variant="body">{t('profile.signedOutExplainer')}</AccessibleText>
+                <AccessibleButton
+                  label={t('home.signInButton')}
+                  style={styles.rowAction}
+                  onPress={() => {
+                    onClose();
+                    onSignIn();
+                  }}
+                />
+              </FormRow>
+            </FormCard>
           ) : (
             <>
-              <View style={styles.card}>
-                <AccessibleText variant="caption" color={colors.textMuted}>
-                  {t('profile.pictureLabel')}
-                </AccessibleText>
-                <View style={styles.pictureRow}>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={
-                      me.avatarUrl ? t('profile.changePicture') : t('profile.addPicture')
-                    }
-                    onPress={() => setPickerOpen(true)}
-                    disabled={busy !== null}
-                    style={styles.pictureTarget}
-                  >
-                    <Avatar me={me} size={96} />
-                    <View style={styles.pictureBadge}>
-                      <CameraIcon size={20} color={colors.primaryText} />
-                    </View>
-                  </Pressable>
-
-                  <View style={styles.pictureActions}>
-                    {busy === 'picture' ? (
-                      <View style={styles.busyRow}>
-                        <ActivityIndicator color={colors.primaryStrong} />
-                        <AccessibleText variant="body" color={colors.textMuted}>
-                          {t('profile.saving')}
-                        </AccessibleText>
+              {/* One card for the whole form: the picture, then the two
+                  names, separated by hairlines rather than by boxes of
+                  their own. */}
+              <FormCard>
+                <FormRow label={t('profile.pictureLabel')}>
+                  <View style={styles.pictureRow}>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        me.avatarUrl ? t('profile.changePicture') : t('profile.addPicture')
+                      }
+                      onPress={() => setPickerOpen(true)}
+                      disabled={busy !== null}
+                    >
+                      <Avatar me={me} size={84} />
+                      <View style={styles.pictureBadge}>
+                        <CameraIcon size={20} color={colors.primaryText} />
                       </View>
-                    ) : (
-                      <AccessibleButton
-                        label={me.avatarUrl ? t('profile.changePicture') : t('profile.addPicture')}
-                        variant="secondary"
-                        onPress={() => setPickerOpen(true)}
-                      />
-                    )}
-                  </View>
-                </View>
-              </View>
+                    </Pressable>
 
-              <View style={styles.card}>
-                <AccessibleText variant="caption" color={colors.textMuted}>
-                  {t('profile.firstNameLabel')}
-                </AccessibleText>
-                <TextInput
+                    <View style={styles.pictureActions}>
+                      {busy === 'picture' ? (
+                        <View style={styles.busyRow}>
+                          <ActivityIndicator color={colors.primaryStrong} />
+                          <AccessibleText variant="body" color={colors.textMuted}>
+                            {t('profile.saving')}
+                          </AccessibleText>
+                        </View>
+                      ) : (
+                        <AccessibleButton
+                          label={me.avatarUrl ? t('profile.changePicture') : t('profile.addPicture')}
+                          onPress={() => setPickerOpen(true)}
+                        />
+                      )}
+                    </View>
+                  </View>
+                </FormRow>
+
+                <FormDivider />
+
+                <FormField
+                  label={t('profile.firstNameLabel')}
                   value={firstName}
                   onChangeText={(value) => {
                     setFirstName(value);
                     setSaved(false);
                   }}
-                  style={styles.input}
-                  accessibilityLabel={t('profile.firstNameLabel')}
                   autoCapitalize="words"
                   returnKeyType="next"
                 />
 
-                <AccessibleText variant="caption" color={colors.textMuted}>
-                  {t('profile.lastNameLabel')}
-                </AccessibleText>
-                <TextInput
+                <FormDivider />
+
+                <FormField
+                  label={t('profile.lastNameLabel')}
                   value={lastName}
                   onChangeText={(value) => {
                     setLastName(value);
                     setSaved(false);
                   }}
-                  style={styles.input}
-                  accessibilityLabel={t('profile.lastNameLabel')}
                   autoCapitalize="words"
                   returnKeyType="done"
                   onSubmitEditing={() => {
                     if (nameChanged) void saveName();
                   }}
                 />
+              </FormCard>
 
-                {/* Coral only once there is something to save. A greyed
-                    coral fill with white text on it is unreadable, so
-                    nothing-to-save takes the plain outlined look
-                    instead. */}
-                <AccessibleButton
-                  label={busy === 'name' ? t('profile.saving') : t('profile.save')}
-                  variant={nameChanged ? 'primary' : 'secondary'}
-                  onPress={() => void saveName()}
-                  disabled={busy !== null || !nameChanged}
-                />
-              </View>
+              {/* Every action is a filled button now, so "nothing to
+                  save" is said by the disabled state rather than by a
+                  second look. */}
+              <AccessibleButton
+                label={busy === 'name' ? t('profile.saving') : t('profile.save')}
+                onPress={() => void saveName()}
+                disabled={busy !== null || !nameChanged}
+                style={nameChanged ? undefined : styles.buttonDisabled}
+              />
 
               {error && (
                 <AccessibleText variant="body" color={colors.danger}>
@@ -253,9 +242,12 @@ export function ProfileScreen({ visible, onClose, onSignIn }: Props) {
                 {t('profile.laterLabel')}
               </AccessibleText>
 
+              {/* The white row with a red label, the same look "Leave
+                  this place" already has in the More menu: undoing
+                  something never wears the colour that saves. */}
               <AccessibleButton
                 label={t('home.signOutButton')}
-                variant="secondary"
+                variant="destructive"
                 onPress={() => {
                   onClose();
                   void signOut();
@@ -285,12 +277,11 @@ export function ProfileScreen({ visible, onClose, onSignIn }: Props) {
             />
             <AccessibleButton
               label={t('profile.takePhoto')}
-              variant="secondary"
               onPress={() => void pickPicture('camera')}
             />
             <AccessibleButton
               label={t('profile.cancel')}
-              variant="secondary"
+              variant="quiet"
               onPress={() => setPickerOpen(false)}
             />
           </View>
@@ -328,21 +319,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     gap: spacing.md,
   },
-  card: {
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
   pictureRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-  },
-  pictureTarget: {
-    // The circle is the other way to change the picture, so it carries
-    // the camera badge that says so.
-    position: 'relative',
   },
   pictureBadge: {
     position: 'absolute',
@@ -365,15 +345,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  input: {
-    minHeight: minTouchTarget,
-    fontSize: fontSizes.body,
-    color: colors.text,
-    paddingHorizontal: spacing.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    backgroundColor: colors.background,
+  rowAction: {
+    marginTop: spacing.sm,
+  },
+  buttonDisabled: {
+    opacity: 0.45,
   },
   laterNote: {
     paddingHorizontal: spacing.xs,

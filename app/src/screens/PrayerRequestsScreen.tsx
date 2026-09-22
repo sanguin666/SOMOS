@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
+import { FormCard, FormDivider, FormField } from '../components/FormCard';
 import { CandleIcon } from '../components/icons';
 import { createPrayerRequest, getPrayerRequests, prayForRequest } from '../api/prayerRequests';
 import { SignInNotice } from '../components/SignInNotice';
@@ -72,26 +73,29 @@ export function PrayerRequestsScreen({ poi, onSignIn }: Props) {
       </View>
 
       {me ? (
-        <View style={styles.form}>
-          <TextInput
-            value={message}
-            onChangeText={setMessage}
-            placeholder={t('prayerRequests.messagePlaceholder')}
-            multiline
-            style={styles.messageInput}
-          />
-          <TextInput
-            value={authorName}
-            onChangeText={setAuthorName}
-            placeholder={t('prayerRequests.namePlaceholder')}
-            style={styles.nameInput}
-          />
-          <AccessibleButton
-            label={submitting ? t('prayerRequests.sharingButton') : t('prayerRequests.shareButton')}
-            onPress={submit}
-            disabled={submitting || !message.trim()}
-          />
-        </View>
+        <>
+          <FormCard>
+              <FormField
+                label={t('prayerRequests.messagePlaceholder')}
+                value={message}
+                onChangeText={setMessage}
+                multiline
+                tall
+              />
+              <FormDivider />
+              <FormField
+                label={t('prayerRequests.namePlaceholder')}
+                value={authorName}
+                onChangeText={setAuthorName}
+              />
+            </FormCard>
+
+            <AccessibleButton
+              label={submitting ? t('prayerRequests.sharingButton') : t('prayerRequests.shareButton')}
+              onPress={submit}
+              disabled={submitting || !message.trim()}
+            />
+        </>
       ) : (
         <SignInNotice onSignIn={onSignIn} />
       )}
@@ -121,8 +125,8 @@ export function PrayerRequestsScreen({ poi, onSignIn }: Props) {
               onPress={() => pray(item.id)}
               style={styles.prayButton}
             >
-              <CandleIcon size={16} color={colors.primary} />
-              <AccessibleText variant="caption" color={colors.primary} style={styles.prayLabel}>
+              <CandleIcon size={16} color={colors.primaryText} />
+              <AccessibleText variant="caption" color={colors.primaryText} style={styles.prayLabel}>
                 {t('prayerRequests.prayButton')}
               </AccessibleText>
             </Pressable>
@@ -137,31 +141,6 @@ const styles = StyleSheet.create({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
-  },
-  form: {
-    gap: spacing.sm,
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-  },
-  messageInput: {
-    minHeight: 88,
-    borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    padding: spacing.md,
-    fontSize: 18,
-    textAlignVertical: 'top',
-  },
-  nameInput: {
-    minHeight: 56,
-    borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.md,
-    fontSize: 18,
   },
   card: {
     ...cardSurface,
@@ -182,9 +161,9 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.md,
     borderRadius: 9999,
-    backgroundColor: colors.background,
-    borderWidth: 2,
-    borderColor: colors.primary,
+    // A button is not a box: filled coral rather than a beige patch, so
+    // nothing inside the white card reads as a second box.
+    backgroundColor: colors.primary,
   },
   prayLabel: {
     fontWeight: '700',
