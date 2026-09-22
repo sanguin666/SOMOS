@@ -281,7 +281,7 @@ export function ProfileScreen({ visible, onClose, onSignIn }: Props) {
             />
             <AccessibleButton
               label={t('profile.cancel')}
-              variant="quiet"
+              variant="secondary"
               onPress={() => setPickerOpen(false)}
             />
           </View>

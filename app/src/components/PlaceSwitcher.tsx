@@ -1,7 +1,7 @@
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleText } from './AccessibleText';
-import { CheckIcon, CloseIcon, LogoMark, PinIcon, PlusIcon } from './icons';
+import { CheckIcon, CloseIcon, PinIcon, PlusIcon } from './icons';
 import type { SavedPlace } from '../storage/savedPlaces';
 import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import { useI18n } from '../i18n/I18nContext';
@@ -16,7 +16,6 @@ type Props = {
   failed: boolean;
   onSelect: (place: SavedPlace) => void;
   onAddPlace: () => void;
-  onGoAppHome: () => void;
   onClose: () => void;
 };
 
@@ -34,7 +33,6 @@ export function PlaceSwitcher({
   failed,
   onSelect,
   onAddPlace,
-  onGoAppHome,
   onClose,
 }: Props) {
   const { t } = useI18n();
@@ -104,26 +102,12 @@ export function PlaceSwitcher({
             accessibilityRole="button"
             accessibilityLabel={t('places.addPlace')}
             onPress={onAddPlace}
-            style={[styles.row, styles.rowAction]}
+            style={[styles.row, styles.rowAction, styles.rowLast]}
           >
             <PlusIcon size={26} color={colors.primaryStrong} />
             <View style={styles.rowText}>
               <AccessibleText variant="body" style={styles.rowName}>
                 {t('places.addPlace')}
-              </AccessibleText>
-            </View>
-          </Pressable>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('places.appHome')}
-            onPress={onGoAppHome}
-            style={[styles.row, styles.rowAction]}
-          >
-            <LogoMark size={26} />
-            <View style={styles.rowText}>
-              <AccessibleText variant="body" style={styles.rowName}>
-                {t('places.appHome')}
               </AccessibleText>
             </View>
           </Pressable>
@@ -189,6 +173,11 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.primary,
   },
   rowCurrent: {},
+  // The last row in the sheet: a line under it would separate it from
+  // nothing.
+  rowLast: {
+    borderBottomWidth: 0,
+  },
   rowAction: {},
   rowText: {
     flex: 1,

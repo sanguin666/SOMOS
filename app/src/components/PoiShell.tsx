@@ -4,6 +4,7 @@ import { Screen } from './Screen';
 import { AccessibleText } from './AccessibleText';
 import { Avatar } from './Avatar';
 import {
+  BackChevronIcon,
   CalendarIcon,
   CandleIcon,
   ChatBubbleIcon,
@@ -125,6 +126,7 @@ export function PoiShell({
   me,
   activeTab,
   onSelectTab,
+  onBack,
   onOpenPlaces,
   onOpenProfile,
   children,
@@ -177,6 +179,21 @@ export function PoiShell({
           {poi.city ?? t('hub.locationNotSet')}
         </AccessibleText>
       </Pressable>
+
+      {/* Only there when there is somewhere to go back to, and it takes
+          no width when it is not: the place name keeps the room instead.
+          The phone's own back button does the same thing (see
+          PoiHubScreen), this is for the people who never use it. */}
+      {onBack && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+          onPress={onBack}
+          style={styles.backButton}
+        >
+          <BackChevronIcon size={26} color={colors.text} />
+        </Pressable>
+      )}
 
       {/* Signed in or not, the circle is in the same place and opens the
           same screen — which offers signing in when there is no session,
@@ -234,6 +251,9 @@ type Props = {
   me: Me | null;
   activeTab: HubTab;
   onSelectTab: (tab: HubTab) => void;
+  // Where the banner's back chevron goes, or nothing when the screen
+  // showing is the place's own home page and there is nowhere back to.
+  onBack?: () => void;
   // Opens the place switcher; the banner only reports the tap so the
   // switcher's state lives with whoever owns the place list.
   onOpenPlaces: () => void;
@@ -335,6 +355,12 @@ const styles = StyleSheet.create({
   },
   heroLocation: {
     fontWeight: '700',
+  },
+  backButton: {
+    width: minTouchTarget,
+    height: minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   // A 48pt circle inside a full-size target, so the picture stays a
   // picture rather than growing to fill the touch area.
