@@ -35,7 +35,9 @@ export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
        Nothing here is inset: the picture is sized against this view, so a
        padding on it would shrink the picture too and leave a strip of
        bare colour down one side. The margin the panel needs lives on the
-       panel. */
+       panel.
+
+       The asset is the supplied illustration whole, not a crop of it. */
     <ImageBackground
       source={require('../../assets/onboarding-crowd.jpg')}
       resizeMode="cover"
