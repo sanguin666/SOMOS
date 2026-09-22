@@ -30,10 +30,10 @@ export class Event {
   startsAt!: Date;
 
   @Column({ nullable: true })
-  location?: string;
+  location?: string | null;
 
   @Column('text', { nullable: true })
-  description?: string;
+  description?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

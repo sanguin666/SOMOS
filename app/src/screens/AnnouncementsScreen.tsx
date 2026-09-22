@@ -116,14 +116,14 @@ function AnnouncementCard({
           <AccessibleText variant="caption">{formatDate(item.createdAt)}</AccessibleText>
         </View>
 
-        {item.body && (
+        {!!item.body && (
           <AccessibleText variant="body" color={colors.textMuted} numberOfLines={expanded ? undefined : 2}>
             {item.body}
           </AccessibleText>
         )}
       </Pressable>
 
-      {item.audioUrl && (
+      {!!item.audioUrl && (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={playerStatus.playing ? t('announcements.pauseVoice') : t('announcements.playVoice')}

@@ -38,15 +38,15 @@ export class PoiPageBlock {
   // A heading for a text block, a caption for an image, or an override for
   // a live block's default heading.
   @Column({ nullable: true })
-  title?: string;
+  title?: string | null;
 
   @Column('text', { nullable: true })
-  body?: string;
+  body?: string | null;
 
   // Relative path (e.g. /uploads/poi-pages/<file>.jpg) served statically;
   // the app and the dashboard both prefix it with their API base URL.
   @Column({ name: 'image_url', nullable: true })
-  imageUrl?: string;
+  imageUrl?: string | null;
 
   // How many entries a live block shows. Ignored by text/image/donate.
   @Column({ name: 'item_count', type: 'int', default: 3 })

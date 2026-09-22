@@ -1,4 +1,5 @@
 import { IsDateString, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { EmptyStringToNull } from '../../common/transforms/empty-to-null.js';
 
 export class CreateEventDto {
   @IsString()
@@ -10,9 +11,11 @@ export class CreateEventDto {
 
   @IsOptional()
   @IsString()
-  location?: string;
+  @EmptyStringToNull()
+  location?: string | null;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  @EmptyStringToNull()
+  description?: string | null;
 }

@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { EmptyStringToNull } from '../../common/transforms/empty-to-null.js';
 
 export class CreateAnnouncementDto {
   @IsString()
@@ -8,5 +9,6 @@ export class CreateAnnouncementDto {
   // Optional: an announcement may be voice-only (see AnnouncementsService.create).
   @IsOptional()
   @IsString()
-  body?: string;
+  @EmptyStringToNull()
+  body?: string | null;
 }

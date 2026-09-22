@@ -1,20 +1,24 @@
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { MAX_BLOCK_ITEM_COUNT } from './create-page-block.dto.js';
+import { EmptyStringToNull } from '../../common/transforms/empty-to-null.js';
 
 // `type` is deliberately not updatable: changing it would reinterpret the
 // other columns. Delete the block and add the one you wanted instead.
 export class UpdatePageBlockDto {
   @IsOptional()
   @IsString()
-  title?: string;
+  @EmptyStringToNull()
+  title?: string | null;
 
   @IsOptional()
   @IsString()
-  body?: string;
+  @EmptyStringToNull()
+  body?: string | null;
 
   @IsOptional()
   @IsString()
-  imageUrl?: string;
+  @EmptyStringToNull()
+  imageUrl?: string | null;
 
   @IsOptional()
   @IsInt()

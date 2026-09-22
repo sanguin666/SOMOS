@@ -101,6 +101,13 @@ npm run dev
 
 Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: schedule Events, publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), print a QR flyer from **My QR**, and manage **Settings** — active modules plus the parish's own info (description, picture) shown in the app.
 
+Its dependency cache is deliberately kept in the OS temp directory rather than
+in `admin/node_modules/.vite` (see `admin/vite.config.ts`). Inside a synced
+folder — Dropbox, OneDrive, Google Drive — the sync client holds the cache files
+open, Vite's rename of them fails with `EBUSY: resource busy or locked`, and the
+dashboard serves a blank page. Losing that temp cache only costs one
+re-optimisation on the next start.
+
 Content that's meant to come from parish staff (editing/deleting announcements and livestreams, moderating prayer requests and community posts, toggling modules) requires this admin login. Posting itself — an announcement, a prayer request, a community post — is still open from the congregant app with no login yet, matching the phone-based auth that isn't built.
 
 ### 5. Access from a physical phone

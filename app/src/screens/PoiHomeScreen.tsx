@@ -193,12 +193,12 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
           case 'text':
             return (
               <View key={block.id} style={styles.section}>
-                {block.title && (
+                {!!block.title && (
                   <AccessibleText variant="bodyLarge" style={styles.blockTitle}>
                     {block.title}
                   </AccessibleText>
                 )}
-                {block.body && <AccessibleText variant="body">{block.body}</AccessibleText>}
+                {!!block.body && <AccessibleText variant="body">{block.body}</AccessibleText>}
               </View>
             );
 
@@ -212,7 +212,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
                   resizeMode="cover"
                   accessibilityLabel={block.title || poi.name}
                 />
-                {block.title && (
+                {!!block.title && (
                   <AccessibleText variant="caption" color={colors.textMuted}>
                     {block.title}
                   </AccessibleText>
@@ -261,7 +261,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
                       <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
                         {event.title}
                       </AccessibleText>
-                      {event.location && (
+                      {!!event.location && (
                         <AccessibleText variant="caption" color={colors.textMuted}>
                           {event.location}
                         </AccessibleText>
@@ -299,7 +299,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
                       </AccessibleText>
                       <AccessibleText variant="caption">{formatShortDate(item.createdAt)}</AccessibleText>
                     </View>
-                    {item.body && (
+                    {!!item.body && (
                       <AccessibleText variant="body" color={colors.textMuted} numberOfLines={2}>
                         {item.body}
                       </AccessibleText>
@@ -348,12 +348,12 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
           case 'donate':
             return (
               <View key={block.id} style={styles.section}>
-                {block.title && (
+                {!!block.title && (
                   <AccessibleText variant="bodyLarge" style={styles.blockTitle}>
                     {block.title}
                   </AccessibleText>
                 )}
-                {block.body && (
+                {!!block.body && (
                   <AccessibleText variant="body" color={colors.textMuted}>
                     {block.body}
                   </AccessibleText>
