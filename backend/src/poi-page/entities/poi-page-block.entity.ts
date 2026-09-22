@@ -37,7 +37,9 @@ export class PoiPageBlock {
 
   // A heading for a text block, a caption for an image, or an override for
   // a live block's default heading.
-  @Column({ nullable: true })
+  // Spelled-out column type: a `string | null` property reflects as
+  // `Object`, which TypeORM cannot map to a Postgres data type.
+  @Column('varchar', { nullable: true })
   title?: string | null;
 
   @Column('text', { nullable: true })
@@ -45,7 +47,7 @@ export class PoiPageBlock {
 
   // Relative path (e.g. /uploads/poi-pages/<file>.jpg) served statically;
   // the app and the dashboard both prefix it with their API base URL.
-  @Column({ name: 'image_url', nullable: true })
+  @Column('varchar', { name: 'image_url', nullable: true })
   imageUrl?: string | null;
 
   // How many entries a live block shows. Ignored by text/image/donate.

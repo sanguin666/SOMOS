@@ -13,6 +13,23 @@ import { CommunityComment } from '../community/entities/community-comment.entity
 import { Donation } from '../donations/entities/donation.entity.js';
 import { PoiPageBlock } from '../poi-page/entities/poi-page-block.entity.js';
 
+// Every entity the app maps. Exported so the metadata check in
+// typeorm.config.spec.ts sees exactly the same list the app runs with.
+export const ENTITIES = [
+  User,
+  Poi,
+  UserPoi,
+  ActiveModule,
+  Announcement,
+  Event,
+  PrayerRequest,
+  Livestream,
+  CommunityPost,
+  CommunityComment,
+  Donation,
+  PoiPageBlock,
+];
+
 export function buildTypeOrmConfig(
   configService: ConfigService,
 ): TypeOrmModuleOptions {
@@ -23,20 +40,7 @@ export function buildTypeOrmConfig(
     username: configService.get<string>('DB_USERNAME', 'ansae'),
     password: configService.get<string>('DB_PASSWORD', 'ansae'),
     database: configService.get<string>('DB_NAME', 'ansae'),
-    entities: [
-      User,
-      Poi,
-      UserPoi,
-      ActiveModule,
-      Announcement,
-      Event,
-      PrayerRequest,
-      Livestream,
-      CommunityPost,
-      CommunityComment,
-      Donation,
-      PoiPageBlock,
-    ],
+    entities: ENTITIES,
     // Convenient for the local demo: tables are created/updated automatically.
     // Switch to real migrations before any production use.
     synchronize: configService.get<string>('NODE_ENV', 'development') !== 'production',
