@@ -1,5 +1,6 @@
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { PageBlockType } from '../../common/enums/page-block-type.enum.js';
+import { EmptyStringToNull } from '../../common/transforms/empty-to-null.js';
 
 // Upper bound on a live block's entry count. More than this and the home
 // page stops being a summary — the module's own screen is one tap away.
@@ -11,15 +12,18 @@ export class CreatePageBlockDto {
 
   @IsOptional()
   @IsString()
-  title?: string;
+  @EmptyStringToNull()
+  title?: string | null;
 
   @IsOptional()
   @IsString()
-  body?: string;
+  @EmptyStringToNull()
+  body?: string | null;
 
   @IsOptional()
   @IsString()
-  imageUrl?: string;
+  @EmptyStringToNull()
+  imageUrl?: string | null;
 
   @IsOptional()
   @IsInt()

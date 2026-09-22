@@ -61,6 +61,11 @@ echo Setting up admin dashboard...
 pushd admin
 if not exist .env copy .env.example .env >nul
 call npm install
+REM Vite's dependency cache now lives in the Windows temp folder instead of
+REM node_modules\.vite - inside Dropbox it was getting locked mid-rename and
+REM the dashboard came up blank. Clear the old in-project one if it's still
+REM lying around; failing to delete it is harmless, nothing reads it now.
+if exist node_modules\.vite rd /s /q node_modules\.vite >nul 2>&1
 popd
 echo.
 

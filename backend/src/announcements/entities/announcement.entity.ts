@@ -27,7 +27,7 @@ export class Announcement {
   title!: string;
 
   @Column('text', { nullable: true })
-  body?: string;
+  body?: string | null;
 
   // Relative path (e.g. /uploads/announcements/<file>.m4a) to an optional
   // voice message recorded in the app, e.g. by church staff instead of
