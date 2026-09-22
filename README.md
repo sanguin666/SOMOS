@@ -280,6 +280,34 @@ The admin dashboard's **Settings** page (`admin/src/pages/SettingsPage.tsx`, `PA
 
 The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer for the parish's entrance: a QR code (via the `qrcode` package) encoding a link to the landing site's `#join` section (`/?token=<poi token>#join`), an editable headline/subtext (`qrFlyerHeadline`/`qrFlyerSubtext` on `Poi`, defaulting to generic copy if left blank), and a "Print / Save as PDF" button that uses the browser's own print dialog with a dedicated print stylesheet — no PDF library needed.
 
+## Going to production
+
+The demo defaults are deliberately convenient, and each one is a different setting in production rather than something to remember:
+
+| | Development | Production (`NODE_ENV=production`) |
+| --- | --- | --- |
+| Schema | `synchronize: true` — built from the entities on every start | migrations only, applied on boot (`migrationsRun`), `synchronize` off |
+| `JWT_SECRET` | falls back to a fixed development secret | **required** — the app refuses to start without it |
+| CORS | any origin, so a phone on the LAN and a browser both work | only the origins listed in `CORS_ORIGINS`, and none if it's unset |
+| Login codes | returned in the response as `devCode`, since nothing is sent | never returned; configure a real `SmsSender` |
+| Uploads | `./uploads` next to the backend | still local disk — set `UPLOADS_DIR` to a mounted volume, or swap in S3 |
+
+### Migrations
+
+`src/migrations/` holds the schema as checked-in migrations, and `src/data-source.ts` is what the TypeORM CLI loads. They point at the compiled output, so each script builds first:
+
+```bash
+npm run migration:generate -- src/migrations/WhatChanged   # after editing an entity
+npm run migration:run                                      # apply
+npm run migration:revert                                   # undo the last one
+```
+
+Development doesn't need any of this — it still builds the schema straight from the entities, so an entity edit shows up on the next save. Generate a migration when you change an entity so production has a path from the old shape to the new one; `synchronize` against real data is how a renamed column silently becomes a dropped one.
+
+### Still open
+
+Uploads are the real remaining gap: local disk is fine for one small server with a persistent volume, and wrong for anything that replaces its disk between deploys or runs more than one instance. Every caller already goes through `common/upload/multer-storage.ts`, so this is a change of storage engine, not a change to the modules that upload.
+
 ## Marketing landing page
 
 `landing/` is a small static site (plain HTML/CSS/JS, no build step, no framework) advertising ANSAE to churches — open `landing/index.html` directly in a browser, or serve the folder with any static file server (e.g. `npx serve landing`). It's one scrolling page: features, pricing, and the "join" flow are all sections of `index.html` (`#pricing`, `#join`), not separate pages. The `#join` section is what the QR flyer's code links to: today it explains how to get the app (the store links are placeholders — the app isn't published yet) and displays the scanned POI token for manual entry as a fallback (`landing/assets/main.js` reads it from the URL's `?token=` query param). Text is in Spanish by default, switchable to English/French via the header pills (`landing/assets/i18n.js`, persisted in `localStorage`). Getting a real domain and deploying this site (and pointing `VITE_LANDING_URL` in `admin/.env` at it) is a manual step outside this repo.
