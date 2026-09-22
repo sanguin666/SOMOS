@@ -28,12 +28,16 @@ export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
     /* The illustration is the screen, edge to edge and under the status
        bar and the home indicator alike — hence ImageBackground as the
        root rather than a sized layer behind it, which is what left a
-       band of nothing at the bottom. */
+       band of nothing at the bottom.
+
+       Nothing here is inset: the picture is sized against this view, so a
+       padding on it would shrink the picture too and leave a strip of
+       bare colour down one side. The margin the panel needs lives on the
+       panel. */
     <ImageBackground
       source={require('../../assets/onboarding-crowd.jpg')}
       resizeMode="cover"
       style={styles.root}
-      imageStyle={styles.image}
     >
       {/* The words and the buttons sit on their own panel rather than on
           the illustration, so nothing is ever read against a figure. */}
@@ -70,18 +74,11 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    // Shows only for the instant before the picture decodes, and behind
-    // it on any screen too wide for the crop.
+    // Shows only for the instant before the picture decodes.
     backgroundColor: colors.background,
   },
-  image: {
-    // The picture is taller than it is wide, so a wide phone crops the
-    // top and bottom rather than the sides, where the crowd thins out.
-    width: '100%',
-    height: '100%',
-  },
   panel: {
+    marginHorizontal: spacing.lg,
     backgroundColor: colors.surface,
     borderRadius: radii.lg * 2,
     paddingVertical: spacing.xl,
