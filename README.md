@@ -280,6 +280,21 @@ The admin dashboard's **Settings** page (`admin/src/pages/SettingsPage.tsx`, `PA
 
 The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer for the parish's entrance: a QR code (via the `qrcode` package) encoding a link to the landing site's `#join` section (`/?token=<poi token>#join`), an editable headline/subtext (`qrFlyerHeadline`/`qrFlyerSubtext` on `Poi`, defaulting to generic copy if left blank), and a "Print / Save as PDF" button that uses the browser's own print dialog with a dedicated print stylesheet — no PDF library needed.
 
+## Tests and CI
+
+```bash
+cd backend && npm test        # unit tests, no database needed
+cd backend && npm run test:e2e   # boots the real app against Postgres
+cd app && npm test            # pure logic (QR parsing); npm run typecheck for the rest
+cd admin && npm run build     # tsc -b, so this is the typecheck too
+```
+
+The e2e tests use the database named by `DB_NAME`, defaulting to `ansae_test`, and **truncate every table between tests** — never point them at your development database. Create it once with `createdb ansae_test` (or `docker compose exec db createdb -U ansae ansae_test`). They run one file at a time for that reason.
+
+What's covered is the part that can break quietly: the login flow (one-shot codes, expiry, throttling, a number spelled two ways), and the access-control table above, as tests that call the real endpoints. A guard that stops applying is not something a type checker or a lint rule notices.
+
+`.github/workflows/ci.yml` runs all of it on every push and pull request, with Postgres as a service container. It also applies the checked-in migrations to an empty database and asks TypeORM whether the entities still match — an entity changed without a migration fails the build, because that combination is a deploy that breaks on boot.
+
 ## Going to production
 
 The demo defaults are deliberately convenient, and each one is a different setting in production rather than something to remember:

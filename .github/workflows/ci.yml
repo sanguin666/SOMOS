@@ -1,0 +1,149 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch makes the first one's run pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ansae
+          POSTGRES_PASSWORD: ansae
+          POSTGRES_DB: ansae_test
+        ports:
+          - 5432:5432
+        # Without this the job can start running tests before Postgres is
+        # accepting connections.
+        options: >-
+          --health-cmd "pg_isready -U ansae"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_USERNAME: ansae
+      DB_PASSWORD: ansae
+      DB_NAME: ansae_test
+      NODE_ENV: test
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests
+        run: npm test
+
+      # Boots the real app against the Postgres service above: the guards
+      # and the one-shot login codes are only meaningfully tested against a
+      # real database.
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      # The checked-in migrations are what production uses to build its
+      # schema, so a migration that doesn't match the entities is a broken
+      # deploy. This applies them to an empty database and then asks TypeORM
+      # whether anything is still missing.
+      - name: Migrations match the entities
+        run: |
+          set -o pipefail
+          psql "postgresql://ansae:ansae@127.0.0.1:5432/postgres" -c "CREATE DATABASE ansae_migrations;"
+          DB_NAME=ansae_migrations npx typeorm migration:run -d dist/data-source.js
+          # TypeORM writes a migration when it finds a difference and exits
+          # non-zero when it finds none, so the wanted outcome is the
+          # failure — matched on its message rather than its exit code, so
+          # that a connection error isn't read as "no changes".
+          output=$(DB_NAME=ansae_migrations npx typeorm migration:generate \
+            -d dist/data-source.js src/migrations/ShouldNotExist 2>&1 || true)
+          echo "$output"
+          if ! grep -q "No changes in database schema were found" <<< "$output"; then
+            echo "::error::Entities have changed without a matching migration. Run: npm run migration:generate -- src/migrations/WhatChanged"
+            exit 1
+          fi
+
+  app:
+    name: App
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      # Bundling catches what a typecheck can't: a missing native module, a
+      # bad import path, a plugin the config doesn't know about.
+      - name: Bundle
+        run: npx expo export --platform web --output-dir /tmp/expo-web
+
+  admin:
+    name: Admin dashboard
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # `tsc -b && vite build` — the typecheck is part of it.
+      - name: Build
+        run: npm run build
