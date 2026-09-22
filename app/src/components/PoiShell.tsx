@@ -205,7 +205,6 @@ export function PoiShell({
             label={label}
             active={tab === highlighted}
             activeColor={poiTheme.accentStrong}
-            activeBackground={poiTheme.accentSoft}
             onPress={() => onSelectTab(tab)}
           />
         );
@@ -277,14 +276,12 @@ function TabBarItem({
   label,
   active,
   activeColor,
-  activeBackground,
   onPress,
 }: {
   icon: (color: string) => ReactNode;
   label: string;
   active: boolean;
   activeColor: string;
-  activeBackground: string;
   onPress: () => void;
 }) {
   const color = active ? activeColor : colors.textMuted;
@@ -295,11 +292,10 @@ function TabBarItem({
       accessibilityState={{ selected: active }}
       accessibilityLabel={label}
       onPress={onPress}
-      style={[styles.tabBarItem, active && { backgroundColor: activeBackground }]}
+      style={styles.tabBarItem}
     >
-      {/* Selection is a filled rounded pill plus a bolded, coral label —
-          the line that used to mark it ran along an edge the bar no
-          longer has. */}
+      {/* Selection is the brand colour on the icon and the label, plus
+          the bolder weight below — no fill behind it. */}
       {icon(color)}
       <AccessibleText variant="caption" color={color} numberOfLines={1} style={active ? styles.tabBarLabelActive : styles.tabBarLabel}>
         {label}
@@ -309,24 +305,21 @@ function TabBarItem({
 }
 
 const styles = StyleSheet.create({
-  // The slot itself is only the page colour behind the status bar — the
-  // white card inside it is what people see as the top bar.
+  // A plain white banner across the full width, painted behind the
+  // status bar too. It sits outside the scroll view, so it stays put
+  // while the page moves under it.
   headerSlot: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
   },
   hero: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
     paddingVertical: spacing.sm,
     paddingLeft: spacing.md,
     paddingRight: spacing.sm,
-    backgroundColor: colors.surface,
-    borderRadius: radii.pill,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    ...floatingShadow,
   },
   heroTitleBlock: {
     flex: 1,

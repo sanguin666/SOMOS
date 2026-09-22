@@ -111,6 +111,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+    ...cardSurface,
+    borderRadius: radii.lg,
+    padding: spacing.md,
   },
   badge: {
     width: 56,
