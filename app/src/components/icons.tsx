@@ -386,3 +386,20 @@ export function ExitIcon({ size = 24, color = '#111111' }: IconProps) {
     </Svg>
   );
 }
+
+export function GlobeIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={2} />
+      {/* An equator and a meridian: enough to read as a globe at 26pt,
+          where anything more detailed turns to mush. */}
+      <Path d="M3 12h18" stroke={color} strokeWidth={2} strokeLinecap="round" />
+      <Path
+        d="M12 3c2.6 2.4 4 5.4 4 9s-1.4 6.6-4 9c-2.6-2.4-4-5.4-4-9s1.4-6.6 4-9Z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
