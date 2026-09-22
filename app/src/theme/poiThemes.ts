@@ -21,7 +21,7 @@ const POI_THEMES: Record<PoiType, PoiTheme> = {
   church: {
     accent: colors.primary,
     accentStrong: colors.primaryStrong,
-    accentSoft: colors.surface,
+    accentSoft: colors.primarySoft,
     accentText: colors.primaryText,
     label: 'Church',
   },

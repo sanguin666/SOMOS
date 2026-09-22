@@ -78,6 +78,27 @@ export type Translations = {
     prayerRequests: string;
     community: string;
   };
+  profile: {
+    title: string;
+    openSignedOut: string;
+    pictureLabel: string;
+    addPicture: string;
+    changePicture: string;
+    choosePhoto: string;
+    takePhoto: string;
+    cancel: string;
+    nameLabel: string;
+    firstNameLabel: string;
+    lastNameLabel: string;
+    save: string;
+    saving: string;
+    saved: string;
+    noName: string;
+    signedOutExplainer: string;
+    laterLabel: string;
+    permissionDenied: string;
+    error: string;
+  };
   places: {
     title: string;
     addPlace: string;
@@ -258,6 +279,27 @@ const en: Translations = {
     title: 'More',
     prayerRequests: 'Prayer requests',
     community: 'Our group',
+  },
+  profile: {
+    title: 'Your settings',
+    openSignedOut: 'Sign in',
+    pictureLabel: 'Your picture',
+    addPicture: 'Add a picture',
+    changePicture: 'Change picture',
+    choosePhoto: 'Choose a photo',
+    takePhoto: 'Take a photo',
+    cancel: 'Cancel',
+    nameLabel: 'Your name',
+    firstNameLabel: 'First name',
+    lastNameLabel: 'Last name',
+    save: 'Save',
+    saving: 'Saving…',
+    saved: 'Saved',
+    noName: 'No name yet',
+    signedOutExplainer: 'Sign in to set your name and your picture.',
+    laterLabel: 'More settings are coming here later.',
+    permissionDenied: 'ANSAE needs permission to open your photos. You can allow it in your phone settings.',
+    error: "That didn't save. Please try again.",
   },
   places: {
     title: 'Your places',
@@ -442,6 +484,27 @@ const es: Translations = {
     prayerRequests: 'Peticiones de oración',
     community: 'Nuestro grupo',
   },
+  profile: {
+    title: 'Tus ajustes',
+    openSignedOut: 'Iniciar sesión',
+    pictureLabel: 'Tu foto',
+    addPicture: 'Añadir una foto',
+    changePicture: 'Cambiar la foto',
+    choosePhoto: 'Elegir una foto',
+    takePhoto: 'Hacer una foto',
+    cancel: 'Cancelar',
+    nameLabel: 'Tu nombre',
+    firstNameLabel: 'Nombre',
+    lastNameLabel: 'Apellido',
+    save: 'Guardar',
+    saving: 'Guardando…',
+    saved: 'Guardado',
+    noName: 'Todavía sin nombre',
+    signedOutExplainer: 'Inicia sesión para poner tu nombre y tu foto.',
+    laterLabel: 'Aquí habrá más ajustes más adelante.',
+    permissionDenied: 'ANSAE necesita permiso para abrir tus fotos. Puedes darlo en los ajustes del teléfono.',
+    error: 'No se pudo guardar. Inténtalo de nuevo.',
+  },
   places: {
     title: 'Tus lugares',
     addPlace: 'Añadir un lugar',
@@ -624,6 +687,27 @@ const fr: Translations = {
     title: 'Plus',
     prayerRequests: 'Intentions de prière',
     community: 'Notre groupe',
+  },
+  profile: {
+    title: 'Vos réglages',
+    openSignedOut: 'Se connecter',
+    pictureLabel: 'Votre photo',
+    addPicture: 'Ajouter une photo',
+    changePicture: 'Changer la photo',
+    choosePhoto: 'Choisir une photo',
+    takePhoto: 'Prendre une photo',
+    cancel: 'Annuler',
+    nameLabel: 'Votre nom',
+    firstNameLabel: 'Prénom',
+    lastNameLabel: 'Nom',
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saved: 'Enregistré',
+    noName: 'Pas encore de nom',
+    signedOutExplainer: 'Connectez-vous pour indiquer votre nom et votre photo.',
+    laterLabel: 'D’autres réglages arriveront ici plus tard.',
+    permissionDenied: 'ANSAE a besoin d’accéder à vos photos. Vous pouvez l’autoriser dans les réglages du téléphone.',
+    error: 'L’enregistrement a échoué. Réessayez.',
   },
   places: {
     title: 'Vos lieux',

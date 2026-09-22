@@ -75,6 +75,33 @@ export class UsersService {
     await this.usersRepository.remove(user);
   }
 
+  /**
+   * The name someone sets for themselves in the app's settings. Only the
+   * fields that were sent are written, so editing the first name never
+   * wipes the last one.
+   */
+  async updateProfile(
+    id: string,
+    profile: { firstName?: string; lastName?: string },
+  ): Promise<User> {
+    const user = await this.findOne(id);
+    if (profile.firstName !== undefined) {
+      user.firstName = profile.firstName.trim();
+    }
+    if (profile.lastName !== undefined) {
+      // An empty last name is a real answer, not a missing one: plenty of
+      // people give only one name.
+      user.lastName = profile.lastName.trim() || undefined;
+    }
+    return this.usersRepository.save(user);
+  }
+
+  async updateAvatar(id: string, avatarUrl: string): Promise<User> {
+    const user = await this.findOne(id);
+    user.avatarUrl = avatarUrl;
+    return this.usersRepository.save(user);
+  }
+
   async updateLanguage(id: string, language: Language): Promise<User> {
     const user = await this.findOne(id);
     user.language = language;

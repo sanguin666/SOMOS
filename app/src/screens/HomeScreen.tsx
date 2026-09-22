@@ -128,7 +128,7 @@ export function HomeScreen({ onScanQR, onSignIn, onOpenPoi }: Props) {
                   justifyContent: 'center',
                   borderWidth: 2,
                   borderColor: isSelected ? colors.primary : colors.border,
-                  backgroundColor: isSelected ? colors.primary : colors.background,
+                  backgroundColor: isSelected ? colors.primary : colors.surface,
                 }}
               >
                 <AccessibleText variant="body" color={isSelected ? colors.primaryText : colors.text}>

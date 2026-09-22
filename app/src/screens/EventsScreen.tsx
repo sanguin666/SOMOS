@@ -4,7 +4,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { getEvents } from '../api/events';
 import { useI18n } from '../i18n/I18nContext';
-import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import type { Event, Poi } from '../api/types';
 
 type Props = {
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 9999,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -10,6 +10,7 @@ import { LivestreamScreen } from './LivestreamScreen';
 import { MoreScreen } from './MoreScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
 import { PrayerRequestsScreen } from './PrayerRequestsScreen';
+import { ProfileScreen } from './ProfileScreen';
 import { useAuth } from '../auth/AuthContext';
 import { getActiveModules } from '../api/pois';
 import type { ActiveModule, CommunityPost, Poi } from '../api/types';
@@ -35,11 +36,12 @@ type Drilldown =
  * button is the one thing that changes.
  */
 export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
-  const { isAdminOf } = useAuth();
+  const { isAdminOf, me } = useAuth();
   const isStaff = isAdminOf(poi.id);
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [tab, setTab] = useState<HubTab>('home');
   const [drilldown, setDrilldown] = useState<Drilldown>({ kind: 'list' });
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,10 +68,18 @@ export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
     <PoiShell
       poi={poi}
       modules={modules}
+      me={me}
       activeTab={tab}
       onSelectTab={selectTab}
       onOpenPlaces={onOpenPlaces}
+      onOpenProfile={() => setProfileOpen(true)}
     >
+      <ProfileScreen
+        visible={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        onSignIn={onSignIn}
+      />
+
       {tab === 'home' && <PoiHomeScreen poi={poi} modules={modules} onSelectTab={selectTab} />}
 
       {tab === 'more' && (

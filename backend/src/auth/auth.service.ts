@@ -37,6 +37,7 @@ export class AuthService {
       phone: user.phone,
       firstName: user.firstName,
       lastName: user.lastName,
+      avatarUrl: user.avatarUrl,
       language: user.language,
       adminPois,
       // Every place this person belongs to, admin or not — the app's "my
@@ -63,6 +64,18 @@ export class AuthService {
 
   leavePoi(userId: string, poiId: string): Promise<void> {
     return this.userPoisService.leave(userId, poiId);
+  }
+
+  /** The settings menu's name field. Returns the same shape as `me` so the
+   * app can drop the answer straight into its session. */
+  async updateMyProfile(userId: string, profile: { firstName?: string; lastName?: string }) {
+    await this.usersService.updateProfile(userId, profile);
+    return this.me(userId);
+  }
+
+  async updateMyAvatar(userId: string, avatarUrl: string) {
+    await this.usersService.updateAvatar(userId, avatarUrl);
+    return this.me(userId);
   }
 
   async updateMyLanguage(userId: string, language: Language): Promise<{ language: Language }> {

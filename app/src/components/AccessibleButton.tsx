@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
 
 const containerStyles = StyleSheet.create({
   primary: { backgroundColor: colors.primary, borderColor: colors.primary },
-  secondary: { backgroundColor: colors.background, borderColor: colors.border },
+  secondary: { backgroundColor: colors.surface, borderColor: colors.border },
   danger: { backgroundColor: colors.danger, borderColor: colors.danger },
 });
 

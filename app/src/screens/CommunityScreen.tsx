@@ -8,7 +8,7 @@ import { SignInNotice } from '../components/SignInNotice';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import type { CommunityPost, Poi } from '../api/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: spacing.sm,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
   },
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.surface,
+    ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
   },
