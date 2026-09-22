@@ -3,6 +3,7 @@ import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
 import { createEvent, deleteEvent, getEvents, updateEvent } from '../api/events';
 import type { Event } from '../api/types';
+import { DestructiveButton } from '../components/DestructiveButton';
 
 // <input type="datetime-local"> works in the browser's local time and
 // wants "YYYY-MM-DDTHH:mm" — this pair converts to/from that and the ISO
@@ -181,9 +182,7 @@ export function EventsPage() {
               <button type="button" className="btn" onClick={() => startEdit(item)}>
                 {t('events.edit')}
               </button>
-              <button type="button" className="btn btn-danger" onClick={() => handleDelete(item.id)}>
-                {t('events.delete')}
-              </button>
+              <DestructiveButton label={t('events.delete')} onConfirm={() => handleDelete(item.id)} />
             </div>
           </div>
         ),

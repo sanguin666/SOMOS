@@ -12,6 +12,7 @@ import {
   uploadPageImage,
 } from '../api/poiPage';
 import type { ActiveModule, ModuleType, PageBlockType, PoiPageBlock } from '../api/types';
+import { DestructiveButton } from '../components/DestructiveButton';
 
 // Blocks that fill themselves from a module's content. They have nothing
 // to write, only a count, and they need that module switched on.
@@ -223,14 +224,14 @@ export function PoiHomePage() {
 
         return (
           <div key={block.id} className="card form">
-            <div className="card-actions" style={{ justifyContent: 'space-between' }}>
+            <div className="card-actions" style={{ justifyContent: 'space-between', marginTop: 10, marginBottom: 4 }}>
               <p className="card-title" style={{ margin: 0 }}>
                 {index + 1}. {BLOCK_NAMES[block.type]}
               </p>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
-                  className="btn"
+                  className="btn btn-icon"
                   onClick={() => move(index, -1)}
                   disabled={index === 0}
                   aria-label={t('homePage.moveUp')}
@@ -239,16 +240,14 @@ export function PoiHomePage() {
                 </button>
                 <button
                   type="button"
-                  className="btn"
+                  className="btn btn-icon"
                   onClick={() => move(index, 1)}
                   disabled={index === blocks.length - 1}
                   aria-label={t('homePage.moveDown')}
                 >
                   ↓
                 </button>
-                <button type="button" className="btn" onClick={() => remove(block.id)}>
-                  {t('homePage.delete')}
-                </button>
+                <DestructiveButton label={t('homePage.delete')} onConfirm={() => remove(block.id)} />
               </div>
             </div>
 
@@ -338,9 +337,9 @@ export function PoiHomePage() {
       {blocks !== null && (
         <div className="card">
           <p className="card-title">{t('homePage.addSection')}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 12 }}>
             {ADDABLE_BLOCKS.map((type) => (
-              <button key={type} type="button" className="btn" onClick={() => add(type)}>
+              <button key={type} type="button" className="btn btn-primary" onClick={() => add(type)}>
                 + {BLOCK_NAMES[type]}
               </button>
             ))}

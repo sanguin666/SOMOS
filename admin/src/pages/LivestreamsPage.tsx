@@ -8,6 +8,7 @@ import {
   updateLivestream,
 } from '../api/livestreams';
 import type { Livestream, LivestreamStatus } from '../api/types';
+import { DestructiveButton } from '../components/DestructiveButton';
 
 const STATUS_OPTIONS: LivestreamStatus[] = ['upcoming', 'live', 'ended'];
 
@@ -139,9 +140,7 @@ export function LivestreamsPage() {
                 </option>
               ))}
             </select>
-            <button type="button" className="btn btn-danger" onClick={() => handleDelete(item.id)}>
-              {t('livestreams.delete')}
-            </button>
+            <DestructiveButton label={t('livestreams.delete')} onConfirm={() => handleDelete(item.id)} />
           </div>
         </div>
       ))}

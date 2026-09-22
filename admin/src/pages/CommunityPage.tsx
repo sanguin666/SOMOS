@@ -3,6 +3,7 @@ import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
 import { deleteComment, deletePost, getComments, getCommunityPosts } from '../api/community';
 import type { CommunityComment, CommunityPost } from '../api/types';
+import { DestructiveButton } from '../components/DestructiveButton';
 
 export function CommunityPage() {
   const poiId = usePoiId();
@@ -82,9 +83,7 @@ export function CommunityPage() {
             <button type="button" className="btn" onClick={() => toggleExpand(post)}>
               {expandedId === post.id ? t('community.hideReplies') : `${t('community.replies')} (${post.commentCount})`}
             </button>
-            <button type="button" className="btn btn-danger" onClick={() => handleDeletePost(post.id)}>
-              {t('community.removePost')}
-            </button>
+            <DestructiveButton label={t('community.removePost')} onConfirm={() => handleDeletePost(post.id)} />
           </div>
 
           {expandedId === post.id && (
@@ -97,13 +96,12 @@ export function CommunityPage() {
                     <p style={{ margin: 0 }}>{comment.message}</p>
                     <p className="card-meta">— {comment.authorName ?? t('community.anonymous')}</p>
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => handleDeleteComment(post.id, comment.id)}
-                  >
-                    {t('community.removeReply')}
-                  </button>
+                  <div className="card-actions" style={{ marginTop: 0, flexShrink: 0 }}>
+                    <DestructiveButton
+                      label={t('community.removeReply')}
+                      onConfirm={() => handleDeleteComment(post.id, comment.id)}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

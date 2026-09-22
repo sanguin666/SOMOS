@@ -5,6 +5,8 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'es', 'fr'];
 export type Translations = {
   common: {
     loading: string;
+    yes: string;
+    cancel: string;
   };
   login: {
     heading: string;
@@ -18,6 +20,8 @@ export type Translations = {
   layout: {
     managing: string;
     language: string;
+    chooseLanguage: string;
+    close: string;
     signOut: string;
     navDonations: string;
     navEvents: string;
@@ -244,6 +248,8 @@ export type Translations = {
 const en: Translations = {
   common: {
     loading: 'Loading…',
+    yes: 'Yes',
+    cancel: 'Cancel',
   },
   login: {
     heading: 'ANSAE Admin',
@@ -257,6 +263,8 @@ const en: Translations = {
   layout: {
     managing: 'Managing',
     language: 'Language',
+    chooseLanguage: 'Choose a language',
+    close: 'Close',
     signOut: 'Sign out',
     navDonations: 'Donations',
     navEvents: 'Events',
@@ -484,6 +492,8 @@ const en: Translations = {
 const es: Translations = {
   common: {
     loading: 'Cargando…',
+    yes: 'Sí',
+    cancel: 'Cancelar',
   },
   login: {
     heading: 'ANSAE Admin',
@@ -497,6 +507,8 @@ const es: Translations = {
   layout: {
     managing: 'Administrando',
     language: 'Idioma',
+    chooseLanguage: 'Elige un idioma',
+    close: 'Cerrar',
     signOut: 'Cerrar sesión',
     navDonations: 'Donaciones',
     navEvents: 'Eventos',
@@ -724,6 +736,8 @@ const es: Translations = {
 const fr: Translations = {
   common: {
     loading: 'Chargement…',
+    yes: 'Oui',
+    cancel: 'Annuler',
   },
   login: {
     heading: 'ANSAE Admin',
@@ -737,6 +751,8 @@ const fr: Translations = {
   layout: {
     managing: 'Gestion de',
     language: 'Langue',
+    chooseLanguage: 'Choisissez une langue',
+    close: 'Fermer',
     signOut: 'Se déconnecter',
     navDonations: 'Dons',
     navEvents: 'Événements',

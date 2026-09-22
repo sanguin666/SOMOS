@@ -90,7 +90,7 @@ export function MyQrPage() {
           <button type="button" className="btn btn-primary" disabled={saving} onClick={save}>
             {saving ? t('qr.saving') : t('qr.save')}
           </button>
-          <button type="button" className="btn" onClick={() => window.print()}>
+          <button type="button" className="btn btn-primary" onClick={() => window.print()}>
             {t('qr.print')}
           </button>
         </div>
