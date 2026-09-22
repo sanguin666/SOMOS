@@ -8,11 +8,11 @@
  */
 
 export const colors = {
-  // The app's canvas: a very light warm beige, so a white box sitting on
-  // it reads as a card rather than as more page. The two are only 1.06:1
-  // apart, which is nowhere near enough on its own — `cardSurface` below
-  // is what actually draws the edge, and every white box should use it.
-  background: '#FBF8F4',
+  // The app's canvas: a warm beige, deep enough that a white box sitting
+  // on it reads as a card on its own. `cardSurface` below still pairs
+  // the white with a hairline, which is what keeps a box's edge crisp
+  // where it meets the page rather than fading into it.
+  background: '#EFE6D5',
   // Boxes, inputs, buttons, and the floating menus. Inside a white panel
   // the nesting goes the other way: a row or a field takes `background`,
   // so the beige is what separates it from the white around it.
