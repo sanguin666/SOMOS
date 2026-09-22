@@ -168,6 +168,38 @@ describe('Access control (e2e)', () => {
       expect(named.body.authorName).toBe('A parishioner');
     });
 
+    it('lets any signed-in member share a prayer intention', async () => {
+      // Unlike an announcement below: an intention is a member speaking.
+      await client(app)
+        .post(`/pois/${place.id}/prayer-requests`)
+        .set('Authorization', `Bearer ${visitorToken}`)
+        .send({ message: 'For my neighbour.' })
+        .expect(201);
+    });
+
+    it('only lets parish staff post an announcement', async () => {
+      await client(app)
+        .post(`/pois/${place.id}/announcements`)
+        .send({ title: 'Anonymous', body: 'Spam' })
+        .expect(401);
+
+      // Signed in, but not staff at this place.
+      await client(app)
+        .post(`/pois/${place.id}/announcements`)
+        .set('Authorization', `Bearer ${visitorToken}`)
+        .send({ title: 'Not mine to post', body: 'Spam' })
+        .expect(403);
+
+      await client(app)
+        .post(`/pois/${place.id}/announcements`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ title: 'Mass is at 10 on Sunday', body: 'Every Sunday from now on.' })
+        .expect(201);
+
+      // Reading them is open, as before.
+      await client(app).get(`/pois/${place.id}/announcements`).expect(200);
+    });
+
     it('needs a session for the praying counter', async () => {
       const created = await client(app)
         .post(`/pois/${place.id}/prayer-requests`)

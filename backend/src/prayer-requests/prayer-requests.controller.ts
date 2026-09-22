@@ -13,8 +13,9 @@ export class PrayerRequestsController {
     private readonly prayerRequestsService: PrayerRequestsService,
   ) {}
 
-  // Posting needs an account. Reading doesn't: the wall of requests is
-  // there for anyone who walks in with the app.
+  // Any signed-in member can share an intention — unlike announcements,
+  // which are the parish speaking and are admin-only. Reading needs no
+  // account at all; removing an intention is moderation, so admin-only.
   @Post()
   @UseGuards(JwtAuthGuard)
   create(
@@ -30,7 +31,7 @@ export class PrayerRequestsController {
     return this.prayerRequestsService.findForPoi(poiId);
   }
 
-  // Also behind a session: an open counter is one script away from
+  // A session, but nothing more: an open counter is one script away from
   // meaningless.
   @Post(':id/pray')
   @UseGuards(JwtAuthGuard)

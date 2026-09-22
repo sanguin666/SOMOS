@@ -12,13 +12,16 @@ import { colors, radii, spacing } from '../theme/theme';
 type Props = {
   poi: Poi;
   onCompose: () => void;
+  // Announcements are the parish speaking to its members, so only staff
+  // get the compose button. See the backend's announcements controller.
+  canCompose: boolean;
 };
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-export function AnnouncementsScreen({ poi, onCompose }: Props) {
+export function AnnouncementsScreen({ poi, onCompose, canCompose }: Props) {
   const { t } = useI18n();
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
   const [error, setError] = useState(false);
@@ -42,14 +45,16 @@ export function AnnouncementsScreen({ poi, onCompose }: Props) {
     <>
       <View style={styles.headerRow}>
         <AccessibleText variant="title">{t('announcements.title')}</AccessibleText>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('announcements.newAria')}
-          onPress={onCompose}
-          style={styles.iconButton}
-        >
-          <PlusIcon size={20} color={colors.text} />
-        </Pressable>
+        {canCompose && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('announcements.newAria')}
+            onPress={onCompose}
+            style={styles.iconButton}
+          >
+            <PlusIcon size={20} color={colors.text} />
+          </Pressable>
+        )}
       </View>
 
       {error && (

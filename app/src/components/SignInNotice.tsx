@@ -5,9 +5,9 @@ import { useI18n } from '../i18n/I18nContext';
 import { colors, radii, spacing } from '../theme/theme';
 
 /**
- * Shown in place of a compose form when nobody is signed in. Posting needs
- * an account now that there is one to have; reading never does, so this
- * only ever replaces the form, never the content below it.
+ * Shown in place of a compose form when nobody is signed in. Reading never
+ * needs an account, so this only ever replaces the form, never the content
+ * below it.
  */
 export function SignInNotice({ onSignIn }: { onSignIn: () => void }) {
   const { t } = useI18n();

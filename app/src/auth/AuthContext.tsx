@@ -17,6 +17,13 @@ type AuthState = {
   // is, in fact, signed in.
   ready: boolean;
   me: Me | null;
+  /**
+   * Whether the signed-in person is staff at this place. Drives what the
+   * app offers rather than what it allows — the backend's PoiAdminGuard is
+   * what actually decides, and this only stops the app showing a button
+   * that would come back 403.
+   */
+  isAdminOf: (poiId: string) => boolean;
   signIn: (accessToken: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -92,9 +99,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const isAdminOf = useCallback(
+    (poiId: string) => (me?.adminPois ?? []).some((poi) => poi.id === poiId),
+    [me],
+  );
+
   const value = useMemo(
-    () => ({ ready, me, signIn, signOut, refresh }),
-    [ready, me, signIn, signOut, refresh],
+    () => ({ ready, me, isAdminOf, signIn, signOut, refresh }),
+    [ready, me, isAdminOf, signIn, signOut, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

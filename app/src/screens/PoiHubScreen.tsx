@@ -35,7 +35,8 @@ type Drilldown =
  * button is the one thing that changes.
  */
 export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
-  const { me } = useAuth();
+  const { isAdminOf } = useAuth();
+  const isStaff = isAdminOf(poi.id);
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [tab, setTab] = useState<HubTab>('home');
   const [drilldown, setDrilldown] = useState<Drilldown>({ kind: 'list' });
@@ -96,9 +97,8 @@ export function PoiHubScreen({ poi, onOpenPlaces, onSignIn }: Props) {
         ) : (
           <AnnouncementsScreen
             poi={poi}
-            onCompose={() =>
-              me ? setDrilldown({ kind: 'compose-announcement' }) : onSignIn()
-            }
+            canCompose={isStaff}
+            onCompose={() => setDrilldown({ kind: 'compose-announcement' })}
           />
         ))}
 

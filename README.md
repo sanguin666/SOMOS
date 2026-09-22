@@ -101,7 +101,7 @@ npm run dev
 
 Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: schedule Events, publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), print a QR flyer from **My QR**, and manage **Settings** — active modules plus the parish's own info (description, picture) shown in the app.
 
-Content that's meant to come from parish staff (editing/deleting announcements and livestreams, moderating prayer requests and community posts, toggling modules) requires this admin login. Posting itself — an announcement, a prayer request, a community post, a "praying" tap — requires a congregant session (see the phone login below), but not an admin one, so anyone signed in can still post. Reading needs no account at all.
+Content that's meant to come from parish staff requires this admin login: posting, editing and deleting announcements and livestreams, scheduling events, moderating prayer requests and community posts, and toggling modules. What a congregant can post with an ordinary session (see the phone login below) is a prayer request, a "praying" tap, and community posts and replies. Reading needs no account at all.
 
 ### 5. Access from a physical phone
 
@@ -181,7 +181,7 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 
 - **Donations** — in-app donations through Stripe Checkout (see [Donations & Stripe](#donations--stripe) below); without a Stripe key the screen falls back to a demo confirmation that records the gift without taking a payment
 - **Events** — Masses, baptisms, weddings, funerals, communions, etc. (`backend/src/events`); scheduling/editing is admin-only, the app only reads them (a reminder toggle per event is a local, device-only preference — there's no account yet to attach it to)
-- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message from the app instead of typed; editing/deleting is admin-only, posting needs any signed-in congregant (tightening that to admin-only is noted in the controller)
+- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message instead of typed; admin-only throughout, since an announcement is the parish speaking to its members. The app's compose screen and its voice recording are there for a signed-in admin; everyone else sees the list without a **+** button
 - **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`); posting and the counter need a signed-in congregant, moderation (removal) is admin-only from the dashboard
 - **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`); scheduling/editing is admin-only
 - **Community** — a discussion board: posts with flat (non-nested) comment replies (`src/community`); posting and replying need a signed-in congregant, moderation is admin-only from the dashboard
@@ -251,7 +251,8 @@ Every write route is behind something now. The rules, in one place:
 | Route | Who |
 | --- | --- |
 | `GET` on places, events, announcements, prayer requests, community, livestreams, page blocks | anyone |
-| `POST` a prayer request, a "praying" tap, a community post or reply, an announcement | any signed-in congregant |
+| `POST` a prayer request, a "praying" tap, a community post or reply | any signed-in congregant |
+| `POST` an announcement | an admin of that place — an announcement is the parish speaking |
 | `POST /pois` (create a place) | any signed-in user, who becomes that place's first admin |
 | `PATCH`/`DELETE` a place, its modules, its settings, its page, and all moderation | an admin of *that* place (`PoiAdminGuard`) |
 | anything under `/users/:id` or `/users/:userId/pois` | that user, and only that user (`SelfGuard`) |
