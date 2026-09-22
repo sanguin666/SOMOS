@@ -93,7 +93,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     );
   }
 
-  return response.json() as Promise<T>;
+  // Read as text rather than `response.json()`: a 204, or any other
+  // answer with no body, is a valid success and would otherwise throw on
+  // an empty string. Callers expecting nothing are typed for it.
+  const body = await response.text();
+  return (body ? (JSON.parse(body) as T) : (undefined as T));
 }
 
 export function apiGet<T>(path: string): Promise<T> {
@@ -114,6 +118,10 @@ export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });
+}
+
+export async function apiDelete(path: string): Promise<void> {
+  await request<void>(path, { method: 'DELETE' });
 }
 
 // No Content-Type header here — fetch sets the multipart boundary itself

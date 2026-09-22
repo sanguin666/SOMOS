@@ -10,9 +10,9 @@ import { PhoneLoginScreen } from './src/screens/PhoneLoginScreen';
 import { PlaceSwitcher } from './src/components/PlaceSwitcher';
 import { I18nProvider } from './src/i18n/I18nContext';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
-import { joinPoi, setLastActivePoi } from './src/api/auth';
+import { joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
 import { getPoi } from './src/api/pois';
-import { getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
+import { forgetPlace, getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
 import { landingPoi } from './src/landing';
 import { colors } from './src/theme/theme';
 import type { Poi } from './src/api/types';
@@ -110,6 +110,24 @@ function AppRoutes() {
     closeSwitcher();
   }
 
+  /**
+   * Leaving the place somebody is currently in. The membership goes
+   * first, then the device's own copy, and only then does the app work
+   * out where to go: clearing `landed` hands that back to the effect
+   * above, which lands on another place or on the add-a-place screen
+   * exactly as it would at launch.
+   *
+   * Anything failing here is left to throw — the menu that called this
+   * is the one showing the error, and it should not say "done" over a
+   * membership that is still there.
+   */
+  async function leaveCurrentPoi(poi: Poi) {
+    await leavePoi(poi.id);
+    setPlaces(await forgetPlace(poi.id));
+    await refresh();
+    setLanded(false);
+  }
+
   function closeSwitcher() {
     setSwitcherOpen(false);
     setSwitchingTo(null);
@@ -171,9 +189,16 @@ function AppRoutes() {
       {ready && current?.name === 'scan' && <ScanQRScreen onBack={pop} onFound={openPoi} />}
 
       {ready && current?.name === 'hub' && (
+        /* Keyed by the place, so entering a different one starts on its
+           own home tab rather than wherever the last place was left —
+           landing on another place's "More" menu after leaving one reads
+           as nothing having happened. */
         <PoiHubScreen
+          key={current.poi.id}
           poi={current.poi}
           onOpenPlaces={() => setSwitcherOpen(true)}
+          onAddPlace={() => push({ name: 'scan' })}
+          onLeavePlace={() => leaveCurrentPoi(current.poi)}
           onSignIn={() => push({ name: 'signIn' })}
         />
       )}

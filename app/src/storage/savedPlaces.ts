@@ -59,3 +59,19 @@ export async function rememberPlace(poi: Poi): Promise<SavedPlace[]> {
   }
   return next;
 }
+
+/**
+ * Drops a place from this device's list and returns what is left. Called
+ * when somebody leaves a place: the membership going away on the server
+ * would otherwise leave the place still listed here, since the switcher
+ * shows both.
+ */
+export async function forgetPlace(poiId: string): Promise<SavedPlace[]> {
+  const next = (await getSavedPlaces()).filter((p) => p.id !== poiId);
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // Same as above: not being able to write is not worth failing over.
+  }
+  return next;
+}

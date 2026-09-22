@@ -77,6 +77,12 @@ export type Translations = {
     title: string;
     prayerRequests: string;
     community: string;
+    leavePlace: string;
+    leaveQuestion: string;
+    leaveExplainer: string;
+    leaveConfirm: string;
+    leaveCancel: string;
+    leaveError: string;
   };
   profile: {
     title: string;
@@ -288,6 +294,12 @@ const en: Translations = {
     title: 'More',
     prayerRequests: 'Prayer requests',
     community: 'Our group',
+    leavePlace: 'Leave this place',
+    leaveQuestion: 'Leave {{poiName}}?',
+    leaveExplainer: 'It will be removed from your places. You can come back any time by scanning its QR code again.',
+    leaveConfirm: 'Yes, leave',
+    leaveCancel: 'No, stay',
+    leaveError: "We couldn't do that. Please try again.",
   },
   profile: {
     title: 'Your settings',
@@ -501,6 +513,12 @@ const es: Translations = {
     title: 'Más',
     prayerRequests: 'Peticiones de oración',
     community: 'Nuestro grupo',
+    leavePlace: 'Salir de este lugar',
+    leaveQuestion: '¿Salir de {{poiName}}?',
+    leaveExplainer: 'Se quitará de tus lugares. Puedes volver cuando quieras escaneando otra vez su código QR.',
+    leaveConfirm: 'Sí, salir',
+    leaveCancel: 'No, quedarme',
+    leaveError: 'No hemos podido hacerlo. Inténtalo de nuevo.',
   },
   profile: {
     title: 'Tus ajustes',
@@ -714,6 +732,12 @@ const fr: Translations = {
     title: 'Plus',
     prayerRequests: 'Intentions de prière',
     community: 'Notre groupe',
+    leavePlace: 'Quitter ce lieu',
+    leaveQuestion: 'Quitter {{poiName}} ?',
+    leaveExplainer: 'Il sera retiré de vos lieux. Vous pourrez revenir quand vous voulez en scannant à nouveau son code QR.',
+    leaveConfirm: 'Oui, quitter',
+    leaveCancel: 'Non, rester',
+    leaveError: 'Nous n’avons pas pu le faire. Réessayez.',
   },
   profile: {
     title: 'Vos réglages',
