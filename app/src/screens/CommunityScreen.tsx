@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
+import { FormCard, FormDivider, FormField } from '../components/FormCard';
 import { ChatBubbleIcon, ChevronRightIcon } from '../components/icons';
 import { createCommunityPost, getCommunityPosts } from '../api/community';
 import { SignInNotice } from '../components/SignInNotice';
@@ -58,26 +59,29 @@ export function CommunityScreen({ poi, onOpenPost, onSignIn }: Props) {
       </View>
 
       {me ? (
-        <View style={styles.form}>
-          <TextInput
-            value={message}
-            onChangeText={setMessage}
-            placeholder={t('community.messagePlaceholder')}
-            multiline
-            style={styles.messageInput}
-          />
-          <TextInput
-            value={authorName}
-            onChangeText={setAuthorName}
-            placeholder={t('community.namePlaceholder')}
-            style={styles.nameInput}
-          />
-          <AccessibleButton
-            label={submitting ? t('community.postingButton') : t('community.postButton')}
-            onPress={submit}
-            disabled={submitting || !message.trim()}
-          />
-        </View>
+        <>
+          <FormCard>
+              <FormField
+                label={t('community.messagePlaceholder')}
+                value={message}
+                onChangeText={setMessage}
+                multiline
+                tall
+              />
+              <FormDivider />
+              <FormField
+                label={t('community.namePlaceholder')}
+                value={authorName}
+                onChangeText={setAuthorName}
+              />
+            </FormCard>
+
+            <AccessibleButton
+              label={submitting ? t('community.postingButton') : t('community.postButton')}
+              onPress={submit}
+              disabled={submitting || !message.trim()}
+            />
+        </>
       ) : (
         <SignInNotice onSignIn={onSignIn} />
       )}
@@ -125,31 +129,6 @@ const styles = StyleSheet.create({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
-  },
-  form: {
-    gap: spacing.sm,
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-  },
-  messageInput: {
-    minHeight: 88,
-    borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    padding: spacing.md,
-    fontSize: 18,
-    textAlignVertical: 'top',
-  },
-  nameInput: {
-    minHeight: 56,
-    borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.md,
-    fontSize: 18,
   },
   card: {
     flexDirection: 'row',

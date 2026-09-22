@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
+import { FormCard, FormDivider, FormField } from '../components/FormCard';
 import { BackChevronIcon } from '../components/icons';
 import { createComment, getComments } from '../api/community';
 import { SignInNotice } from '../components/SignInNotice';
@@ -93,26 +94,29 @@ export function CommunityThreadScreen({ poi, post, onBack, onSignIn }: Props) {
       ))}
 
       {me ? (
-        <View style={styles.form}>
-          <TextInput
-            value={message}
-            onChangeText={setMessage}
-            placeholder={t('communityThread.messagePlaceholder')}
-            multiline
-            style={styles.messageInput}
-          />
-          <TextInput
-            value={authorName}
-            onChangeText={setAuthorName}
-            placeholder={t('communityThread.namePlaceholder')}
-            style={styles.nameInput}
-          />
-          <AccessibleButton
-            label={submitting ? t('communityThread.replyingButton') : t('communityThread.replyButton')}
-            onPress={submit}
-            disabled={submitting || !message.trim()}
-          />
-        </View>
+        <>
+          <FormCard>
+              <FormField
+                label={t('communityThread.messagePlaceholder')}
+                value={message}
+                onChangeText={setMessage}
+                multiline
+                tall
+              />
+              <FormDivider />
+              <FormField
+                label={t('communityThread.namePlaceholder')}
+                value={authorName}
+                onChangeText={setAuthorName}
+              />
+            </FormCard>
+
+            <AccessibleButton
+              label={submitting ? t('communityThread.replyingButton') : t('communityThread.replyButton')}
+              onPress={submit}
+              disabled={submitting || !message.trim()}
+            />
+        </>
       ) : (
         <SignInNotice onSignIn={onSignIn} />
       )}
@@ -147,31 +151,5 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     padding: spacing.lg,
     gap: spacing.xs,
-  },
-  form: {
-    gap: spacing.sm,
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-    marginTop: spacing.sm,
-  },
-  messageInput: {
-    minHeight: 72,
-    borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    padding: spacing.md,
-    fontSize: 18,
-    textAlignVertical: 'top',
-  },
-  nameInput: {
-    minHeight: 56,
-    borderRadius: radii.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.md,
-    fontSize: 18,
   },
 });

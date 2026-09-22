@@ -16,9 +16,19 @@ export const colors = {
   // than this closes the gap to nothing, which is the state Seb turned
   // down once already.
   background: '#FAF5EE',
-  // Boxes, inputs, buttons, and the floating menus. Inside a white panel
-  // the nesting goes the other way: a row or a field takes `background`,
-  // so the beige is what separates it from the white around it.
+  // Boxes, sheets, buttons and the floating menus.
+  //
+  // THE RULE: only ever one white box deep. Whatever sits inside a white
+  // card or sheet — a text field, a row, an option in a list — carries no
+  // fill and no border of its own. It is told apart by a hairline in
+  // `cardBorder`, by its colour, or by a tick; never by a frame, and
+  // never by a patch of `background`, which would read as a box inside a
+  // box. `FormCard` and `FormField` are this rule as components; use
+  // them rather than rebuilding a form by hand.
+  //
+  // Actions are the exception, because a button is not a box: inside
+  // white, use a filled button (`primary`, or `danger` for something
+  // that undoes) or the `quiet` variant for the way out.
   surface: '#FFFFFF',
   text: '#111111',
   textMuted: '#3D3D3D',
