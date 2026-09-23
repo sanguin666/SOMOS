@@ -154,10 +154,10 @@ async function seed() {
   if (!poi) {
     poi = await poiRepository.save(
       poiRepository.create({
-        name: "St. Mary's Parish",
+        name: "St. Mary's Community",
         type: PoiType.CHURCH,
         city: 'Springfield',
-        description: 'A welcoming Catholic parish in the heart of Springfield, serving families for over 80 years.',
+        description: 'A welcoming community in the heart of Springfield, serving families for over 80 years.',
         qrCodeToken: DEMO_QR_TOKEN,
       }),
     );
@@ -212,7 +212,7 @@ async function seed() {
       announcementRepository.create({
         poi: poi2,
         title: 'Bienvenidos a Holy Trinity Chapel',
-        body: 'Este es un anuncio de muestra para nuestra segunda parroquia, usado para mostrar el panel de administración.',
+        body: 'Este es un anuncio de muestra para nuestra segunda comunidad, usado para mostrar el panel de administración.',
       }),
     );
     console.log('Seeded demo announcement for Holy Trinity Chapel');
@@ -257,12 +257,12 @@ async function seed() {
       announcementRepository.create({
         poi,
         title: 'This week’s bulletin',
-        body: "This week's readings, choir practice moves to Thursday evenings starting this month, and a reminder that the parish office will be closed on Monday for the holiday.",
+        body: "This week's readings, choir practice moves to Thursday evenings starting this month, and a reminder that the community office will be closed on Monday for the holiday.",
       }),
       announcementRepository.create({
         poi,
         title: 'Food pantry donations needed',
-        body: 'Our food pantry is running low on canned goods and pasta. Donations can be dropped off at the parish hall any weekday between 9am and 4pm.',
+        body: 'Our food pantry is running low on canned goods and pasta. Donations can be dropped off at the community hall any weekday between 9am and 4pm.',
       }),
     ]);
     console.log('Seeded demo announcements');
@@ -299,7 +299,7 @@ async function seed() {
         poi,
         title: 'Community Potluck',
         startsAt: potluck,
-        location: 'Parish Hall',
+        location: 'Community Hall',
         description: 'Bring a dish to share — all are welcome!',
       }),
     ]);
@@ -385,7 +385,7 @@ async function seed() {
       communityCommentRepository.create({
         post: carpoolPost,
         authorName: 'Margaret',
-        message: 'Same here, I leave from the parish hall around 8am.',
+        message: 'Same here, I leave from the community hall around 8am.',
       }),
       communityCommentRepository.create({
         post: potluckPost,
@@ -410,7 +410,7 @@ async function seed() {
         position: 0,
         type: PageBlockType.TEXT,
         title: 'Welcome to St. Mary’s',
-        body: 'A welcoming parish in the heart of Springfield. Whether you have been coming for fifty years or are walking in for the first time, there is a seat for you. Sunday Mass is at 10:00, and the doors open half an hour before.',
+        body: 'A welcoming community in the heart of Springfield. Whether you have been coming for fifty years or are walking in for the first time, there is a seat for you. Sunday Mass is at 10:00, and the doors open half an hour before.',
       }),
       pageBlockRepository.create({
         poi,
@@ -429,13 +429,13 @@ async function seed() {
         position: 3,
         type: PageBlockType.TEXT,
         title: 'Visiting us',
-        body: 'The parish office is open weekdays from 9am to 4pm. There is step-free access on the side entrance from the car park, and a hearing loop in the first four rows.',
+        body: 'The community office is open weekdays from 9am to 4pm. There is step-free access on the side entrance from the car park, and a hearing loop in the first four rows.',
       }),
       pageBlockRepository.create({
         poi,
         position: 4,
         type: PageBlockType.DONATE,
-        title: 'Support the parish',
+        title: 'Support the community',
         body: 'Every gift keeps the lights on, the food pantry stocked and the doors open.',
       }),
     ]);
@@ -452,6 +452,26 @@ async function seed() {
   console.log('\nDemo admin dashboard login:');
   console.log(`  email:    ${DEMO_ADMIN_EMAIL}`);
   console.log(`  password: ${DEMO_ADMIN_PASSWORD}`);
+
+  // Seb, 23 Sep 2026: nothing shown anywhere should say "parish" — the
+  // word is "community". The rows above are only created when missing,
+  // so a database seeded before that keeps the old wording; this puts
+  // the demo's own text right, and touches nothing anyone has edited.
+  const rewordings: [{ update: (where: object, set: object) => Promise<unknown> }, string, string, string][] = [
+    [poiRepository, 'name', "St. Mary's Parish", "St. Mary's Community"],
+    [poiRepository, 'description', 'A welcoming Catholic parish in the heart of Springfield, serving families for over 80 years.', 'A welcoming community in the heart of Springfield, serving families for over 80 years.'],
+    [announcementRepository, 'body', 'Este es un anuncio de muestra para nuestra segunda parroquia, usado para mostrar el panel de administración.', 'Este es un anuncio de muestra para nuestra segunda comunidad, usado para mostrar el panel de administración.'],
+    [announcementRepository, 'body', "This week's readings, choir practice moves to Thursday evenings starting this month, and a reminder that the parish office will be closed on Monday for the holiday.", "This week's readings, choir practice moves to Thursday evenings starting this month, and a reminder that the community office will be closed on Monday for the holiday."],
+    [announcementRepository, 'body', 'Our food pantry is running low on canned goods and pasta. Donations can be dropped off at the parish hall any weekday between 9am and 4pm.', 'Our food pantry is running low on canned goods and pasta. Donations can be dropped off at the community hall any weekday between 9am and 4pm.'],
+    [eventRepository, 'location', 'Parish Hall', 'Community Hall'],
+    [communityCommentRepository, 'message', 'Same here, I leave from the parish hall around 8am.', 'Same here, I leave from the community hall around 8am.'],
+    [pageBlockRepository, 'body', 'A welcoming parish in the heart of Springfield. Whether you have been coming for fifty years or are walking in for the first time, there is a seat for you. Sunday Mass is at 10:00, and the doors open half an hour before.', 'A welcoming community in the heart of Springfield. Whether you have been coming for fifty years or are walking in for the first time, there is a seat for you. Sunday Mass is at 10:00, and the doors open half an hour before.'],
+    [pageBlockRepository, 'body', 'The parish office is open weekdays from 9am to 4pm. There is step-free access on the side entrance from the car park, and a hearing loop in the first four rows.', 'The community office is open weekdays from 9am to 4pm. There is step-free access on the side entrance from the car park, and a hearing loop in the first four rows.'],
+    [pageBlockRepository, 'title', 'Support the parish', 'Support the community'],
+  ];
+  for (const [repository, column, from, to] of rewordings) {
+    await repository.update({ [column]: from }, { [column]: to });
+  }
 
   await dataSource.destroy();
 }

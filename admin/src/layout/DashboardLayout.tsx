@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { LogoMark } from '../components/LogoMark';
 import { LanguagePicker } from '../components/LanguagePicker';
+import { PickerRow, PickerSheet, PinIcon } from '../components/PickerSheet';
 
 export function DashboardLayout() {
   const { user, logout } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const { poiId } = useParams<{ poiId: string }>();
+  const [poiPickerOpen, setPoiPickerOpen] = useState(false);
 
   if (!user) return null;
 
@@ -45,18 +48,22 @@ export function DashboardLayout() {
 
         {user.adminPois.length > 1 ? (
           <div className="poi-switcher">
-            <label htmlFor="poi-select">{t('layout.managing')}</label>
-            <select
-              id="poi-select"
-              value={poiId}
-              onChange={(e) => handlePoiChange(e.target.value)}
-            >
-              {user.adminPois.map((poi) => (
-                <option key={poi.id} value={poi.id}>
-                  {poi.name}
-                </option>
-              ))}
-            </select>
+            <p className="poi-switcher-caption">{t('layout.managing')}</p>
+            <PickerRow
+              icon={<PinIcon />}
+              value={currentPoi?.name ?? ''}
+              ariaLabel={`${t('layout.managing')}: ${currentPoi?.name ?? ''}`}
+              onClick={() => setPoiPickerOpen(true)}
+            />
+            <PickerSheet
+              open={poiPickerOpen}
+              onClose={() => setPoiPickerOpen(false)}
+              title={t('layout.choosePlace')}
+              options={user.adminPois.map((poi) => ({ key: poi.id, label: poi.name }))}
+              selectedKey={poiId ?? ''}
+              onChoose={handlePoiChange}
+              closeLabel={t('layout.close')}
+            />
           </div>
         ) : (
           currentPoi && <p className="poi-name">{currentPoi.name}</p>

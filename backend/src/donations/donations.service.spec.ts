@@ -12,7 +12,7 @@ import { StripeService } from './stripe.service.js';
  * it was paid.
  */
 describe('DonationsService (Stripe checkout)', () => {
-  const poi = { id: 'poi-1', name: "St. Mary's Parish" };
+  const poi = { id: 'poi-1', name: "St. Mary's Community" };
 
   let service: DonationsService;
   let saved: Donation[];
