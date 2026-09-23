@@ -126,10 +126,18 @@ a {
   margin: 0;
 }
 
-.poi-switcher label {
-  display: block;
+.poi-switcher-caption {
+  margin: 0 0 2px;
   font-size: 14px;
   color: var(--color-text-muted);
+}
+
+/* The place row carries the place's name as its main line, big enough to
+   read at a glance, and wraps rather than cutting a long name short. */
+.poi-switcher .picker-row-label {
+  font-size: 18px;
+  line-height: 1.25;
+  padding: 8px 0;
 }
 
 .poi-name {
@@ -360,12 +368,6 @@ select {
   cursor: pointer;
 }
 
-.sidebar select {
-  width: 100%;
-  padding-left: 0;
-  font-size: 18px;
-}
-
 /* ---------- Buttons: three, and no fourth ---------- */
 
 /* .btn-primary is the orange button of the landing page, and it is every
@@ -443,9 +445,9 @@ select {
   color: var(--color-primary-strong);
 }
 
-/* ---------- Language picker ---------- */
+/* ---------- Pickers (language, place) ---------- */
 
-.language-row {
+.picker-row {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -462,18 +464,18 @@ select {
 
 /* In the sidebar the row already sits on white: it keeps no edge of its
    own there, and the orange line above it does the separating. */
-.sidebar .language-row {
+.sidebar .picker-row {
   border-color: transparent;
   padding: 0 4px;
 }
 
-.language-row-label {
+.picker-row-label {
   flex: 1;
   font-weight: 700;
   color: var(--color-text);
 }
 
-.language-row-value {
+.picker-row-value {
   font-size: 16px;
 }
 
@@ -599,7 +601,7 @@ select {
   border-radius: 0;
 }
 
-.login-panel .language-row {
+.login-panel .picker-row {
   border-color: transparent;
   padding: 0 4px;
 }

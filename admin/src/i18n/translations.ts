@@ -21,6 +21,7 @@ export type Translations = {
     managing: string;
     language: string;
     chooseLanguage: string;
+    choosePlace: string;
     close: string;
     signOut: string;
     navDonations: string;
@@ -264,6 +265,7 @@ const en: Translations = {
     managing: 'Managing',
     language: 'Language',
     chooseLanguage: 'Choose a language',
+    choosePlace: 'Choose a place',
     close: 'Close',
     signOut: 'Sign out',
     navDonations: 'Donations',
@@ -508,6 +510,7 @@ const es: Translations = {
     managing: 'Administrando',
     language: 'Idioma',
     chooseLanguage: 'Elige un idioma',
+    choosePlace: 'Elige un lugar',
     close: 'Cerrar',
     signOut: 'Cerrar sesión',
     navDonations: 'Donaciones',
@@ -752,6 +755,7 @@ const fr: Translations = {
     managing: 'Gestion de',
     language: 'Langue',
     chooseLanguage: 'Choisissez une langue',
+    choosePlace: 'Choisissez un lieu',
     close: 'Fermer',
     signOut: 'Se déconnecter',
     navDonations: 'Dons',
