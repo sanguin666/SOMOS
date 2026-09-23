@@ -72,6 +72,10 @@ export type Translations = {
     homeLabel: string;
     moreLabel: string;
     switchPlace: string;
+    requestsLabel: string;
+    massIntentionsLabel: string;
+    celebrationTimes: string;
+    nextMass: string;
   };
   more: {
     title: string;
@@ -140,6 +144,35 @@ export type Translations = {
     confirmation: string;
     demoConfirmation: string;
     doneButton: string;
+    purposeLabel: string;
+    purposeGeneral: string;
+    purposeCollection: string;
+    purposeCollectionHint: string;
+    campaignProgress: string;
+    frequencyLabel: string;
+    once: string;
+    monthly: string;
+    monthlyHint: string;
+    monthlySignIn: string;
+    receiptToggle: string;
+    receiptHint: string;
+    nameLabel: string;
+    addressLabel: string;
+    postalCodeLabel: string;
+    cityLabel: string;
+    taxIdLabel: string;
+    donateMonthlyButton: string;
+    monthlyConfirmation: string;
+    myMonthly: string;
+    monthlyAmount: string;
+    since: string;
+    stopMonthly: string;
+    stopQuestion: string;
+    stopConfirm: string;
+    stopKeep: string;
+    myReceipts: string;
+    openReceipt: string;
+    receiptFor: string;
   };
   events: {
     title: string;
@@ -223,6 +256,109 @@ export type Translations = {
     replyButton: string;
     replyingButton: string;
   };
+  schedule: {
+    everyWeek: string;
+    comingUp: string;
+    today: string;
+    tomorrow: string;
+    category_mass: string;
+    category_confession: string;
+    category_adoration: string;
+    category_prayer: string;
+    category_office_hours: string;
+    category_other: string;
+  };
+  requests: {
+    title: string;
+    subtitle: string;
+    newButton: string;
+    empty: string;
+    error: string;
+    type_baptism: string;
+    type_wedding: string;
+    type_funeral: string;
+    type_first_communion: string;
+    type_confirmation: string;
+    type_certificate: string;
+    type_meeting: string;
+    type_blessing: string;
+    type_sick_visit: string;
+    type_other: string;
+    status_received: string;
+    status_in_progress: string;
+    status_appointment_set: string;
+    status_completed: string;
+    status_cancelled: string;
+    unread: string;
+    documentsPendingOne: string;
+    documentsPendingMany: string;
+    sentOn: string;
+    newTitle: string;
+    chooseType: string;
+    nameLabel: string;
+    phoneLabel: string;
+    dateLabel: string;
+    datePlaceholder: string;
+    detailsLabel: string;
+    detailsPlaceholder: string;
+    send: string;
+    sending: string;
+    actionError: string;
+    appointment: string;
+    documents: string;
+    doc_pending: string;
+    doc_sent: string;
+    doc_received: string;
+    sendPhoto: string;
+    sendAnother: string;
+    takePhoto: string;
+    choosePhoto: string;
+    cancelChoice: string;
+    openFile: string;
+    yourRequest: string;
+    preferredDate: string;
+    messages: string;
+    noMessages: string;
+    office: string;
+    you: string;
+    messageLabel: string;
+    attach: string;
+    photo: string;
+    removeAttachment: string;
+    sendMessage: string;
+    cancelRequest: string;
+    cancelQuestion: string;
+    cancelConfirm: string;
+    cancelKeep: string;
+    permissionDenied: string;
+  };
+  intentions: {
+    title: string;
+    subtitle: string;
+    intentionLabel: string;
+    intentionPlaceholder: string;
+    nameLabel: string;
+    contactLabel: string;
+    whichMass: string;
+    whenever: string;
+    offering: string;
+    offeringFixed: string;
+    offeringNone: string;
+    noOffering: string;
+    submit: string;
+    submitWithOffering: string;
+    error: string;
+    payingTitle: string;
+    thankYou: string;
+    confirmedFor: string;
+    confirmedWhenever: string;
+    another: string;
+    mine: string;
+    status_pending_payment: string;
+    status_confirmed: string;
+    status_celebrated: string;
+    status_cancelled: string;
+  };
 };
 
 const en: Translations = {
@@ -290,6 +426,10 @@ const en: Translations = {
     homeLabel: 'Home',
     moreLabel: 'More',
     switchPlace: 'Change place',
+    requestsLabel: 'Requests',
+    massIntentionsLabel: 'Intentions',
+    celebrationTimes: 'Celebration times',
+    nextMass: 'Next Mass',
   },
   more: {
     title: 'More',
@@ -360,6 +500,35 @@ const en: Translations = {
     demoConfirmation:
       'This is a demo — no real payment was made. A donation of {{amount}} to {{poiName}} was recorded.',
     doneButton: 'Done',
+    purposeLabel: 'WHAT IS IT FOR?',
+    purposeGeneral: 'Where it is most needed',
+    purposeCollection: 'The collection',
+    purposeCollectionHint: 'Your part of the Sunday collection, from wherever you are.',
+    campaignProgress: '{{raised}} raised of {{goal}}',
+    frequencyLabel: 'HOW OFTEN?',
+    once: 'Once',
+    monthly: 'Every month',
+    monthlyHint: 'Taken each month by card. You can stop it here at any time.',
+    monthlySignIn: 'Sign in to give every month, so you can stop it whenever you like.',
+    receiptToggle: 'I would like a tax receipt',
+    receiptHint: 'One receipt a year, adding up all your gifts.',
+    nameLabel: 'Full name',
+    addressLabel: 'Address',
+    postalCodeLabel: 'Postcode',
+    cityLabel: 'Town or city',
+    taxIdLabel: 'Tax number (optional)',
+    donateMonthlyButton: 'Give {{amount}} a month',
+    monthlyConfirmation: 'Your gift of {{amount}} a month to {{poiName}} is set up. Thank you for your faithfulness.',
+    myMonthly: 'MY MONTHLY GIFTS',
+    monthlyAmount: '{{amount}} a month',
+    since: 'since {{date}}',
+    stopMonthly: 'Stop this monthly gift',
+    stopQuestion: 'Stop giving every month?',
+    stopConfirm: 'Yes, stop it',
+    stopKeep: 'No, keep it',
+    myReceipts: 'MY TAX RECEIPTS',
+    openReceipt: 'Open',
+    receiptFor: 'Receipt for {{year}}, {{amount}}',
   },
   events: {
     title: 'Events',
@@ -443,6 +612,109 @@ const en: Translations = {
     replyButton: 'Reply',
     replyingButton: 'Replying…',
   },
+  schedule: {
+    everyWeek: 'EVERY WEEK',
+    comingUp: 'COMING UP',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+    category_mass: 'Masses',
+    category_confession: 'Confessions',
+    category_adoration: 'Adoration',
+    category_prayer: 'Prayer',
+    category_office_hours: 'Office hours',
+    category_other: 'Also every week',
+  },
+  requests: {
+    title: 'Requests',
+    subtitle: 'Ask the office for a sacrament, a certificate or a meeting, and follow it here.',
+    newButton: 'Make a request',
+    empty: 'You have not made any request yet.',
+    error: 'Could not load your requests. Please try again.',
+    type_baptism: 'Baptism',
+    type_wedding: 'Wedding',
+    type_funeral: 'Funeral',
+    type_first_communion: 'First Communion',
+    type_confirmation: 'Confirmation',
+    type_certificate: 'A certificate (baptism, marriage…)',
+    type_meeting: 'Meet a priest',
+    type_blessing: 'A blessing (home, object)',
+    type_sick_visit: 'Visit someone who is ill',
+    type_other: 'Something else',
+    status_received: 'Received',
+    status_in_progress: 'In progress',
+    status_appointment_set: 'Appointment set',
+    status_completed: 'Completed',
+    status_cancelled: 'Cancelled',
+    unread: 'New reply from the office',
+    documentsPendingOne: '1 document to send',
+    documentsPendingMany: '{{count}} documents to send',
+    sentOn: 'Sent on {{date}}',
+    newTitle: 'New request',
+    chooseType: 'WHAT IS IT FOR?',
+    nameLabel: 'Your name',
+    phoneLabel: 'Phone, to call you back',
+    dateLabel: 'Preferred date (optional)',
+    datePlaceholder: 'e.g. a Saturday in June',
+    detailsLabel: 'Tell us more',
+    detailsPlaceholder: 'Who it is for, and anything the office should know',
+    send: 'Send the request',
+    sending: 'Sending…',
+    actionError: 'That did not work. Please try again.',
+    appointment: 'YOUR APPOINTMENT',
+    documents: 'DOCUMENTS REQUESTED',
+    doc_pending: 'To send',
+    doc_sent: 'Sent, waiting for the office',
+    doc_received: 'Received',
+    sendPhoto: 'Send a photo',
+    sendAnother: 'Send another photo',
+    takePhoto: 'Take a photo',
+    choosePhoto: 'Choose a photo',
+    cancelChoice: 'Cancel',
+    openFile: 'Open {{name}}',
+    yourRequest: 'YOUR REQUEST',
+    preferredDate: 'Preferred date: {{date}}',
+    messages: 'MESSAGES',
+    noMessages: 'No messages yet. The office will write to you here.',
+    office: 'The office',
+    you: 'You',
+    messageLabel: 'Write to the office',
+    attach: 'Attach a photo',
+    photo: 'Photo',
+    removeAttachment: 'Remove the photo',
+    sendMessage: 'Send',
+    cancelRequest: 'Cancel this request',
+    cancelQuestion: 'Cancel this request?',
+    cancelConfirm: 'Yes, cancel it',
+    cancelKeep: 'No, keep it',
+    permissionDenied: 'ANSAE needs access to your photos or camera for this. You can allow it in your phone’s settings.',
+  },
+  intentions: {
+    title: 'Mass intentions',
+    subtitle: 'Ask for a Mass to be offered for someone: a loved one who has died, someone who is ill, a thanksgiving.',
+    intentionLabel: 'For whom, or for what?',
+    intentionPlaceholder: 'e.g. For the repose of the soul of Jean Martin',
+    nameLabel: 'Your name',
+    contactLabel: 'Phone or email (optional)',
+    whichMass: 'WHICH MASS?',
+    whenever: 'Whenever the community can',
+    offering: 'OFFERING',
+    offeringFixed: 'The offering asked by the community is {{amount}}, paid by card.',
+    offeringNone: 'The community asks for no offering.',
+    noOffering: 'No offering',
+    submit: 'Send the intention',
+    submitWithOffering: 'Send, with {{amount}}',
+    error: 'The intention could not be sent. Please try again.',
+    payingTitle: 'Complete your offering',
+    thankYou: 'Thank you',
+    confirmedFor: 'Your intention will be prayed at the Mass on {{when}}.',
+    confirmedWhenever: 'Your intention has been received. The community will choose the Mass.',
+    another: 'Ask for another intention',
+    mine: 'MY INTENTIONS',
+    status_pending_payment: 'Waiting for payment',
+    status_confirmed: 'Planned',
+    status_celebrated: 'Celebrated',
+    status_cancelled: 'Cancelled',
+  },
 };
 
 const es: Translations = {
@@ -510,6 +782,10 @@ const es: Translations = {
     homeLabel: 'Inicio',
     moreLabel: 'Más',
     switchPlace: 'Cambiar de lugar',
+    requestsLabel: 'Solicitudes',
+    massIntentionsLabel: 'Intenciones',
+    celebrationTimes: 'Horarios de celebraciones',
+    nextMass: 'Próxima misa',
   },
   more: {
     title: 'Más',
@@ -580,6 +856,35 @@ const es: Translations = {
     demoConfirmation:
       'Esto es una demostración: no se realizó ningún pago real. Se registró un donativo de {{amount}} para {{poiName}}.',
     doneButton: 'Listo',
+    purposeLabel: '¿PARA QUÉ?',
+    purposeGeneral: 'Donde más se necesite',
+    purposeCollection: 'La colecta',
+    purposeCollectionHint: 'Tu parte de la colecta del domingo, estés donde estés.',
+    campaignProgress: '{{raised}} recaudados de {{goal}}',
+    frequencyLabel: '¿CON QUÉ FRECUENCIA?',
+    once: 'Una vez',
+    monthly: 'Cada mes',
+    monthlyHint: 'Se cobra cada mes con tarjeta. Puedes pararlo aquí cuando quieras.',
+    monthlySignIn: 'Inicia sesión para donar cada mes y poder pararlo cuando quieras.',
+    receiptToggle: 'Quiero un certificado fiscal',
+    receiptHint: 'Un certificado al año con todos tus donativos.',
+    nameLabel: 'Nombre y apellidos',
+    addressLabel: 'Dirección',
+    postalCodeLabel: 'Código postal',
+    cityLabel: 'Localidad',
+    taxIdLabel: 'NIF (necesario para la deducción)',
+    donateMonthlyButton: 'Donar {{amount}} al mes',
+    monthlyConfirmation: 'Tu donativo de {{amount}} al mes para {{poiName}} está en marcha. Gracias por tu fidelidad.',
+    myMonthly: 'MIS DONATIVOS MENSUALES',
+    monthlyAmount: '{{amount}} al mes',
+    since: 'desde {{date}}',
+    stopMonthly: 'Parar este donativo mensual',
+    stopQuestion: '¿Dejar de donar cada mes?',
+    stopConfirm: 'Sí, pararlo',
+    stopKeep: 'No, mantenerlo',
+    myReceipts: 'MIS CERTIFICADOS',
+    openReceipt: 'Abrir',
+    receiptFor: 'Certificado de {{year}}, {{amount}}',
   },
   events: {
     title: 'Eventos',
@@ -663,6 +968,109 @@ const es: Translations = {
     replyButton: 'Responder',
     replyingButton: 'Respondiendo…',
   },
+  schedule: {
+    everyWeek: 'CADA SEMANA',
+    comingUp: 'PRÓXIMAMENTE',
+    today: 'Hoy',
+    tomorrow: 'Mañana',
+    category_mass: 'Misas',
+    category_confession: 'Confesiones',
+    category_adoration: 'Adoración',
+    category_prayer: 'Oración',
+    category_office_hours: 'Horario de despacho',
+    category_other: 'También cada semana',
+  },
+  requests: {
+    title: 'Solicitudes',
+    subtitle: 'Pide al despacho un sacramento, un certificado o una cita, y síguelo aquí.',
+    newButton: 'Hacer una solicitud',
+    empty: 'Todavía no has hecho ninguna solicitud.',
+    error: 'No se pudieron cargar tus solicitudes. Inténtalo de nuevo.',
+    type_baptism: 'Bautizo',
+    type_wedding: 'Boda',
+    type_funeral: 'Funeral',
+    type_first_communion: 'Primera comunión',
+    type_confirmation: 'Confirmación',
+    type_certificate: 'Un certificado (bautismo, matrimonio…)',
+    type_meeting: 'Hablar con un sacerdote',
+    type_blessing: 'Una bendición (casa, objeto)',
+    type_sick_visit: 'Visitar a un enfermo',
+    type_other: 'Otra cosa',
+    status_received: 'Recibida',
+    status_in_progress: 'En curso',
+    status_appointment_set: 'Cita fijada',
+    status_completed: 'Completada',
+    status_cancelled: 'Cancelada',
+    unread: 'Nueva respuesta del despacho',
+    documentsPendingOne: '1 documento por enviar',
+    documentsPendingMany: '{{count}} documentos por enviar',
+    sentOn: 'Enviada el {{date}}',
+    newTitle: 'Nueva solicitud',
+    chooseType: '¿PARA QUÉ ES?',
+    nameLabel: 'Tu nombre',
+    phoneLabel: 'Teléfono, para llamarte',
+    dateLabel: 'Fecha deseada (opcional)',
+    datePlaceholder: 'p. ej. un sábado de junio',
+    detailsLabel: 'Cuéntanos más',
+    detailsPlaceholder: 'Para quién es y lo que el despacho debe saber',
+    send: 'Enviar la solicitud',
+    sending: 'Enviando…',
+    actionError: 'No ha funcionado. Inténtalo de nuevo.',
+    appointment: 'TU CITA',
+    documents: 'DOCUMENTOS SOLICITADOS',
+    doc_pending: 'Por enviar',
+    doc_sent: 'Enviado, pendiente del despacho',
+    doc_received: 'Recibido',
+    sendPhoto: 'Enviar una foto',
+    sendAnother: 'Enviar otra foto',
+    takePhoto: 'Hacer una foto',
+    choosePhoto: 'Elegir una foto',
+    cancelChoice: 'Cancelar',
+    openFile: 'Abrir {{name}}',
+    yourRequest: 'TU SOLICITUD',
+    preferredDate: 'Fecha deseada: {{date}}',
+    messages: 'MENSAJES',
+    noMessages: 'Todavía no hay mensajes. El despacho te escribirá aquí.',
+    office: 'El despacho',
+    you: 'Tú',
+    messageLabel: 'Escribir al despacho',
+    attach: 'Adjuntar una foto',
+    photo: 'Foto',
+    removeAttachment: 'Quitar la foto',
+    sendMessage: 'Enviar',
+    cancelRequest: 'Cancelar esta solicitud',
+    cancelQuestion: '¿Cancelar esta solicitud?',
+    cancelConfirm: 'Sí, cancelarla',
+    cancelKeep: 'No, mantenerla',
+    permissionDenied: 'ANSAE necesita acceso a tus fotos o a la cámara. Puedes permitirlo en los ajustes del teléfono.',
+  },
+  intentions: {
+    title: 'Intenciones de misa',
+    subtitle: 'Pide que se ofrezca una misa por alguien: un ser querido fallecido, un enfermo, una acción de gracias.',
+    intentionLabel: '¿Por quién o por qué?',
+    intentionPlaceholder: 'p. ej. Por el eterno descanso de Juan García',
+    nameLabel: 'Tu nombre',
+    contactLabel: 'Teléfono o correo (opcional)',
+    whichMass: '¿EN QUÉ MISA?',
+    whenever: 'Cuando la comunidad pueda',
+    offering: 'OFRENDA',
+    offeringFixed: 'La ofrenda que pide la comunidad es de {{amount}}, con tarjeta.',
+    offeringNone: 'La comunidad no pide ofrenda.',
+    noOffering: 'Sin ofrenda',
+    submit: 'Enviar la intención',
+    submitWithOffering: 'Enviar, con {{amount}}',
+    error: 'No se pudo enviar la intención. Inténtalo de nuevo.',
+    payingTitle: 'Completa tu ofrenda',
+    thankYou: 'Gracias',
+    confirmedFor: 'Tu intención se rezará en la misa del {{when}}.',
+    confirmedWhenever: 'Tu intención se ha recibido. La comunidad elegirá la misa.',
+    another: 'Pedir otra intención',
+    mine: 'MIS INTENCIONES',
+    status_pending_payment: 'Pendiente de pago',
+    status_confirmed: 'Prevista',
+    status_celebrated: 'Celebrada',
+    status_cancelled: 'Cancelada',
+  },
 };
 
 const fr: Translations = {
@@ -730,6 +1138,10 @@ const fr: Translations = {
     homeLabel: 'Accueil',
     moreLabel: 'Plus',
     switchPlace: 'Changer de lieu',
+    requestsLabel: 'Demandes',
+    massIntentionsLabel: 'Intentions',
+    celebrationTimes: 'Horaires des célébrations',
+    nextMass: 'Prochaine messe',
   },
   more: {
     title: 'Plus',
@@ -800,6 +1212,35 @@ const fr: Translations = {
     demoConfirmation:
       "Ceci est une démonstration — aucun paiement réel n'a été effectué. Un don de {{amount}} pour {{poiName}} a été enregistré.",
     doneButton: 'Terminé',
+    purposeLabel: 'POUR QUOI ?',
+    purposeGeneral: 'Là où c’est le plus utile',
+    purposeCollection: 'La quête',
+    purposeCollectionHint: 'Votre part de la quête du dimanche, où que vous soyez.',
+    campaignProgress: '{{raised}} collectés sur {{goal}}',
+    frequencyLabel: 'À QUEL RYTHME ?',
+    once: 'Une fois',
+    monthly: 'Chaque mois',
+    monthlyHint: 'Prélevé chaque mois par carte. Vous pouvez l’arrêter ici à tout moment.',
+    monthlySignIn: 'Connectez-vous pour donner chaque mois et pouvoir l’arrêter quand vous voulez.',
+    receiptToggle: 'Je souhaite un reçu fiscal',
+    receiptHint: 'Un reçu par an, qui additionne tous vos dons.',
+    nameLabel: 'Nom et prénom',
+    addressLabel: 'Adresse',
+    postalCodeLabel: 'Code postal',
+    cityLabel: 'Ville',
+    taxIdLabel: 'N° fiscal (facultatif)',
+    donateMonthlyButton: 'Donner {{amount}} par mois',
+    monthlyConfirmation: 'Votre don de {{amount}} par mois à {{poiName}} est en place. Merci pour votre fidélité.',
+    myMonthly: 'MES DONS MENSUELS',
+    monthlyAmount: '{{amount}} par mois',
+    since: 'depuis {{date}}',
+    stopMonthly: 'Arrêter ce don mensuel',
+    stopQuestion: 'Arrêter le don mensuel ?',
+    stopConfirm: 'Oui, l’arrêter',
+    stopKeep: 'Non, le garder',
+    myReceipts: 'MES REÇUS FISCAUX',
+    openReceipt: 'Ouvrir',
+    receiptFor: 'Reçu {{year}}, {{amount}}',
   },
   events: {
     title: 'Événements',
@@ -882,6 +1323,109 @@ const fr: Translations = {
     namePlaceholder: 'Votre nom (facultatif)',
     replyButton: 'Répondre',
     replyingButton: 'Envoi…',
+  },
+  schedule: {
+    everyWeek: 'CHAQUE SEMAINE',
+    comingUp: 'À VENIR',
+    today: 'Aujourd’hui',
+    tomorrow: 'Demain',
+    category_mass: 'Messes',
+    category_confession: 'Confessions',
+    category_adoration: 'Adoration',
+    category_prayer: 'Prière',
+    category_office_hours: 'Accueil',
+    category_other: 'Aussi chaque semaine',
+  },
+  requests: {
+    title: 'Demandes',
+    subtitle: 'Demandez un sacrement, un certificat ou un rendez-vous, et suivez-le ici.',
+    newButton: 'Faire une demande',
+    empty: 'Vous n’avez encore fait aucune demande.',
+    error: 'Impossible de charger vos demandes. Réessayez.',
+    type_baptism: 'Baptême',
+    type_wedding: 'Mariage',
+    type_funeral: 'Obsèques',
+    type_first_communion: 'Première communion',
+    type_confirmation: 'Confirmation',
+    type_certificate: 'Un certificat (baptême, mariage…)',
+    type_meeting: 'Rencontrer un prêtre',
+    type_blessing: 'Une bénédiction (maison, objet)',
+    type_sick_visit: 'Visite à un malade',
+    type_other: 'Autre demande',
+    status_received: 'Reçue',
+    status_in_progress: 'En cours',
+    status_appointment_set: 'Rendez-vous fixé',
+    status_completed: 'Terminée',
+    status_cancelled: 'Annulée',
+    unread: 'Nouvelle réponse de l’accueil',
+    documentsPendingOne: '1 document à fournir',
+    documentsPendingMany: '{{count}} documents à fournir',
+    sentOn: 'Envoyée le {{date}}',
+    newTitle: 'Nouvelle demande',
+    chooseType: 'C’EST POUR QUOI ?',
+    nameLabel: 'Votre nom',
+    phoneLabel: 'Téléphone, pour vous rappeler',
+    dateLabel: 'Date souhaitée (facultatif)',
+    datePlaceholder: 'ex. un samedi de juin',
+    detailsLabel: 'Précisez votre demande',
+    detailsPlaceholder: 'Pour qui, et ce que l’accueil doit savoir',
+    send: 'Envoyer la demande',
+    sending: 'Envoi…',
+    actionError: 'Cela n’a pas marché. Réessayez.',
+    appointment: 'VOTRE RENDEZ-VOUS',
+    documents: 'PIÈCES DEMANDÉES',
+    doc_pending: 'À fournir',
+    doc_sent: 'Envoyé, en attente de l’accueil',
+    doc_received: 'Reçu',
+    sendPhoto: 'Envoyer une photo',
+    sendAnother: 'Envoyer une autre photo',
+    takePhoto: 'Prendre une photo',
+    choosePhoto: 'Choisir une photo',
+    cancelChoice: 'Annuler',
+    openFile: 'Ouvrir {{name}}',
+    yourRequest: 'VOTRE DEMANDE',
+    preferredDate: 'Date souhaitée : {{date}}',
+    messages: 'MESSAGES',
+    noMessages: 'Pas encore de message. L’accueil vous écrira ici.',
+    office: 'L’accueil',
+    you: 'Vous',
+    messageLabel: 'Écrire à l’accueil',
+    attach: 'Joindre une photo',
+    photo: 'Photo',
+    removeAttachment: 'Retirer la photo',
+    sendMessage: 'Envoyer',
+    cancelRequest: 'Annuler cette demande',
+    cancelQuestion: 'Annuler cette demande ?',
+    cancelConfirm: 'Oui, l’annuler',
+    cancelKeep: 'Non, la garder',
+    permissionDenied: 'ANSAE a besoin d’accéder à vos photos ou à l’appareil photo. Vous pouvez l’autoriser dans les réglages du téléphone.',
+  },
+  intentions: {
+    title: 'Intentions de messe',
+    subtitle: 'Faites célébrer une messe pour quelqu’un : un défunt, un malade, une action de grâce.',
+    intentionLabel: 'Pour qui, ou pour quoi ?',
+    intentionPlaceholder: 'ex. Pour le repos de l’âme de Jean Martin',
+    nameLabel: 'Votre nom',
+    contactLabel: 'Téléphone ou e-mail (facultatif)',
+    whichMass: 'À QUELLE MESSE ?',
+    whenever: 'Dès que la communauté le peut',
+    offering: 'OFFRANDE',
+    offeringFixed: 'L’offrande demandée par la communauté est de {{amount}}, réglée par carte.',
+    offeringNone: 'La communauté ne demande pas d’offrande.',
+    noOffering: 'Sans offrande',
+    submit: 'Envoyer l’intention',
+    submitWithOffering: 'Envoyer, avec {{amount}}',
+    error: 'L’intention n’a pas pu être envoyée. Réessayez.',
+    payingTitle: 'Réglez votre offrande',
+    thankYou: 'Merci',
+    confirmedFor: 'Votre intention sera portée à la messe du {{when}}.',
+    confirmedWhenever: 'Votre intention est bien reçue. La communauté choisira la messe.',
+    another: 'Demander une autre intention',
+    mine: 'MES INTENTIONS',
+    status_pending_payment: 'En attente de paiement',
+    status_confirmed: 'Prévue',
+    status_celebrated: 'Célébrée',
+    status_cancelled: 'Annulée',
   },
 };
 

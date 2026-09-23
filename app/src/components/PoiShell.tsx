@@ -7,8 +7,10 @@ import {
   BackChevronIcon,
   CalendarIcon,
   CandleIcon,
+  ChaliceIcon,
   ChatBubbleIcon,
   ChevronDownIcon,
+  ClipboardIcon,
   HeartIcon,
   HomeIcon,
   LogoMark,
@@ -47,6 +49,8 @@ const DEFAULT_MENU_ORDER: ModuleType[] = [
   'events',
   'announcements',
   'donations',
+  'requests',
+  'mass_intentions',
   'prayer_requests',
   'community',
   'livestreams',
@@ -282,6 +286,10 @@ function describe(tab: HubTab, t: Translate): Described {
       return { icon: (c) => <CandleIcon size={24} color={c} />, label: t('hub.prayerRequestsLabel') };
     case 'community':
       return { icon: (c) => <ChatBubbleIcon size={24} color={c} />, label: t('hub.communityLabel') };
+    case 'requests':
+      return { icon: (c) => <ClipboardIcon size={24} color={c} />, label: t('hub.requestsLabel') };
+    case 'mass_intentions':
+      return { icon: (c) => <ChaliceIcon size={24} color={c} />, label: t('hub.massIntentionsLabel') };
     case 'more':
       return { icon: (c) => <MoreDotsIcon size={24} color={c} />, label: t('hub.moreLabel') };
   }

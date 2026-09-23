@@ -21,11 +21,13 @@ export const PRIVATE_UPLOADS_ROOT = process.env.PRIVATE_UPLOADS_DIR
 
 export function privateDiskStorage(subfolder: string): StorageEngine {
   const dir = join(PRIVATE_UPLOADS_ROOT, subfolder);
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
   return diskStorage({
-    destination: dir,
+    // Made on each upload rather than once at start-up, so a folder
+    // cleared while the server runs costs nothing but a mkdir.
+    destination: (_req, _file, callback) => {
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+      callback(null, dir);
+    },
     filename: (_req, file, callback) => {
       callback(null, `${randomUUID()}${extname(file.originalname).toLowerCase()}`);
     },

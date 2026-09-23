@@ -328,6 +328,22 @@ a {
   color: #8a8175;
 }
 
+/* A row of a form that is read, not typed into: the value keeps the
+   size and colour of a typed one. */
+.form-row-value {
+  font-size: 19px;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  padding: 4px 0;
+}
+
+/* A form that follows a list of rows in the same white card: a hairline
+   between the two, never a second box. */
+.form-after-rows {
+  margin-top: 12px;
+  border-top: 1px solid var(--color-card-border);
+}
+
 .form textarea {
   resize: vertical;
   min-height: 96px;
@@ -421,6 +437,12 @@ select {
 .btn-icon {
   width: 48px;
   padding: 0;
+}
+
+/* A link that leads somewhere (back to a list, a receipt, a file to
+   download) dressed as one of the buttons above. */
+a.btn {
+  text-decoration: none;
 }
 
 .error-text {
@@ -793,6 +815,22 @@ select {
   border-bottom: none;
 }
 
+/* A campaign's way to its goal: a line, not a box — the fill in the
+   chart's orange over the hairline colour. */
+.progress {
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
+  background: var(--color-card-border);
+  overflow: hidden;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--series-1);
+}
+
 .donation-amount {
   font-weight: 700;
   font-variant-numeric: proportional-nums;
@@ -882,5 +920,51 @@ select {
   .qr-flyer-code {
     width: 320px;
     height: 320px;
+  }
+}
+
+/* ---------- Printing a register (Mass intentions) ---------- */
+
+/* Only what sits in .print-area goes on paper: the sidebar, the forms and
+   the buttons (.no-print) are taken out of the page rather than hidden, so
+   no blank sheets come out after the list. The white boxes lose their
+   edges on paper; the celebrations are split by their headings. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  .sidebar,
+  .no-print {
+    display: none !important;
+  }
+  .main {
+    padding: 0;
+    max-width: none;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-only {
+    display: block;
+  }
+  .print-area .card {
+    border: none;
+    border-radius: 0;
+    padding: 0 0 12px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .print-area .card-title {
+    font-size: 16pt;
+    border-bottom: 1px solid #111;
+    padding-bottom: 4px;
+  }
+  .print-area .card-row {
+    padding: 8px 0;
   }
 }

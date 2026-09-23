@@ -8,6 +8,8 @@ import { getPoiPageBlocks } from '../api/poiPage';
 import { getAnnouncements } from '../api/announcements';
 import { getEvents } from '../api/events';
 import { getLivestreams } from '../api/livestreams';
+import { TimetableRows } from '../components/Timetable';
+import { formatWhen, isWeekly, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
 import type {
   ActiveModule,
   Announcement,
@@ -34,6 +36,15 @@ type Props = {
 // as a starting point, so a POI can adopt it and then edit it.
 const DEFAULT_BLOCKS: PoiPageBlock[] = [
   {
+    id: 'default:celebration-times',
+    type: 'celebration_times',
+    position: 0,
+    title: null,
+    body: null,
+    imageUrl: null,
+    itemCount: 1,
+  },
+  {
     id: 'default:next-events',
     type: 'next_events',
     position: 0,
@@ -55,6 +66,7 @@ const DEFAULT_BLOCKS: PoiPageBlock[] = [
 
 // A live block is only worth rendering while the module behind it is on.
 const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
+  celebration_times: 'events',
   next_events: 'events',
   past_events: 'events',
   latest_announcements: 'announcements',
@@ -73,7 +85,7 @@ function formatShortDate(iso: string) {
  * before they pick anything from the menu.
  */
 export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
   const [blocks, setBlocks] = useState<PoiPageBlock[] | null>(null);
@@ -108,7 +120,9 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
     const required = BLOCK_MODULE[block.type];
     return !required || isLive(required);
   });
-  const needsEvents = visible.some((b) => b.type === 'next_events' || b.type === 'past_events');
+  const needsEvents = visible.some(
+    (b) => b.type === 'celebration_times' || b.type === 'next_events' || b.type === 'past_events',
+  );
   const needsAnnouncements = visible.some((b) => b.type === 'latest_announcements');
   const needsLivestreams = visible.some((b) => b.type === 'next_livestream');
 
@@ -168,10 +182,14 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
   }
 
   const now = Date.now();
-  const upcoming = (events ?? [])
+  // The next and past event blocks are for one-off events. The weekly
+  // ones have the timetable block, and would otherwise sit in "past"
+  // forever, their first occurrence being long gone.
+  const oneOffs = (events ?? []).filter((e) => !isWeekly(e));
+  const upcoming = oneOffs
     .filter((e) => new Date(e.startsAt).getTime() >= now)
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const past = (events ?? [])
+  const past = oneOffs
     .filter((e) => new Date(e.startsAt).getTime() < now)
     .sort((a, b) => b.startsAt.localeCompare(a.startsAt));
   // The API returns livestreams newest-scheduled first, so the last
@@ -213,6 +231,59 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
                 )}
               </View>
             );
+
+          case 'celebration_times': {
+            // Succinct by design: the next Mass, then the week's Masses
+            // in a few lines. Confessions and the rest are one tap away.
+            const today = new Date(now);
+            const timetable = weeklyTimetable(events ?? [], today);
+            const [nextMass] = upcomingOccurrences(events ?? [], today, 1, (e) => e.category === 'mass');
+            const massTimes = timetable.find((section) => section.category === 'mass');
+            if (!nextMass && !massTimes) return null;
+            return (
+              <View key={block.id} style={styles.section}>
+                <SectionHeader
+                  label={block.title || t('hub.celebrationTimes')}
+                  accent={poiTheme.accentStrong}
+                  onSeeAll={() => onSelectTab('events')}
+                  seeAllLabel={t('hub.seeAll')}
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    nextMass
+                      ? `${t('hub.nextMass')}: ${formatWhen(nextMass.startsAt, today, language, {
+                          today: t('schedule.today'),
+                          tomorrow: t('schedule.tomorrow'),
+                        })}`
+                      : t('hub.celebrationTimes')
+                  }
+                  onPress={() => onSelectTab('events')}
+                  style={styles.timesCard}
+                >
+                  {nextMass && (
+                    <View style={styles.nextMass}>
+                      <AccessibleText variant="caption" color={poiTheme.accentStrong} style={styles.nextMassLabel}>
+                        {t('hub.nextMass')}
+                      </AccessibleText>
+                      <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+                        {formatWhen(nextMass.startsAt, today, language, {
+                          today: t('schedule.today'),
+                          tomorrow: t('schedule.tomorrow'),
+                        })}
+                      </AccessibleText>
+                      {!!(nextMass.event.location || nextMass.event.title) && (
+                        <AccessibleText variant="caption" color={colors.textMuted}>
+                          {[nextMass.event.title, nextMass.event.location].filter(Boolean).join(' · ')}
+                        </AccessibleText>
+                      )}
+                    </View>
+                  )}
+                  {massTimes && <TimetableRows rows={massTimes.rows} />}
+                </Pressable>
+              </View>
+            );
+          }
 
           case 'next_events':
           case 'past_events': {
@@ -405,6 +476,21 @@ const styles = StyleSheet.create({
     aspectRatio: 16 / 9,
     borderRadius: radii.lg,
     ...cardSurface,
+  },
+  timesCard: {
+    ...cardSurface,
+    borderRadius: radii.lg,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xs,
+  },
+  nextMass: {
+    paddingVertical: spacing.md,
+    gap: 2,
+  },
+  nextMassLabel: {
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   sectionHeader: {
     flexDirection: 'row',

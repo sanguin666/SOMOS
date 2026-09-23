@@ -5,9 +5,11 @@ import { AccessibleText } from '../components/AccessibleText';
 import {
   CalendarIcon,
   CandleIcon,
+  ChaliceIcon,
   ChatBubbleIcon,
   CheckIcon,
   ChevronRightIcon,
+  ClipboardIcon,
   ExitIcon,
   GlobeIcon,
   HeartIcon,
@@ -298,6 +300,10 @@ function moduleLabel(type: ModuleType, t: ReturnType<typeof useI18n>['t']): stri
       return t('announcements.title');
     case 'donations':
       return t('hub.donationsLabel');
+    case 'requests':
+      return t('requests.title');
+    case 'mass_intentions':
+      return t('intentions.title');
   }
 }
 
@@ -315,6 +321,10 @@ function moduleIcon(type: ModuleType): (color: string) => ReactNode {
       return (color) => <MegaphoneIcon size={26} color={color} />;
     case 'donations':
       return (color) => <HeartIcon size={26} color={color} />;
+    case 'requests':
+      return (color) => <ClipboardIcon size={26} color={color} />;
+    case 'mass_intentions':
+      return (color) => <ChaliceIcon size={26} color={color} />;
   }
 }
 

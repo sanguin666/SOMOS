@@ -403,3 +403,51 @@ export function GlobeIcon({ size = 24, color = '#111111' }: IconProps) {
     </Svg>
   );
 }
+
+// Requests to the office: a clipboard with a form on it.
+export function ClipboardIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Rect x={5} y={4} width={14} height={18} rx={2} stroke={color} strokeWidth={2} />
+      <Rect x={9} y={2} width={6} height={4} rx={1} stroke={color} strokeWidth={2} fill="#FFFFFF" />
+      <Line x1={8.5} y1={11} x2={15.5} y2={11} stroke={color} strokeWidth={2} strokeLinecap="round" />
+      <Line x1={8.5} y1={15} x2={13.5} y2={15} stroke={color} strokeWidth={2} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+// Mass intentions: a chalice with the host above it.
+export function ChaliceIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={4} r={2.2} stroke={color} strokeWidth={1.8} />
+      <Path d="M6 8.5h12c0 4-2.7 6.5-6 6.5s-6-2.5-6-6.5Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+      <Line x1={12} y1={15} x2={12} y2={20} stroke={color} strokeWidth={2} />
+      <Line x1={8} y1={21} x2={16} y2={21} stroke={color} strokeWidth={2} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function PaperclipIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M20.5 11.5 12.3 19.7a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// A paper still to hand in, or one handed in (with `done`).
+export function DocumentIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+      <Path d="M14 2v6h6" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+    </Svg>
+  );
+}

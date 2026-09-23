@@ -34,6 +34,8 @@ export type Translations = {
     navHomePage: string;
     navSettings: string;
     noAdminPois: string;
+    navRequests: string;
+    navMassIntentions: string;
   };
   donations: {
     title: string;
@@ -60,6 +62,12 @@ export type Translations = {
     anonymous: string;
     loadError: string;
     loading: string;
+    purposeGeneral: string;
+    purposeCollection: string;
+    purposeCampaign: string;
+    purposeCampaignNamed: string;
+    purposeMassIntention: string;
+    monthly: string;
   };
   events: {
     title: string;
@@ -80,6 +88,25 @@ export type Translations = {
     deleteError: string;
     loading: string;
     empty: string;
+    categoryLabel: string;
+    categoryMass: string;
+    categoryConfession: string;
+    categoryAdoration: string;
+    categoryPrayer: string;
+    categoryOfficeHours: string;
+    categoryOther: string;
+    recurrenceLabel: string;
+    recurrenceNone: string;
+    recurrenceWeekly: string;
+    firstStartsAtLabel: string;
+    endTimeLabel: string;
+    repeatUntilLabel: string;
+    everyWeekday: string;
+    fromDate: string;
+    untilDate: string;
+    weeklyHeading: string;
+    weeklyHint: string;
+    onceHeading: string;
   };
   announcements: {
     title: string;
@@ -168,6 +195,8 @@ export type Translations = {
     prayerRequests: string;
     livestream: string;
     community: string;
+    requests: string;
+    massIntentions: string;
   };
   menuOrder: {
     title: string;
@@ -229,6 +258,8 @@ export type Translations = {
     blockLatestAnnouncements: string;
     blockNextLivestream: string;
     blockDonate: string;
+    blockCelebrationTimes: string;
+    celebrationTimesNote: string;
   };
   qr: {
     title: string;
@@ -243,6 +274,184 @@ export type Translations = {
     print: string;
     previewTitle: string;
     scanHint: string;
+  };
+  requests: {
+    title: string;
+    subtitle: string;
+    filterLabel: string;
+    filterOpen: string;
+    filterClosed: string;
+    filterAll: string;
+    loading: string;
+    empty: string;
+    loadError: string;
+    loadOneError: string;
+    open: string;
+    askedOn: string;
+    appointmentOn: string;
+    unread: string;
+    documentsPendingOne: string;
+    documentsPendingMany: string;
+    backToList: string;
+    contactLabel: string;
+    accountLabel: string;
+    noName: string;
+    preferredDateLabel: string;
+    detailsLabel: string;
+    statusHeading: string;
+    statusLabel: string;
+    statusReceived: string;
+    statusInProgress: string;
+    statusAppointmentSet: string;
+    statusCompleted: string;
+    statusCancelled: string;
+    appointmentAtLabel: string;
+    appointmentPlaceLabel: string;
+    appointmentPlacePlaceholder: string;
+    statusHint: string;
+    save: string;
+    saving: string;
+    saved: string;
+    saveError: string;
+    documentsHeading: string;
+    noDocuments: string;
+    awaited: string;
+    receivedOn: string;
+    openFile: string;
+    markReceived: string;
+    markNotReceived: string;
+    removeDocument: string;
+    askHeading: string;
+    documentLabel: string;
+    documentPlaceholder: string;
+    documentNoteLabel: string;
+    ask: string;
+    asking: string;
+    documentError: string;
+    conversationHeading: string;
+    noMessages: string;
+    fromOffice: string;
+    office: string;
+    messageLabel: string;
+    attachmentLabel: string;
+    send: string;
+    sending: string;
+    sendHint: string;
+    sendError: string;
+    typeBaptism: string;
+    typeWedding: string;
+    typeFuneral: string;
+    typeFirstCommunion: string;
+    typeConfirmation: string;
+    typeCertificate: string;
+    typeMeeting: string;
+    typeBlessing: string;
+    typeSickVisit: string;
+    typeOther: string;
+  };
+  massIntentions: {
+    title: string;
+    subtitle: string;
+    addTitle: string;
+    intentionLabel: string;
+    intentionPlaceholder: string;
+    requesterNameLabel: string;
+    requesterContactLabel: string;
+    celebrationLabel: string;
+    noDate: string;
+    otherDate: string;
+    otherAtLabel: string;
+    otherTitleLabel: string;
+    otherTitlePlaceholder: string;
+    offeringReceivedLabel: string;
+    add: string;
+    adding: string;
+    addError: string;
+    registerTitle: string;
+    filterLabel: string;
+    filterUpcoming: string;
+    filterAll: string;
+    print: string;
+    printTitle: string;
+    loading: string;
+    empty: string;
+    loadError: string;
+    noDateHeading: string;
+    askedBy: string;
+    fromOffice: string;
+    fromApp: string;
+    statusCelebrated: string;
+    statusCancelled: string;
+    markCelebrated: string;
+    markAllCelebrated: string;
+    move: string;
+    saveMove: string;
+    cancelIntention: string;
+    putBack: string;
+    saveError: string;
+    offeringTitle: string;
+    offeringHint: string;
+    offeringLabel: string;
+    offeringPlaceholder: string;
+    saveOffering: string;
+    saving: string;
+    saved: string;
+    offeringError: string;
+  };
+  campaigns: {
+    title: string;
+    subtitle: string;
+    titleLabel: string;
+    titlePlaceholder: string;
+    descriptionLabel: string;
+    goalLabel: string;
+    endsOnLabel: string;
+    create: string;
+    creating: string;
+    save: string;
+    edit: string;
+    delete: string;
+    shown: string;
+    hidden: string;
+    hide: string;
+    show: string;
+    raised: string;
+    raisedOfGoal: string;
+    giftCountOne: string;
+    giftCountMany: string;
+    progressLabel: string;
+    endsOn: string;
+    loading: string;
+    empty: string;
+    loadError: string;
+    createError: string;
+    saveError: string;
+    deleteError: string;
+  };
+  receipts: {
+    title: string;
+    subtitle: string;
+    legalTitle: string;
+    legalHint: string;
+    legalNameLabel: string;
+    legalTaxIdLabel: string;
+    legalAddressLabel: string;
+    signatoryLabel: string;
+    signatoryPlaceholder: string;
+    save: string;
+    saving: string;
+    saved: string;
+    legalLoadError: string;
+    legalSaveError: string;
+    yearLabel: string;
+    exportCsv: string;
+    loading: string;
+    empty: string;
+    loadError: string;
+    noName: string;
+    giftCountOne: string;
+    giftCountMany: string;
+    openReceipt: string;
   };
 };
 
@@ -278,6 +487,8 @@ const en: Translations = {
     navHomePage: 'Home page',
     navSettings: 'Settings',
     noAdminPois: "Your account isn't an admin of any community yet.",
+    navRequests: 'Requests',
+    navMassIntentions: 'Mass intentions',
   },
   donations: {
     title: 'Donations',
@@ -304,6 +515,12 @@ const en: Translations = {
     anonymous: 'Anonymous',
     loadError: 'Could not load donation data.',
     loading: 'Loading…',
+    purposeGeneral: 'Gift to the community',
+    purposeCollection: 'Collection',
+    purposeCampaign: 'Campaign',
+    purposeCampaignNamed: 'Campaign: {{title}}',
+    purposeMassIntention: 'Mass intention offering',
+    monthly: 'Monthly',
   },
   events: {
     title: 'Events',
@@ -324,6 +541,25 @@ const en: Translations = {
     deleteError: 'Could not delete the event.',
     loading: 'Loading…',
     empty: 'No events scheduled yet.',
+    categoryLabel: 'Kind',
+    categoryMass: 'Mass',
+    categoryConfession: 'Confession',
+    categoryAdoration: 'Adoration',
+    categoryPrayer: 'Prayer',
+    categoryOfficeHours: 'Office hours',
+    categoryOther: 'Other',
+    recurrenceLabel: 'Repeats',
+    recurrenceNone: 'Only once',
+    recurrenceWeekly: 'Every week',
+    firstStartsAtLabel: 'First date & time',
+    endTimeLabel: 'Ends at (optional)',
+    repeatUntilLabel: 'Last date (optional — leave empty to keep it going)',
+    everyWeekday: 'Every {{day}}',
+    fromDate: 'from {{date}}',
+    untilDate: 'until {{date}}',
+    weeklyHeading: 'Every week',
+    weeklyHint: "Your community's regular week. The app shows it as your timetable, and the Celebration times section of your home page is built from it.",
+    onceHeading: 'Dates',
   },
   announcements: {
     title: 'Announcements',
@@ -412,6 +648,8 @@ const en: Translations = {
     prayerRequests: 'Prayer Requests',
     livestream: 'Livestream',
     community: 'Community',
+    requests: 'Requests & appointments',
+    massIntentions: 'Mass intentions',
   },
   menuOrder: {
     title: 'Bottom menu order',
@@ -474,6 +712,8 @@ const en: Translations = {
     blockLatestAnnouncements: 'Latest announcements',
     blockNextLivestream: 'Next livestream',
     blockDonate: 'Donate button',
+    blockCelebrationTimes: 'Celebration times',
+    celebrationTimesNote: 'This section is built from your weekly events (Masses, confessions, office hours): set their kind and "Every week" on the Events page.',
   },
   qr: {
     title: 'My QR',
@@ -488,6 +728,184 @@ const en: Translations = {
     print: 'Print / Save as PDF',
     previewTitle: 'Flyer preview',
     scanHint: 'Scan with your phone camera',
+  },
+  requests: {
+    title: 'Requests',
+    subtitle: 'What members ask the community for from the app — a baptism, a wedding, a certificate, a meeting — and everything that follows: status, appointment, documents and messages.',
+    filterLabel: 'Show',
+    filterOpen: 'Still open',
+    filterClosed: 'Done or cancelled',
+    filterAll: 'All',
+    loading: 'Loading…',
+    empty: 'No requests here.',
+    loadError: 'Could not load the requests.',
+    loadOneError: 'Could not load this request.',
+    open: 'Open',
+    askedOn: 'asked on {{date}}',
+    appointmentOn: 'appointment {{date}}',
+    unread: 'New from the member',
+    documentsPendingOne: '1 document awaited',
+    documentsPendingMany: '{{n}} documents awaited',
+    backToList: 'All requests',
+    contactLabel: 'Contact',
+    accountLabel: 'Asked from the account of',
+    noName: 'No name given',
+    preferredDateLabel: 'When they would like it',
+    detailsLabel: 'What they wrote',
+    statusHeading: 'Status and appointment',
+    statusLabel: 'Status',
+    statusReceived: 'Received',
+    statusInProgress: 'In progress',
+    statusAppointmentSet: 'Appointment set',
+    statusCompleted: 'Done',
+    statusCancelled: 'Cancelled',
+    appointmentAtLabel: 'Appointment (date & time)',
+    appointmentPlaceLabel: 'Appointment place',
+    appointmentPlacePlaceholder: 'The office, the sacristy…',
+    statusHint: 'The member sees the status and the appointment in the app. Setting a date on its own marks the request as "Appointment set".',
+    save: 'Save',
+    saving: 'Saving…',
+    saved: 'Saved.',
+    saveError: 'Could not save your changes.',
+    documentsHeading: 'Documents',
+    noDocuments: 'No documents asked for yet.',
+    awaited: 'Awaited',
+    receivedOn: 'Received on {{date}}',
+    openFile: 'Open {{name}}',
+    markReceived: 'Mark as received',
+    markNotReceived: 'Mark as not received',
+    removeDocument: 'Remove',
+    askHeading: 'Ask the member for a document',
+    documentLabel: 'Document',
+    documentPlaceholder: 'e.g. Birth certificate of the child',
+    documentNoteLabel: 'Note for the member (optional)',
+    ask: 'Ask for it',
+    asking: 'Asking…',
+    documentError: 'Could not update the documents.',
+    conversationHeading: 'Conversation',
+    noMessages: 'No messages yet.',
+    fromOffice: '{{name}} (office)',
+    office: 'The office',
+    messageLabel: 'Your message',
+    attachmentLabel: 'Attach a photo or a PDF (optional)',
+    send: 'Send',
+    sending: 'Sending…',
+    sendHint: 'The member reads it in the app.',
+    sendError: 'Could not send the message.',
+    typeBaptism: 'Baptism',
+    typeWedding: 'Wedding',
+    typeFuneral: 'Funeral',
+    typeFirstCommunion: 'First Communion',
+    typeConfirmation: 'Confirmation',
+    typeCertificate: 'Certificate',
+    typeMeeting: 'Meeting',
+    typeBlessing: 'Blessing',
+    typeSickVisit: 'Visit to a sick person',
+    typeOther: 'Other',
+  },
+  massIntentions: {
+    title: 'Mass intentions',
+    subtitle: 'The Masses said for someone, asked for from the app or at the office, listed by celebration for the celebrant.',
+    addTitle: 'Add one taken at the office',
+    intentionLabel: 'Intention',
+    intentionPlaceholder: 'e.g. For John Carter, who died last month',
+    requesterNameLabel: 'Asked by',
+    requesterContactLabel: 'Phone or email (optional)',
+    celebrationLabel: 'Celebration',
+    noDate: 'No date — whenever the community can',
+    otherDate: 'Another date…',
+    otherAtLabel: 'Date & time',
+    otherTitleLabel: 'Celebration name',
+    otherTitlePlaceholder: 'Sunday Mass',
+    offeringReceivedLabel: 'Offering received ({{currency}}, optional)',
+    add: 'Add to the register',
+    adding: 'Adding…',
+    addError: 'Could not add the intention.',
+    registerTitle: 'Register',
+    filterLabel: 'Show',
+    filterUpcoming: 'Still to be said',
+    filterAll: 'All, with celebrated and cancelled',
+    print: 'Print the list',
+    printTitle: 'Mass intentions',
+    loading: 'Loading…',
+    empty: 'No intentions here.',
+    loadError: 'Could not load the intentions.',
+    noDateHeading: 'No date chosen',
+    askedBy: 'asked by {{name}}',
+    fromOffice: 'at the office',
+    fromApp: 'from the app',
+    statusCelebrated: 'Celebrated',
+    statusCancelled: 'Cancelled',
+    markCelebrated: 'Mark as celebrated',
+    markAllCelebrated: 'Mark all {{n}} as celebrated',
+    move: 'Move',
+    saveMove: 'Save',
+    cancelIntention: 'Take off the list',
+    putBack: 'Put back on the list',
+    saveError: 'Could not save the change.',
+    offeringTitle: 'Offering',
+    offeringHint: 'What one intention costs when asked for from the app, as your diocese sets it. Leave it empty to let people choose what to give.',
+    offeringLabel: 'Offering for one intention ({{currency}})',
+    offeringPlaceholder: 'People choose',
+    saveOffering: 'Save',
+    saving: 'Saving…',
+    saved: 'Saved.',
+    offeringError: 'Could not save the offering.',
+  },
+  campaigns: {
+    title: 'Campaigns',
+    subtitle: 'Projects your community raises money for — the roof, the organ, a pilgrimage. Members can give to them from the app and see how close you are.',
+    titleLabel: 'Title',
+    titlePlaceholder: 'e.g. New roof',
+    descriptionLabel: 'Description (optional)',
+    goalLabel: 'Goal ({{currency}}, optional)',
+    endsOnLabel: 'End date (optional)',
+    create: 'Start the campaign',
+    creating: 'Starting…',
+    save: 'Save',
+    edit: 'Edit',
+    delete: 'Delete',
+    shown: 'Shown in the app',
+    hidden: 'Hidden from the app',
+    hide: 'Hide from the app',
+    show: 'Show in the app',
+    raised: 'raised',
+    raisedOfGoal: 'raised of {{goal}}',
+    giftCountOne: '1 gift',
+    giftCountMany: '{{n}} gifts',
+    progressLabel: 'Progress of {{title}}',
+    endsOn: 'Ends on {{date}}',
+    loading: 'Loading…',
+    empty: 'No campaigns yet.',
+    loadError: 'Could not load the campaigns.',
+    createError: 'Could not start the campaign.',
+    saveError: 'Could not save the campaign.',
+    deleteError: 'Could not delete the campaign.',
+  },
+  receipts: {
+    title: 'Tax receipts',
+    subtitle: 'One receipt a year for each person who asked for one when giving, adding up everything they gave. Open a receipt to print it or save it as a PDF; the links work for an hour.',
+    legalTitle: 'Who issues the receipts',
+    legalHint: 'The legal body behind the community, as it must appear on the receipts. It is often not the name people know the place by.',
+    legalNameLabel: 'Legal name',
+    legalTaxIdLabel: 'Tax number',
+    legalAddressLabel: 'Address',
+    signatoryLabel: 'Signed by',
+    signatoryPlaceholder: 'Name and role',
+    save: 'Save',
+    saving: 'Saving…',
+    saved: 'Saved.',
+    legalLoadError: 'Could not load who issues the receipts.',
+    legalSaveError: 'Could not save your changes.',
+    yearLabel: 'Year',
+    exportCsv: 'Download the list (CSV)',
+    loading: 'Loading…',
+    empty: 'Nobody asked for a receipt for {{year}}.',
+    loadError: 'Could not load the receipts.',
+    noName: 'No name given',
+    giftCountOne: '1 gift',
+    giftCountMany: '{{n}} gifts',
+    openReceipt: 'Open the receipt',
   },
 };
 
@@ -523,6 +941,8 @@ const es: Translations = {
     navHomePage: 'Página de inicio',
     navSettings: 'Configuración',
     noAdminPois: 'Tu cuenta todavía no es administradora de ninguna comunidad.',
+    navRequests: 'Solicitudes',
+    navMassIntentions: 'Intenciones de misa',
   },
   donations: {
     title: 'Donaciones',
@@ -549,6 +969,12 @@ const es: Translations = {
     anonymous: 'Anónimo',
     loadError: 'No se pudieron cargar los datos de donaciones.',
     loading: 'Cargando…',
+    purposeGeneral: 'Donativo a la comunidad',
+    purposeCollection: 'Colecta',
+    purposeCampaign: 'Campaña',
+    purposeCampaignNamed: 'Campaña: {{title}}',
+    purposeMassIntention: 'Ofrenda de intención de misa',
+    monthly: 'Mensual',
   },
   events: {
     title: 'Eventos',
@@ -569,6 +995,25 @@ const es: Translations = {
     deleteError: 'No se pudo eliminar el evento.',
     loading: 'Cargando…',
     empty: 'Todavía no hay eventos programados.',
+    categoryLabel: 'Tipo',
+    categoryMass: 'Misa',
+    categoryConfession: 'Confesión',
+    categoryAdoration: 'Adoración',
+    categoryPrayer: 'Oración',
+    categoryOfficeHours: 'Horario de despacho',
+    categoryOther: 'Otro',
+    recurrenceLabel: 'Se repite',
+    recurrenceNone: 'Solo una vez',
+    recurrenceWeekly: 'Cada semana',
+    firstStartsAtLabel: 'Primera fecha y hora',
+    endTimeLabel: 'Termina a las (opcional)',
+    repeatUntilLabel: 'Última fecha (opcional; déjala vacía para que continúe)',
+    everyWeekday: 'Cada {{day}}',
+    fromDate: 'desde el {{date}}',
+    untilDate: 'hasta el {{date}}',
+    weeklyHeading: 'Cada semana',
+    weeklyHint: 'La semana habitual de tu comunidad. La app la muestra como tu horario, y la sección Horarios de celebraciones de tu página de inicio se construye con ella.',
+    onceHeading: 'Fechas',
   },
   announcements: {
     title: 'Anuncios',
@@ -657,6 +1102,8 @@ const es: Translations = {
     prayerRequests: 'Peticiones de oración',
     livestream: 'Transmisión en vivo',
     community: 'Comunidad',
+    requests: 'Solicitudes y citas',
+    massIntentions: 'Intenciones de misa',
   },
   menuOrder: {
     title: 'Orden del menú inferior',
@@ -719,6 +1166,8 @@ const es: Translations = {
     blockLatestAnnouncements: 'Últimos anuncios',
     blockNextLivestream: 'Próxima transmisión',
     blockDonate: 'Botón de donar',
+    blockCelebrationTimes: 'Horarios de celebraciones',
+    celebrationTimesNote: 'Esta sección se construye con tus eventos semanales (misas, confesiones, horario de despacho): indica su tipo y «Cada semana» en la página Eventos.',
   },
   qr: {
     title: 'Mi código QR',
@@ -733,6 +1182,184 @@ const es: Translations = {
     print: 'Imprimir / Guardar como PDF',
     previewTitle: 'Vista previa del folleto',
     scanHint: 'Escanea con la cámara de tu teléfono',
+  },
+  requests: {
+    title: 'Solicitudes',
+    subtitle: 'Lo que los miembros piden a la comunidad desde la app —un bautizo, una boda, un certificado, una cita— y todo lo que sigue: estado, cita, documentos y mensajes.',
+    filterLabel: 'Mostrar',
+    filterOpen: 'Abiertas',
+    filterClosed: 'Terminadas o canceladas',
+    filterAll: 'Todas',
+    loading: 'Cargando…',
+    empty: 'No hay solicitudes aquí.',
+    loadError: 'No se pudieron cargar las solicitudes.',
+    loadOneError: 'No se pudo cargar esta solicitud.',
+    open: 'Abrir',
+    askedOn: 'pedida el {{date}}',
+    appointmentOn: 'cita el {{date}}',
+    unread: 'Novedad del miembro',
+    documentsPendingOne: '1 documento pendiente',
+    documentsPendingMany: '{{n}} documentos pendientes',
+    backToList: 'Todas las solicitudes',
+    contactLabel: 'Contacto',
+    accountLabel: 'Pedida desde la cuenta de',
+    noName: 'Sin nombre',
+    preferredDateLabel: 'Cuándo lo desean',
+    detailsLabel: 'Lo que escribieron',
+    statusHeading: 'Estado y cita',
+    statusLabel: 'Estado',
+    statusReceived: 'Recibida',
+    statusInProgress: 'En curso',
+    statusAppointmentSet: 'Cita fijada',
+    statusCompleted: 'Terminada',
+    statusCancelled: 'Cancelada',
+    appointmentAtLabel: 'Cita (fecha y hora)',
+    appointmentPlaceLabel: 'Lugar de la cita',
+    appointmentPlacePlaceholder: 'El despacho, la sacristía…',
+    statusHint: 'El miembro ve el estado y la cita en la app. Con solo poner una fecha, la solicitud pasa a «Cita fijada».',
+    save: 'Guardar',
+    saving: 'Guardando…',
+    saved: 'Guardado.',
+    saveError: 'No se pudieron guardar los cambios.',
+    documentsHeading: 'Documentos',
+    noDocuments: 'Todavía no se ha pedido ningún documento.',
+    awaited: 'Pendiente',
+    receivedOn: 'Recibido el {{date}}',
+    openFile: 'Abrir {{name}}',
+    markReceived: 'Marcar como recibido',
+    markNotReceived: 'Marcar como no recibido',
+    removeDocument: 'Quitar',
+    askHeading: 'Pedir un documento al miembro',
+    documentLabel: 'Documento',
+    documentPlaceholder: 'p. ej., partida de nacimiento del niño',
+    documentNoteLabel: 'Nota para el miembro (opcional)',
+    ask: 'Pedirlo',
+    asking: 'Pidiendo…',
+    documentError: 'No se pudieron actualizar los documentos.',
+    conversationHeading: 'Conversación',
+    noMessages: 'Todavía no hay mensajes.',
+    fromOffice: '{{name}} (despacho)',
+    office: 'El despacho',
+    messageLabel: 'Tu mensaje',
+    attachmentLabel: 'Adjuntar una foto o un PDF (opcional)',
+    send: 'Enviar',
+    sending: 'Enviando…',
+    sendHint: 'El miembro lo lee en la app.',
+    sendError: 'No se pudo enviar el mensaje.',
+    typeBaptism: 'Bautizo',
+    typeWedding: 'Boda',
+    typeFuneral: 'Funeral',
+    typeFirstCommunion: 'Primera Comunión',
+    typeConfirmation: 'Confirmación',
+    typeCertificate: 'Certificado',
+    typeMeeting: 'Cita',
+    typeBlessing: 'Bendición',
+    typeSickVisit: 'Visita a un enfermo',
+    typeOther: 'Otra',
+  },
+  massIntentions: {
+    title: 'Intenciones de misa',
+    subtitle: 'Las misas ofrecidas por alguien, pedidas desde la app o en el despacho, ordenadas por celebración para el celebrante.',
+    addTitle: 'Añadir una recibida en el despacho',
+    intentionLabel: 'Intención',
+    intentionPlaceholder: 'p. ej., por Juan García, fallecido el mes pasado',
+    requesterNameLabel: 'Pedida por',
+    requesterContactLabel: 'Teléfono o correo (opcional)',
+    celebrationLabel: 'Celebración',
+    noDate: 'Sin fecha: cuando la comunidad pueda',
+    otherDate: 'Otra fecha…',
+    otherAtLabel: 'Fecha y hora',
+    otherTitleLabel: 'Nombre de la celebración',
+    otherTitlePlaceholder: 'Misa dominical',
+    offeringReceivedLabel: 'Ofrenda recibida ({{currency}}, opcional)',
+    add: 'Añadir al registro',
+    adding: 'Añadiendo…',
+    addError: 'No se pudo añadir la intención.',
+    registerTitle: 'Registro',
+    filterLabel: 'Mostrar',
+    filterUpcoming: 'Pendientes',
+    filterAll: 'Todas, también celebradas y canceladas',
+    print: 'Imprimir la lista',
+    printTitle: 'Intenciones de misa',
+    loading: 'Cargando…',
+    empty: 'No hay intenciones aquí.',
+    loadError: 'No se pudieron cargar las intenciones.',
+    noDateHeading: 'Sin fecha elegida',
+    askedBy: 'pedida por {{name}}',
+    fromOffice: 'en el despacho',
+    fromApp: 'desde la app',
+    statusCelebrated: 'Celebrada',
+    statusCancelled: 'Cancelada',
+    markCelebrated: 'Marcar como celebrada',
+    markAllCelebrated: 'Marcar las {{n}} como celebradas',
+    move: 'Cambiar de fecha',
+    saveMove: 'Guardar',
+    cancelIntention: 'Quitar de la lista',
+    putBack: 'Volver a la lista',
+    saveError: 'No se pudo guardar el cambio.',
+    offeringTitle: 'Ofrenda',
+    offeringHint: 'Lo que cuesta una intención pedida desde la app, según lo fija tu diócesis. Déjalo vacío para que cada uno elija cuánto dar.',
+    offeringLabel: 'Ofrenda por una intención ({{currency}})',
+    offeringPlaceholder: 'Cada uno elige',
+    saveOffering: 'Guardar',
+    saving: 'Guardando…',
+    saved: 'Guardado.',
+    offeringError: 'No se pudo guardar la ofrenda.',
+  },
+  campaigns: {
+    title: 'Campañas',
+    subtitle: 'Proyectos para los que tu comunidad recauda fondos: el tejado, el órgano, una peregrinación. Los miembros pueden donar desde la app y ver cuánto falta.',
+    titleLabel: 'Título',
+    titlePlaceholder: 'p. ej., tejado nuevo',
+    descriptionLabel: 'Descripción (opcional)',
+    goalLabel: 'Objetivo ({{currency}}, opcional)',
+    endsOnLabel: 'Fecha de fin (opcional)',
+    create: 'Crear la campaña',
+    creating: 'Creando…',
+    save: 'Guardar',
+    edit: 'Editar',
+    delete: 'Eliminar',
+    shown: 'Visible en la app',
+    hidden: 'Oculta en la app',
+    hide: 'Ocultar en la app',
+    show: 'Mostrar en la app',
+    raised: 'recaudados',
+    raisedOfGoal: 'recaudados de {{goal}}',
+    giftCountOne: '1 donativo',
+    giftCountMany: '{{n}} donativos',
+    progressLabel: 'Progreso de {{title}}',
+    endsOn: 'Termina el {{date}}',
+    loading: 'Cargando…',
+    empty: 'Todavía no hay campañas.',
+    loadError: 'No se pudieron cargar las campañas.',
+    createError: 'No se pudo crear la campaña.',
+    saveError: 'No se pudo guardar la campaña.',
+    deleteError: 'No se pudo eliminar la campaña.',
+  },
+  receipts: {
+    title: 'Certificados de donación',
+    subtitle: 'Un certificado al año para cada persona que lo pidió al donar, con la suma de todo lo que dio. Abre un certificado para imprimirlo o guardarlo en PDF; los enlaces funcionan durante una hora.',
+    legalTitle: 'Quién emite los certificados',
+    legalHint: 'La entidad jurídica que está detrás de la comunidad, tal como debe figurar en los certificados. A menudo no es el nombre por el que se conoce el lugar.',
+    legalNameLabel: 'Nombre legal',
+    legalTaxIdLabel: 'Número de identificación fiscal',
+    legalAddressLabel: 'Dirección',
+    signatoryLabel: 'Firmado por',
+    signatoryPlaceholder: 'Nombre y cargo',
+    save: 'Guardar',
+    saving: 'Guardando…',
+    saved: 'Guardado.',
+    legalLoadError: 'No se pudo cargar quién emite los certificados.',
+    legalSaveError: 'No se pudieron guardar los cambios.',
+    yearLabel: 'Año',
+    exportCsv: 'Descargar la lista (CSV)',
+    loading: 'Cargando…',
+    empty: 'Nadie pidió un certificado para {{year}}.',
+    loadError: 'No se pudieron cargar los certificados.',
+    noName: 'Sin nombre',
+    giftCountOne: '1 donativo',
+    giftCountMany: '{{n}} donativos',
+    openReceipt: 'Abrir el certificado',
   },
 };
 
@@ -768,6 +1395,8 @@ const fr: Translations = {
     navHomePage: "Page d'accueil",
     navSettings: 'Paramètres',
     noAdminPois: "Votre compte n'est encore administrateur d'aucune communauté.",
+    navRequests: 'Demandes',
+    navMassIntentions: 'Intentions de messe',
   },
   donations: {
     title: 'Dons',
@@ -794,6 +1423,12 @@ const fr: Translations = {
     anonymous: 'Anonyme',
     loadError: 'Impossible de charger les données de dons.',
     loading: 'Chargement…',
+    purposeGeneral: 'Don à la communauté',
+    purposeCollection: 'Quête',
+    purposeCampaign: 'Campagne',
+    purposeCampaignNamed: 'Campagne : {{title}}',
+    purposeMassIntention: "Offrande d'intention de messe",
+    monthly: 'Mensuel',
   },
   events: {
     title: 'Événements',
@@ -814,6 +1449,25 @@ const fr: Translations = {
     deleteError: "Impossible de supprimer l'événement.",
     loading: 'Chargement…',
     empty: "Aucun événement prévu pour l'instant.",
+    categoryLabel: 'Type',
+    categoryMass: 'Messe',
+    categoryConfession: 'Confession',
+    categoryAdoration: 'Adoration',
+    categoryPrayer: 'Prière',
+    categoryOfficeHours: "Heures d'accueil",
+    categoryOther: 'Autre',
+    recurrenceLabel: 'Répétition',
+    recurrenceNone: 'Une seule fois',
+    recurrenceWeekly: 'Chaque semaine',
+    firstStartsAtLabel: 'Première date et heure',
+    endTimeLabel: 'Se termine à (facultatif)',
+    repeatUntilLabel: 'Dernière date (facultatif — laissez vide pour continuer)',
+    everyWeekday: 'Chaque {{day}}',
+    fromDate: 'à partir du {{date}}',
+    untilDate: "jusqu'au {{date}}",
+    weeklyHeading: 'Chaque semaine',
+    weeklyHint: "La semaine habituelle de votre communauté. L'application l'affiche comme vos horaires, et la section Horaires des célébrations de votre page d'accueil est construite à partir d'elle.",
+    onceHeading: 'Dates',
   },
   announcements: {
     title: 'Annonces',
@@ -902,6 +1556,8 @@ const fr: Translations = {
     prayerRequests: 'Intentions de prière',
     livestream: 'Diffusion en direct',
     community: 'Communauté',
+    requests: 'Demandes et rendez-vous',
+    massIntentions: 'Intentions de messe',
   },
   menuOrder: {
     title: 'Ordre du menu du bas',
@@ -964,6 +1620,8 @@ const fr: Translations = {
     blockLatestAnnouncements: 'Dernières annonces',
     blockNextLivestream: 'Prochaine diffusion',
     blockDonate: 'Bouton de don',
+    blockCelebrationTimes: 'Horaires des célébrations',
+    celebrationTimesNote: "Cette section est construite à partir de vos événements hebdomadaires (messes, confessions, heures d'accueil) : indiquez leur type et « Chaque semaine » dans la page Événements.",
   },
   qr: {
     title: 'Mon code QR',
@@ -978,6 +1636,184 @@ const fr: Translations = {
     print: 'Imprimer / Enregistrer en PDF',
     previewTitle: 'Aperçu du flyer',
     scanHint: 'Scannez avec l’appareil photo de votre téléphone',
+  },
+  requests: {
+    title: 'Demandes',
+    subtitle: "Ce que les membres demandent à la communauté depuis l'application — un baptême, un mariage, un certificat, un rendez-vous — et tout ce qui suit : statut, rendez-vous, documents et messages.",
+    filterLabel: 'Afficher',
+    filterOpen: 'En cours',
+    filterClosed: 'Terminées ou annulées',
+    filterAll: 'Toutes',
+    loading: 'Chargement…',
+    empty: 'Aucune demande ici.',
+    loadError: 'Impossible de charger les demandes.',
+    loadOneError: 'Impossible de charger cette demande.',
+    open: 'Ouvrir',
+    askedOn: 'demandée le {{date}}',
+    appointmentOn: 'rendez-vous le {{date}}',
+    unread: 'Nouveau de la part du membre',
+    documentsPendingOne: '1 document attendu',
+    documentsPendingMany: '{{n}} documents attendus',
+    backToList: 'Toutes les demandes',
+    contactLabel: 'Contact',
+    accountLabel: 'Demandée depuis le compte de',
+    noName: 'Sans nom',
+    preferredDateLabel: 'Quand ils le souhaitent',
+    detailsLabel: 'Ce qu’ils ont écrit',
+    statusHeading: 'Statut et rendez-vous',
+    statusLabel: 'Statut',
+    statusReceived: 'Reçue',
+    statusInProgress: 'En cours',
+    statusAppointmentSet: 'Rendez-vous fixé',
+    statusCompleted: 'Terminée',
+    statusCancelled: 'Annulée',
+    appointmentAtLabel: 'Rendez-vous (date et heure)',
+    appointmentPlaceLabel: 'Lieu du rendez-vous',
+    appointmentPlacePlaceholder: "L'accueil, la sacristie…",
+    statusHint: "Le membre voit le statut et le rendez-vous dans l'application. Indiquer une date suffit à passer la demande en « Rendez-vous fixé ».",
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saved: 'Enregistré.',
+    saveError: "Impossible d'enregistrer vos modifications.",
+    documentsHeading: 'Documents',
+    noDocuments: "Aucun document demandé pour l'instant.",
+    awaited: 'Attendu',
+    receivedOn: 'Reçu le {{date}}',
+    openFile: 'Ouvrir {{name}}',
+    markReceived: 'Marquer comme reçu',
+    markNotReceived: 'Marquer comme non reçu',
+    removeDocument: 'Retirer',
+    askHeading: 'Demander un document au membre',
+    documentLabel: 'Document',
+    documentPlaceholder: "Par ex. : acte de naissance de l'enfant",
+    documentNoteLabel: 'Note pour le membre (facultatif)',
+    ask: 'Le demander',
+    asking: 'Envoi…',
+    documentError: 'Impossible de mettre à jour les documents.',
+    conversationHeading: 'Conversation',
+    noMessages: 'Pas encore de message.',
+    fromOffice: '{{name}} (accueil)',
+    office: "L'accueil",
+    messageLabel: 'Votre message',
+    attachmentLabel: 'Joindre une photo ou un PDF (facultatif)',
+    send: 'Envoyer',
+    sending: 'Envoi…',
+    sendHint: "Le membre le lit dans l'application.",
+    sendError: "Impossible d'envoyer le message.",
+    typeBaptism: 'Baptême',
+    typeWedding: 'Mariage',
+    typeFuneral: 'Obsèques',
+    typeFirstCommunion: 'Première communion',
+    typeConfirmation: 'Confirmation',
+    typeCertificate: 'Certificat',
+    typeMeeting: 'Rencontre',
+    typeBlessing: 'Bénédiction',
+    typeSickVisit: 'Visite à un malade',
+    typeOther: 'Autre',
+  },
+  massIntentions: {
+    title: 'Intentions de messe',
+    subtitle: "Les messes dites pour quelqu'un, demandées depuis l'application ou à l'accueil, classées par célébration pour le célébrant.",
+    addTitle: "Ajouter une intention reçue à l'accueil",
+    intentionLabel: 'Intention',
+    intentionPlaceholder: 'Par ex. : pour Jean Dupont, décédé le mois dernier',
+    requesterNameLabel: 'Demandée par',
+    requesterContactLabel: 'Téléphone ou e-mail (facultatif)',
+    celebrationLabel: 'Célébration',
+    noDate: 'Sans date — dès que la communauté le peut',
+    otherDate: 'Une autre date…',
+    otherAtLabel: 'Date et heure',
+    otherTitleLabel: 'Nom de la célébration',
+    otherTitlePlaceholder: 'Messe du dimanche',
+    offeringReceivedLabel: 'Offrande reçue ({{currency}}, facultatif)',
+    add: 'Ajouter au registre',
+    adding: 'Ajout…',
+    addError: "Impossible d'ajouter l'intention.",
+    registerTitle: 'Registre',
+    filterLabel: 'Afficher',
+    filterUpcoming: 'À célébrer',
+    filterAll: 'Toutes, célébrées et annulées comprises',
+    print: 'Imprimer la liste',
+    printTitle: 'Intentions de messe',
+    loading: 'Chargement…',
+    empty: 'Aucune intention ici.',
+    loadError: 'Impossible de charger les intentions.',
+    noDateHeading: 'Sans date choisie',
+    askedBy: 'demandée par {{name}}',
+    fromOffice: "à l'accueil",
+    fromApp: "depuis l'application",
+    statusCelebrated: 'Célébrée',
+    statusCancelled: 'Annulée',
+    markCelebrated: 'Marquer comme célébrée',
+    markAllCelebrated: 'Marquer les {{n}} comme célébrées',
+    move: 'Déplacer',
+    saveMove: 'Enregistrer',
+    cancelIntention: 'Retirer de la liste',
+    putBack: 'Remettre dans la liste',
+    saveError: "Impossible d'enregistrer la modification.",
+    offeringTitle: 'Offrande',
+    offeringHint: "Ce que coûte une intention demandée depuis l'application, tel que votre diocèse le fixe. Laissez vide pour que chacun choisisse ce qu'il donne.",
+    offeringLabel: 'Offrande pour une intention ({{currency}})',
+    offeringPlaceholder: 'Au choix',
+    saveOffering: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saved: 'Enregistré.',
+    offeringError: "Impossible d'enregistrer l'offrande.",
+  },
+  campaigns: {
+    title: 'Campagnes',
+    subtitle: "Les projets pour lesquels votre communauté collecte des fonds — la toiture, l'orgue, un pèlerinage. Les membres peuvent donner depuis l'application et voir où vous en êtes.",
+    titleLabel: 'Titre',
+    titlePlaceholder: 'Par ex. : nouvelle toiture',
+    descriptionLabel: 'Description (facultatif)',
+    goalLabel: 'Objectif ({{currency}}, facultatif)',
+    endsOnLabel: 'Date de fin (facultatif)',
+    create: 'Lancer la campagne',
+    creating: 'Lancement…',
+    save: 'Enregistrer',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    shown: "Visible dans l'application",
+    hidden: "Masquée dans l'application",
+    hide: "Masquer dans l'application",
+    show: "Afficher dans l'application",
+    raised: 'collectés',
+    raisedOfGoal: 'collectés sur {{goal}}',
+    giftCountOne: '1 don',
+    giftCountMany: '{{n}} dons',
+    progressLabel: 'Progression de {{title}}',
+    endsOn: 'Se termine le {{date}}',
+    loading: 'Chargement…',
+    empty: 'Aucune campagne pour le moment.',
+    loadError: 'Impossible de charger les campagnes.',
+    createError: 'Impossible de lancer la campagne.',
+    saveError: "Impossible d'enregistrer la campagne.",
+    deleteError: 'Impossible de supprimer la campagne.',
+  },
+  receipts: {
+    title: 'Reçus fiscaux',
+    subtitle: "Un reçu par an pour chaque personne qui l'a demandé en donnant, avec le total de ses dons. Ouvrez un reçu pour l'imprimer ou l'enregistrer en PDF ; les liens fonctionnent pendant une heure.",
+    legalTitle: 'Qui émet les reçus',
+    legalHint: "L'entité juridique derrière la communauté, telle qu'elle doit figurer sur les reçus. Ce n'est souvent pas le nom sous lequel on connaît le lieu.",
+    legalNameLabel: 'Dénomination légale',
+    legalTaxIdLabel: "Numéro d'identification",
+    legalAddressLabel: 'Adresse',
+    signatoryLabel: 'Signé par',
+    signatoryPlaceholder: 'Nom et fonction',
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    saved: 'Enregistré.',
+    legalLoadError: 'Impossible de charger qui émet les reçus.',
+    legalSaveError: "Impossible d'enregistrer vos modifications.",
+    yearLabel: 'Année',
+    exportCsv: 'Télécharger la liste (CSV)',
+    loading: 'Chargement…',
+    empty: "Personne n'a demandé de reçu pour {{year}}.",
+    loadError: 'Impossible de charger les reçus.',
+    noName: 'Sans nom',
+    giftCountOne: '1 don',
+    giftCountMany: '{{n}} dons',
+    openReceipt: 'Ouvrir le reçu',
   },
 };
 

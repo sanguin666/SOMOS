@@ -15,3 +15,11 @@ export function updatePoiProfile(
 export function updatePoiMenuOrder(poiId: string, menuOrder: ModuleType[]): Promise<Poi> {
   return apiPatch<Poi>(`/pois/${poiId}/menu-order`, { menuOrder });
 }
+
+// Who the tax receipts are issued by; an empty string clears a field.
+export function updateReceiptSettings(
+  poiId: string,
+  body: { legalName?: string; legalTaxId?: string; legalAddress?: string; receiptSignatory?: string },
+): Promise<Poi> {
+  return apiPatch<Poi>(`/pois/${poiId}/receipt-settings`, body);
+}

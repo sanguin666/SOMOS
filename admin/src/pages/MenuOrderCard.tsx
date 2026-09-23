@@ -14,6 +14,8 @@ const DEFAULT_MENU_ORDER: ModuleType[] = [
   'events',
   'announcements',
   'donations',
+  'requests',
+  'mass_intentions',
   'prayer_requests',
   'community',
   'livestreams',
@@ -28,7 +30,7 @@ type Props = {
 };
 
 /**
- * Lets a parish arrange its own bottom menu: the modules it drags to the
+ * Lets a community arrange its own bottom menu: the modules it drags to the
  * top get a button of their own in the app, the rest fall under More.
  * The preview mirrors the app's own placement rules so an admin sees
  * exactly where each module will land before saving.
@@ -190,5 +192,9 @@ function moduleName(type: ModuleType, t: ReturnType<typeof useI18n>['t']): strin
       return t('moduleNames.livestream');
     case 'community':
       return t('moduleNames.community');
+    case 'requests':
+      return t('moduleNames.requests');
+    case 'mass_intentions':
+      return t('moduleNames.massIntentions');
   }
 }

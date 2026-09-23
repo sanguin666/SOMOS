@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
+import { TimetableCard } from '../components/Timetable';
 import { getEvents } from '../api/events';
+import { isWeekly, occurrencesOf, weeklyTimetable } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
 import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import type { Event, Poi } from '../api/types';
@@ -45,6 +47,12 @@ export function EventsScreen({ poi, onWatchLive }: Props) {
     });
   }
 
+  // The weekly timetable first, since it is what most people come for;
+  // then the one-off events still to come, soonest first.
+  const now = new Date();
+  const timetable = weeklyTimetable(events ?? [], now);
+  const oneOffs = (events ?? []).filter((event) => !isWeekly(event) && occurrencesOf(event, now, 1).length > 0);
+
   return (
     <>
       <View style={styles.titleBlock}>
@@ -85,13 +93,27 @@ export function EventsScreen({ poi, onWatchLive }: Props) {
         </AccessibleText>
       )}
 
-      {!error && events?.length === 0 && (
+      {!error && events !== null && timetable.length === 0 && oneOffs.length === 0 && (
         <AccessibleText variant="body" color={colors.textMuted}>
           {t('events.empty')}
         </AccessibleText>
       )}
 
-      {events?.map((event) => {
+      {timetable.length > 0 && (
+        <AccessibleText variant="caption" style={styles.sectionLabel}>
+          {t('schedule.everyWeek')}
+        </AccessibleText>
+      )}
+      {timetable.map((section) => (
+        <TimetableCard key={section.category} section={section} />
+      ))}
+
+      {timetable.length > 0 && oneOffs.length > 0 && (
+        <AccessibleText variant="caption" style={styles.sectionLabel}>
+          {t('schedule.comingUp')}
+        </AccessibleText>
+      )}
+      {oneOffs.map((event) => {
         const startsAt = new Date(event.startsAt);
         const isNotifying = notifying.has(event.id);
         return (
@@ -134,6 +156,12 @@ export function EventsScreen({ poi, onWatchLive }: Props) {
 const styles = StyleSheet.create({
   titleBlock: {
     gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  sectionLabel: {
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
     marginTop: spacing.sm,
   },
   liveCard: {

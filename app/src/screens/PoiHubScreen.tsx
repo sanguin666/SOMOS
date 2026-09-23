@@ -8,10 +8,14 @@ import { ComposeAnnouncementScreen } from './ComposeAnnouncementScreen';
 import { DonateScreen } from './DonateScreen';
 import { EventsScreen } from './EventsScreen';
 import { LivestreamScreen } from './LivestreamScreen';
+import { MassIntentionsScreen } from './MassIntentionsScreen';
 import { MoreScreen } from './MoreScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
+import { NewRequestScreen } from './NewRequestScreen';
 import { PrayerRequestsScreen } from './PrayerRequestsScreen';
 import { ProfileScreen } from './ProfileScreen';
+import { RequestDetailScreen } from './RequestDetailScreen';
+import { RequestsScreen } from './RequestsScreen';
 import { useAuth } from '../auth/AuthContext';
 import { getActiveModules } from '../api/pois';
 import type { ActiveModule, CommunityPost, Poi } from '../api/types';
@@ -30,7 +34,9 @@ type Props = {
 type Drilldown =
   | { kind: 'list' }
   | { kind: 'compose-announcement' }
-  | { kind: 'community-thread'; post: CommunityPost };
+  | { kind: 'community-thread'; post: CommunityPost }
+  | { kind: 'new-request' }
+  | { kind: 'request'; id: string };
 
 /**
  * Everything under one POI. The banner and the bottom menu live in
@@ -128,7 +134,25 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
         />
       )}
 
-      {tab === 'donations' && <DonateScreen poi={poi} onDone={() => selectTab('home')} />}
+      {tab === 'donations' && (
+        <DonateScreen poi={poi} onDone={() => selectTab('home')} onSignIn={onSignIn} />
+      )}
+
+      {tab === 'requests' &&
+        (drilldown.kind === 'new-request' ? (
+          <NewRequestScreen poi={poi} onCreated={(id) => setDrilldown({ kind: 'request', id })} />
+        ) : drilldown.kind === 'request' ? (
+          <RequestDetailScreen key={drilldown.id} poi={poi} requestId={drilldown.id} />
+        ) : (
+          <RequestsScreen
+            poi={poi}
+            onNew={() => setDrilldown({ kind: 'new-request' })}
+            onOpen={(id) => setDrilldown({ kind: 'request', id })}
+            onSignIn={onSignIn}
+          />
+        ))}
+
+      {tab === 'mass_intentions' && <MassIntentionsScreen poi={poi} />}
 
       {tab === 'events' && (
         <EventsScreen

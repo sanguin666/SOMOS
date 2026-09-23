@@ -3,10 +3,9 @@ import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
 import { getDonationStats, getRecentDonations } from '../api/donations';
 import type { DailyTotal, Donation, DonationStats } from '../api/types';
-
-// Must match the backend's DONATION_CURRENCY, which is what Stripe actually
-// charges in — see backend/src/donations/stripe.service.ts.
-const CURRENCY = import.meta.env.VITE_DONATION_CURRENCY ?? 'EUR';
+import { CURRENCY } from '../format';
+import { CampaignsSection } from './CampaignsSection';
+import { ReceiptsSection } from './ReceiptsSection';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -52,7 +51,7 @@ function niceCeil(value: number): number {
   return step * magnitude;
 }
 
-// null means "no comparable prior period" (e.g. a brand-new parish) —
+// null means "no comparable prior period" (e.g. a brand-new community) —
 // the caller shows a neutral state instead of a misleading ±∞%.
 function computeDelta(current: number, previous: number): number | null {
   if (previous === 0) return current === 0 ? null : null;
@@ -271,6 +270,22 @@ function DonationChart({ data }: { data: DailyTotal[] }) {
   );
 }
 
+// What a gift was for, as one short line under the giver's name.
+function purposeLabel(donation: Donation, t: ReturnType<typeof useI18n>['t']): string {
+  switch (donation.purpose) {
+    case 'collection':
+      return t('donations.purposeCollection');
+    case 'campaign':
+      return donation.campaign
+        ? t('donations.purposeCampaignNamed', { title: donation.campaign.title })
+        : t('donations.purposeCampaign');
+    case 'mass_intention':
+      return t('donations.purposeMassIntention');
+    default:
+      return t('donations.purposeGeneral');
+  }
+}
+
 function timeAgo(iso: string, t: ReturnType<typeof useI18n>['t']): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.round(diffMs / 60000);
@@ -363,7 +378,18 @@ export function DonationsPage() {
           <div className="donation-list">
             {recent.map((donation) => (
               <div key={donation.id} className="donation-item">
-                <span>{donation.donorName ?? t('donations.anonymous')}</span>
+                <span>
+                  {donation.donorName ?? t('donations.anonymous')}
+                  <span className="card-meta" style={{ display: 'block' }}>
+                    {purposeLabel(donation, t)}
+                    {donation.recurring && (
+                      <>
+                        {' · '}
+                        <span className="badge badge-active">{t('donations.monthly')}</span>
+                      </>
+                    )}
+                  </span>
+                </span>
                 <span>
                   <span className="donation-amount">{formatCurrency(donation.amount)}</span>{' '}
                   <span className="muted">· {timeAgo(donation.createdAt, t)}</span>
@@ -373,6 +399,9 @@ export function DonationsPage() {
           </div>
         )}
       </div>
+
+      <CampaignsSection poiId={poiId} />
+      <ReceiptsSection poiId={poiId} />
     </div>
   );
 }

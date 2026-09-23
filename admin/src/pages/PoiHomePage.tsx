@@ -22,6 +22,7 @@ const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
   latest_announcements: 'announcements',
   next_livestream: 'livestreams',
   donate: 'donations',
+  celebration_times: 'events',
 };
 
 const COUNTED_BLOCKS = new Set<PageBlockType>([
@@ -38,6 +39,7 @@ const ADDABLE_BLOCKS: PageBlockType[] = [
   'latest_announcements',
   'next_livestream',
   'donate',
+  'celebration_times',
 ];
 
 // Matches the app's fallback page, so "start from the default" gives a POI
@@ -67,6 +69,7 @@ export function PoiHomePage() {
     latest_announcements: t('homePage.blockLatestAnnouncements'),
     next_livestream: t('homePage.blockNextLivestream'),
     donate: t('homePage.blockDonate'),
+    celebration_times: t('homePage.blockCelebrationTimes'),
   };
 
   function adopt(list: PoiPageBlock[]) {
@@ -311,8 +314,11 @@ export function PoiHomePage() {
                   </label>
                 )}
 
-                {block.type !== 'text' && block.type !== 'donate' && (
-                  <p className="muted">{t('homePage.autoNote')}</p>
+                {block.type === 'celebration_times' ? (
+                  <p className="muted">{t('homePage.celebrationTimesNote')}</p>
+                ) : (
+                  block.type !== 'text' &&
+                  block.type !== 'donate' && <p className="muted">{t('homePage.autoNote')}</p>
                 )}
               </>
             )}

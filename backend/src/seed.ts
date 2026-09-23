@@ -591,8 +591,8 @@ async function seedChurchModules({
 
   // Offerings as a diocese might set them, and who issues the receipts.
   for (const [place, offering, legal] of [
-    [stMarys, 20, { legalName: 'St. Mary’s Community Association', legalTaxId: 'W123456789', legalAddress: '1 Church Street\nSpringfield', receiptSignatory: 'Fr. John Miller, parish priest' }],
-    [holyTrinity, 10, { legalName: 'Parroquia Santísima Trinidad', legalTaxId: 'R2800000A', legalAddress: 'Calle Mayor 1\n28001 Madrid', receiptSignatory: 'P. Luis García, párroco' }],
+    [stMarys, 20, { legalName: 'St. Mary’s Community Association', legalTaxId: 'W123456789', legalAddress: '1 Church Street\nSpringfield', receiptSignatory: 'Fr. John Miller, priest in charge' }],
+    [holyTrinity, 10, { legalName: 'Comunidad Santísima Trinidad', legalTaxId: 'R2800000A', legalAddress: 'Calle Mayor 1\n28001 Madrid', receiptSignatory: 'P. Luis García, sacerdote responsable' }],
   ] as const) {
     if (place.massIntentionOffering == null) {
       await pois.update(place.id, { massIntentionOffering: offering, ...legal });

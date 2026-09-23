@@ -7,14 +7,14 @@ Mobile + web app for churches and other points of interest: donations, events, a
 ```
 backend/   NestJS API (Node.js + TypeORM + PostgreSQL)
 app/       Expo / React Native app (+ React Native Web) — the congregant-facing app
-admin/     React (Vite) admin dashboard for parish staff
+admin/     React (Vite) admin dashboard for community staff
 landing/   Static marketing site (no build step) advertising ANSAE to churches
 docker-compose.yml   Local PostgreSQL for development
 ```
 
 ## Base data model
 
-- `users` — either a congregant (identified by phone number, signing in with a code sent by SMS) or a parish admin (identified by email + password, used by the admin dashboard); each has a `language` (`en`/`es`/`fr`) for their own UI
+- `users` — either a congregant (identified by phone number, signing in with a code sent by SMS) or a community admin (identified by email + password, used by the admin dashboard); each has a `language` (`en`/`es`/`fr`) for their own UI
 - `pois` — a point of interest a user can join, with a name, `type` (only `church` for now — the name stays generic since other kinds of venues/organizations may be supported later), `language` (the language this POI publishes content in), address, and the QR code token used for onboarding
 - `user_pois` — many-to-many join table: a user can belong to several POIs, with a `role` (`member` or `admin`) per POI — an admin user can manage several churches this way
 - `active_modules` — the product modules subscribed to by a POI (e.g. `donations`, `events`), with subscription status and expiration date
@@ -88,9 +88,9 @@ Scan the QR code shown in the terminal with the **Expo Go** app (Android/iOS) to
 
 To test in a browser: `npm run web`.
 
-From the home screen, **"My places"** opens the place you were in last (or the seeded demo POI on a fresh device). **"Scan a place's QR code"** is a real scanner: tap **Use the camera**, point it at a flyer printed from the admin dashboard's **My QR** page, and it opens that parish. **Simulate scan** is still there for when there's no flyer to hand, and the code under the QR can always be typed in instead. All three land on the same hub, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens. From Announcements, the **+** button opens a compose screen where you can type a message and/or record a voice message (tap the microphone, speak, tap Stop, then Post) — works in `npm run web` too, with a normal browser microphone permission prompt.
+From the home screen, **"My places"** opens the place you were in last (or the seeded demo POI on a fresh device). **"Scan a place's QR code"** is a real scanner: tap **Use the camera**, point it at a flyer printed from the admin dashboard's **My QR** page, and it opens that place. **Simulate scan** is still there for when there's no flyer to hand, and the code under the QR can always be typed in instead. All three land on the same hub, with real Donations, Events, Announcements, Prayer Requests, and Livestream screens. From Announcements, the **+** button opens a compose screen where you can type a message and/or record a voice message (tap the microphone, speak, tap Stop, then Post) — works in `npm run web` too, with a normal browser microphone permission prompt.
 
-### 4. Admin dashboard (parish staff)
+### 4. Admin dashboard (community staff)
 
 ```bash
 cd admin
@@ -99,7 +99,7 @@ npm install
 npm run dev
 ```
 
-Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: schedule Events, publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), print a QR flyer from **My QR**, and manage **Settings** — active modules plus the parish's own info (description, picture) shown in the app.
+Opens on `http://localhost:5173`. Sign in with the demo admin account above. If the account manages more than one POI (like the demo one), a switcher appears in the sidebar. From there: schedule Events, publish and edit Announcements, schedule Livestreams, moderate Prayer Requests and Community posts/replies (remove anything inappropriate), print a QR flyer from **My QR**, and manage **Settings** — active modules plus the community's own info (description, picture) shown in the app.
 
 Its dependency cache is deliberately kept in the OS temp directory rather than
 in `admin/node_modules/.vite` (see `admin/vite.config.ts`). Inside a synced
@@ -108,7 +108,7 @@ open, Vite's rename of them fails with `EBUSY: resource busy or locked`, and the
 dashboard serves a blank page. Losing that temp cache only costs one
 re-optimisation on the next start.
 
-Content that's meant to come from parish staff requires this admin login: posting, editing and deleting announcements and livestreams, scheduling events, moderating prayer requests and community posts, and toggling modules. What a congregant can post with an ordinary session (see the phone login below) is a prayer request, a "praying" tap, and community posts and replies. Reading needs no account at all.
+Content that's meant to come from community staff requires this admin login: posting, editing and deleting announcements and livestreams, scheduling events, moderating prayer requests and community posts, and toggling modules. What a congregant can post with an ordinary session (see the phone login below) is a prayer request, a "praying" tap, and community posts and replies. Reading needs no account at all.
 
 ### 5. Access from a physical phone
 
@@ -188,10 +188,15 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 
 - **Donations** — in-app donations through Stripe Checkout (see [Donations & Stripe](#donations--stripe) below); without a Stripe key the screen falls back to a demo confirmation that records the gift without taking a payment
 - **Events** — Masses, baptisms, weddings, funerals, communions, etc. (`backend/src/events`); scheduling/editing is admin-only, the app only reads them (a reminder toggle per event is a local, device-only preference — there's no account yet to attach it to)
-- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message instead of typed; admin-only throughout, since an announcement is the parish speaking to its members. The app's compose screen and its voice recording are there for a signed-in admin; everyone else sees the list without a **+** button
+- **Announcements** — bulletin/newsletter-style posts (`src/announcements`), optionally recorded as a voice message instead of typed; admin-only throughout, since an announcement is the community speaking to its members. The app's compose screen and its voice recording are there for a signed-in admin; everyone else sees the list without a **+** button
 - **Prayer Requests** — community prayer requests with a "praying" counter (`src/prayer-requests`); posting and the counter need a signed-in congregant, moderation (removal) is admin-only from the dashboard
 - **Livestream** — links out to livestreamed/recorded services on an external platform (`src/livestreams`); scheduling/editing is admin-only
 - **Community** — a discussion board: posts with flat (non-nested) comment replies (`src/community`); posting and replying need a signed-in congregant, moderation is admin-only from the dashboard
+- **Celebration times** — part of Events: an event has a kind (Mass, confession, adoration, prayer, office hours, other) and can repeat every week, with an optional end time and last date. The app works out each week's occurrences on the phone (`app/src/utils/schedule.ts`), shows a timetable at the top of the events screen and a short "next Mass" block on the place's home page (`celebration_times` page block)
+- **Requests** — a member asks the office for a baptism, a wedding, a funeral, a certificate, a meeting… (`src/service-requests`), then follows it in the app: status, appointment, the documents the office asks for (sent as photos or PDFs) and a conversation with the office. Files go to `uploads-private/` (`PRIVATE_UPLOADS_DIR`), never served as-is: they open through short-lived signed links (`common/signed-url`). Needs a signed-in member; the dashboard side is admin-only
+- **Mass intentions** — a member asks for a Mass to be said for someone, for one of the coming Masses or "whenever the community can", paying the community's offering through the same Stripe flow as a gift (`src/mass-intentions`). The dashboard keeps the register grouped by celebration, printable for the celebrant, and takes intentions given at the office
+
+Donations also gained campaigns with a goal (`pois/:poiId/campaigns`), the Sunday collection as a purpose, monthly gifts (Stripe subscriptions, signed-in givers only, stoppable from the app) and yearly tax receipts: a printable receipt per giver and a CSV export for the treasurer (in Spain, the starting point of the modelo 182). The community's legal details for the receipts are set on the dashboard's Donations page.
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).
 
@@ -231,7 +236,7 @@ How a gift moves through the system:
   re-checks the session with Stripe, and shows the thank-you screen once the
   payment lands.
 - Only `completed` gifts count towards the admin dashboard's totals, so an
-  abandoned checkout never inflates a parish's figures.
+  abandoned checkout never inflates a community's figures.
 - `POST /stripe/webhook` does the same job from Stripe's side. It needs a
   publicly reachable backend and `STRIPE_WEBHOOK_SECRET`, so the local demo
   doesn't use it — polling covers that case.
@@ -259,11 +264,16 @@ Every write route is behind something now. The rules, in one place:
 | --- | --- |
 | `GET` on places, events, announcements, prayer requests, community, livestreams, page blocks | anyone |
 | `POST` a prayer request, a "praying" tap, a community post or reply | any signed-in congregant |
-| `POST` an announcement | an admin of that place — an announcement is the parish speaking |
+| `POST` an announcement | an admin of that place — an announcement is the community speaking |
 | `POST /pois` (create a place) | any signed-in user, who becomes that place's first admin |
 | `PATCH`/`DELETE` a place, its modules, its settings, its page, and all moderation | an admin of *that* place (`PoiAdminGuard`) |
 | anything under `/users/:id` or `/users/:userId/pois` | that user, and only that user (`SelfGuard`) |
 | `POST` a donation, and the Stripe webhook | anyone (a gift doesn't need an account; the webhook verifies Stripe's signature) |
+| a monthly gift, and the member's own monthly gifts and receipts | a signed-in member, for their own only |
+| `POST` a request, and reading, answering, cancelling or sending documents for it | the signed-in member who made it (anyone else gets a 404) |
+| the office's side of requests, the intentions register, campaigns and receipt exports | an admin of that place |
+| `POST` a Mass intention | anyone (signed in or not) |
+| `GET /private-files/…`, `GET /receipts/…` | whoever holds a signed link, until it expires (about an hour) |
 
 Three things changed shape rather than just gaining a guard:
 
@@ -286,7 +296,7 @@ The app signs someone in with a phone number and a 6-digit code — no password,
 
 The admin dashboard's **Settings** page (`admin/src/pages/SettingsPage.tsx`, `PATCH /pois/:poiId/profile`) combines the active-module toggles with the POI's own public info — a description and a picture (pasted in as a URL for now; the upload pipeline used for announcement voice messages could be reused for direct uploads later) — plus the content-language picker.
 
-The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer for the parish's entrance: a QR code (via the `qrcode` package) encoding a link to the landing site's `#join` section (`/?token=<poi token>#join`), an editable headline/subtext (`qrFlyerHeadline`/`qrFlyerSubtext` on `Poi`, defaulting to generic copy if left blank), and a "Print / Save as PDF" button that uses the browser's own print dialog with a dedicated print stylesheet — no PDF library needed.
+The **My QR** page (`admin/src/pages/MyQrPage.tsx`) generates a printable flyer for the community's entrance: a QR code (via the `qrcode` package) encoding a link to the landing site's `#join` section (`/?token=<poi token>#join`), an editable headline/subtext (`qrFlyerHeadline`/`qrFlyerSubtext` on `Poi`, defaulting to generic copy if left blank), and a "Print / Save as PDF" button that uses the browser's own print dialog with a dedicated print stylesheet — no PDF library needed.
 
 ## Tests and CI
 

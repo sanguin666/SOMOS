@@ -15,10 +15,18 @@ export type Poi = {
   city: string | null;
   postalCode: string | null;
   qrCodeToken: string;
-  // The order this parish wants its modules in the app's bottom menu.
+  // The order this community wants its modules in the app's bottom menu.
   // The app gives the first few a button and puts the rest under More;
   // modules left out fall in behind in the app's default order.
   menuOrder: ModuleType[];
+  // What a Mass intention costs here, or null to let people choose.
+  massIntentionOffering: number | null;
+  // Who issues the tax receipts: the legal body behind the community,
+  // which is rarely the name people know the place by.
+  legalName: string | null;
+  legalTaxId: string | null;
+  legalAddress: string | null;
+  receiptSignatory: string | null;
 };
 
 // The sections a POI stacks on its home page in the app, in the order it
@@ -31,7 +39,9 @@ export type PageBlockType =
   | 'past_events'
   | 'latest_announcements'
   | 'next_livestream'
-  | 'donate';
+  | 'donate'
+  // The place's regular week, built from its weekly events.
+  | 'celebration_times';
 
 export type PoiPageBlock = {
   id: string;
@@ -60,7 +70,9 @@ export type ModuleType =
   | 'announcements'
   | 'prayer_requests'
   | 'livestreams'
-  | 'community';
+  | 'community'
+  | 'requests'
+  | 'mass_intentions';
 
 export type ModuleStatus = 'trial' | 'active' | 'expired' | 'cancelled';
 
@@ -80,12 +92,24 @@ export type Announcement = {
   createdAt: string;
 };
 
+export type EventCategory = 'mass' | 'confession' | 'adoration' | 'prayer' | 'office_hours' | 'other';
+
+// A weekly event repeats on the weekday and at the time of `startsAt`,
+// which is its first occurrence.
+export type EventRecurrence = 'none' | 'weekly';
+
 export type Event = {
   id: string;
   title: string;
   startsAt: string;
+  // For a weekly event, the end of its first occurrence.
+  endsAt: string | null;
   location: string | null;
   description: string | null;
+  category: EventCategory;
+  recurrence: EventRecurrence;
+  // The last day a weekly event still happens, or null for "until changed".
+  repeatUntil: string | null;
 };
 
 export type LivestreamStatus = 'upcoming' | 'live' | 'ended';
@@ -121,11 +145,53 @@ export type CommunityComment = {
   createdAt: string;
 };
 
+export type DonationPurpose = 'general' | 'collection' | 'campaign' | 'mass_intention';
+
 export type Donation = {
   id: string;
   amount: number;
   donorName: string | null;
+  purpose: DonationPurpose;
+  campaign: { id: string; title: string } | null;
+  // A monthly gift: the first payment and every later month alike.
+  recurring: boolean;
   createdAt: string;
+};
+
+// A project the community raises money for, with what it has raised.
+export type Campaign = {
+  id: string;
+  title: string;
+  description: string | null;
+  goalAmount: number | null;
+  endsAt: string | null;
+  // Off: hidden from the app, still listed here with its gifts.
+  active: boolean;
+  raised: number;
+  giftCount: number;
+};
+
+export type ReceiptDonor = {
+  key: string;
+  name: string;
+  address: string | null;
+  postalCode: string | null;
+  city: string | null;
+  taxId: string | null;
+  total: number;
+  count: number;
+  firstGiftAt: string;
+  lastGiftAt: string;
+  // Signed and relative (/receipts/...): prefix with the API base URL.
+  // Opens the receipt for the next hour.
+  url: string;
+};
+
+export type ReceiptList = {
+  year: number;
+  // The year's givers as a CSV, signed like the receipts.
+  exportUrl: string;
+  donors: ReceiptDonor[];
 };
 
 export type PeriodTotal = {
@@ -145,4 +211,87 @@ export type DonationStats = {
   lastWeek: PeriodTotal;
   thisMonth: PeriodTotal;
   lastMonth: PeriodTotal;
+};
+
+export type ServiceRequestType =
+  | 'baptism'
+  | 'wedding'
+  | 'funeral'
+  | 'first_communion'
+  | 'confirmation'
+  | 'certificate'
+  | 'meeting'
+  | 'blessing'
+  | 'sick_visit'
+  | 'other';
+
+export type ServiceRequestStatus = 'received' | 'in_progress' | 'appointment_set' | 'completed' | 'cancelled';
+
+// A private file: `url` is signed, relative (/private-files/...) and
+// opens for the next hour, so prefix it with the API base URL.
+export type RequestFile = {
+  name: string;
+  mime: string | null;
+  url: string;
+};
+
+export type RequestMessage = {
+  id: string;
+  fromStaff: boolean;
+  authorName: string | null;
+  body: string | null;
+  attachment: RequestFile | null;
+  createdAt: string;
+};
+
+export type RequestDocument = {
+  id: string;
+  label: string;
+  note: string | null;
+  // Set when the member sent the file, or when staff ticked it off.
+  receivedAt: string | null;
+  file: RequestFile | null;
+  createdAt: string;
+};
+
+export type ServiceRequestSummary = {
+  id: string;
+  type: ServiceRequestType;
+  status: ServiceRequestStatus;
+  contactName: string;
+  contactPhone: string | null;
+  details: string;
+  // The family's wish, in their own words — not an appointment.
+  preferredDate: string | null;
+  appointmentAt: string | null;
+  appointmentPlace: string | null;
+  // Papers asked for and not yet in.
+  documentsPending: number;
+  // The member did something since the office last opened it.
+  unread: boolean;
+  createdAt: string;
+  updatedAt: string;
+  requester?: { id: string; firstName: string | null; lastName: string | null; phone: string | null };
+};
+
+export type ServiceRequestDetail = ServiceRequestSummary & {
+  messages: RequestMessage[];
+  documents: RequestDocument[];
+};
+
+export type MassIntentionStatus = 'pending_payment' | 'confirmed' | 'celebrated' | 'cancelled';
+
+export type MassIntention = {
+  id: string;
+  intention: string;
+  requesterName: string;
+  requesterContact: string | null;
+  // null: whenever the community can.
+  celebrationAt: string | null;
+  celebrationTitle: string | null;
+  offeringAmount: number | null;
+  status: MassIntentionStatus;
+  // Written in at the office rather than asked for from the app.
+  fromOffice: boolean;
+  createdAt: string;
 };

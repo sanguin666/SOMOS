@@ -22,7 +22,9 @@ export type ModuleType =
   | 'announcements'
   | 'prayer_requests'
   | 'livestreams'
-  | 'community';
+  | 'community'
+  | 'requests'
+  | 'mass_intentions';
 
 export type ActiveModule = {
   id: string;
@@ -38,6 +40,7 @@ export type ActiveModule = {
 export type PageBlockType =
   | 'text'
   | 'image'
+  | 'celebration_times'
   | 'next_events'
   | 'past_events'
   | 'latest_announcements'
@@ -67,12 +70,30 @@ export type Announcement = {
   createdAt: string;
 };
 
+// What kind of celebration or opening an event is. Masses, confessions
+// and the like make up a place's weekly timetable; `other` is everything
+// else (a concert, a fête).
+export type EventCategory =
+  | 'mass'
+  | 'confession'
+  | 'adoration'
+  | 'prayer'
+  | 'office_hours'
+  | 'other';
+
 export type Event = {
   id: string;
   title: string;
+  // For a weekly event, its first occurrence: the weekday and time it
+  // repeats on (see utils/schedule.ts).
   startsAt: string;
+  endsAt: string | null;
   location: string | null;
   description: string | null;
+  category: EventCategory;
+  recurrence: 'none' | 'weekly';
+  // The last day a weekly event still happens, or null for no end.
+  repeatUntil: string | null;
 };
 
 export type PrayerRequest = {

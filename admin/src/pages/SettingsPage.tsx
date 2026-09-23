@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { usePoiId } from '../layout/usePoiId';
+import { usePoiId, useRefreshModules } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
 import { activateModule, getActiveModules, setModuleStatus } from '../api/activeModules';
 import { getPoi } from '../api/pois';
@@ -19,6 +19,7 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
 
 export function SettingsPage() {
   const poiId = usePoiId();
+  const refreshModules = useRefreshModules();
   const { t } = useI18n();
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +43,8 @@ export function SettingsPage() {
     { type: 'prayer_requests', label: t('moduleNames.prayerRequests') },
     { type: 'livestreams', label: t('moduleNames.livestream') },
     { type: 'community', label: t('moduleNames.community') },
+    { type: 'requests', label: t('moduleNames.requests') },
+    { type: 'mass_intentions', label: t('moduleNames.massIntentions') },
   ];
 
   function load() {
@@ -69,6 +72,7 @@ export function SettingsPage() {
         const updated = await setModuleStatus(poiId, existing.id, isLive ? 'cancelled' : 'active');
         setModules((current) => current?.map((m) => (m.id === existing.id ? updated : m)) ?? null);
       }
+      refreshModules();
     } catch {
       setError(t('modules.updateError'));
     } finally {
