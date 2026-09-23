@@ -63,6 +63,35 @@ export class Poi {
   @Column('text', { name: 'menu_order', array: true, default: () => "'{}'" })
   menuOrder!: ModuleType[];
 
+  // What a Mass intention costs here, as the diocese sets it. null lets
+  // the person asking choose what to give (or nothing).
+  @Column('numeric', {
+    name: 'mass_intention_offering',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value: number | null | undefined) => value,
+      from: (value: string | null) => (value === null ? null : Number.parseFloat(value)),
+    },
+  })
+  massIntentionOffering?: number | null;
+
+  // Who issues the tax receipts: the legal body behind the community (in
+  // France the diocesan association, in Spain the parish or diocese with
+  // its own CIF), which is rarely the name people know the place by.
+  @Column('varchar', { name: 'legal_name', nullable: true })
+  legalName?: string | null;
+
+  @Column('varchar', { name: 'legal_tax_id', nullable: true })
+  legalTaxId?: string | null;
+
+  @Column('text', { name: 'legal_address', nullable: true })
+  legalAddress?: string | null;
+
+  @Column('varchar', { name: 'receipt_signatory', nullable: true })
+  receiptSignatory?: string | null;
+
   @Column({ nullable: true })
   address?: string;
 

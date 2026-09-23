@@ -19,6 +19,18 @@ import { PoiType } from './common/enums/poi-type.enum.js';
 import { MemberRole } from './common/enums/member-role.enum.js';
 import { Language } from './common/enums/language.enum.js';
 import { PageBlockType } from './common/enums/page-block-type.enum.js';
+import { ENTITIES } from './config/typeorm.config.js';
+import { EventCategory, EventRecurrence } from './events/entities/event-kinds.js';
+import { DonationCampaign } from './donations/entities/donation-campaign.entity.js';
+import { DonationPurpose } from './donations/entities/donation.entity.js';
+import {
+  ServiceRequest,
+  ServiceRequestStatus,
+  ServiceRequestType,
+} from './service-requests/entities/service-request.entity.js';
+import { ServiceRequestMessage } from './service-requests/entities/service-request-message.entity.js';
+import { ServiceRequestDocument } from './service-requests/entities/service-request-document.entity.js';
+import { MassIntention, MassIntentionStatus } from './mass-intentions/entities/mass-intention.entity.js';
 
 /**
  * Seeds two demo POIs with fixed QR tokens, so the app has something real
@@ -39,20 +51,8 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME ?? 'ansae',
   password: process.env.DB_PASSWORD ?? 'ansae',
   database: process.env.DB_NAME ?? 'ansae',
-  entities: [
-    User,
-    Poi,
-    UserPoi,
-    ActiveModule,
-    Announcement,
-    Event,
-    PrayerRequest,
-    Livestream,
-    CommunityPost,
-    CommunityComment,
-    Donation,
-    PoiPageBlock,
-  ],
+  // The app's own list, so a new table can never be missing here.
+  entities: ENTITIES,
   synchronize: true,
 });
 
@@ -131,6 +131,8 @@ async function seed() {
       ModuleType.PRAYER_REQUESTS,
       ModuleType.LIVESTREAMS,
       ModuleType.COMMUNITY,
+      ModuleType.REQUESTS,
+      ModuleType.MASS_INTENTIONS,
     ]) {
       const existing = await activeModuleRepository.findOne({
         where: { poi: { id: target.id }, moduleType },
@@ -283,12 +285,6 @@ async function seed() {
     potluck.setDate(potluck.getDate() + 13);
     potluck.setHours(18, 0, 0, 0);
     await eventRepository.save([
-      eventRepository.create({
-        poi,
-        title: 'Sunday Mass',
-        startsAt: upcomingSunday,
-        location: 'Main Hall',
-      }),
       eventRepository.create({
         poi,
         title: 'Baptism Ceremony',
@@ -445,6 +441,12 @@ async function seed() {
   await seedDonations(poi, 1);
   await seedDonations(poi2, 0.4);
 
+  await seedChurchModules({
+    dataSource,
+    stMarys: poi,
+    holyTrinity: poi2,
+  });
+
   console.log('\nDemo POI ready:');
   console.log(`  id:       ${poi.id}`);
   console.log(`  QR token: ${poi.qrCodeToken}`);
@@ -474,6 +476,211 @@ async function seed() {
   }
 
   await dataSource.destroy();
+}
+
+/**
+ * The modules built for churches on 23 Sep 2026: a real weekly timetable,
+ * requests and appointments, Mass intentions, and richer giving. Each
+ * piece checks for itself, so this also fills in a database seeded before
+ * these modules existed.
+ */
+async function seedChurchModules({
+  dataSource,
+  stMarys,
+  holyTrinity,
+}: {
+  dataSource: DataSource;
+  stMarys: Poi;
+  holyTrinity: Poi;
+}) {
+  const events = dataSource.getRepository(Event);
+  const pois = dataSource.getRepository(Poi);
+  const blocks = dataSource.getRepository(PoiPageBlock);
+  const campaigns = dataSource.getRepository(DonationCampaign);
+  const donations = dataSource.getRepository(Donation);
+  const users = dataSource.getRepository(User);
+  const memberships = dataSource.getRepository(UserPoi);
+  const requests = dataSource.getRepository(ServiceRequest);
+  const messages = dataSource.getRepository(ServiceRequestMessage);
+  const documents = dataSource.getRepository(ServiceRequestDocument);
+  const intentions = dataSource.getRepository(MassIntention);
+
+  // The next date falling on `weekday` (0 = Sunday) at hh:mm, from today.
+  function nextWeekday(weekday: number, hours: number, minutes = 0): Date {
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    const ahead = (weekday - date.getDay() + 7) % 7;
+    date.setDate(date.getDate() + ahead);
+    return date;
+  }
+
+  // The old demo had a one-off "Sunday Mass"; it is the weekly one now.
+  await events.update(
+    { title: 'Sunday Mass', recurrence: EventRecurrence.NONE },
+    { recurrence: EventRecurrence.WEEKLY, category: EventCategory.MASS },
+  );
+
+  const timetables: [Poi, { title: string; weekday: number; at: [number, number]; category: EventCategory; location: string }[]][] = [
+    [
+      stMarys,
+      [
+        { title: 'Sunday Mass', weekday: 0, at: [10, 0], category: EventCategory.MASS, location: 'Main church' },
+        { title: 'Saturday evening Mass', weekday: 6, at: [18, 30], category: EventCategory.MASS, location: 'Main church' },
+        { title: 'Weekday Mass', weekday: 3, at: [9, 0], category: EventCategory.MASS, location: 'Chapel' },
+        { title: 'Confessions', weekday: 5, at: [17, 0], category: EventCategory.CONFESSION, location: 'Chapel' },
+        { title: 'Adoration', weekday: 4, at: [20, 0], category: EventCategory.ADORATION, location: 'Chapel' },
+        { title: 'Office open', weekday: 2, at: [10, 0], category: EventCategory.OFFICE_HOURS, location: 'Community office' },
+      ],
+    ],
+    [
+      holyTrinity,
+      [
+        { title: 'Misa dominical', weekday: 0, at: [12, 0], category: EventCategory.MASS, location: 'Iglesia' },
+        { title: 'Misa', weekday: 4, at: [19, 0], category: EventCategory.MASS, location: 'Capilla' },
+        { title: 'Confesiones', weekday: 6, at: [18, 0], category: EventCategory.CONFESSION, location: 'Capilla' },
+        { title: 'Despacho abierto', weekday: 1, at: [18, 0], category: EventCategory.OFFICE_HOURS, location: 'Despacho' },
+      ],
+    ],
+  ];
+  for (const [place, rows] of timetables) {
+    for (const row of rows) {
+      const existing = await events.findOne({ where: { poi: { id: place.id }, title: row.title } });
+      if (existing) {
+        if (existing.startsAt.getHours() === row.at[0] && existing.startsAt.getMinutes() === row.at[1]) {
+          // Keep it, but make sure an old one-off row reads as weekly.
+          if (existing.recurrence !== EventRecurrence.WEEKLY || existing.category !== row.category) {
+            await events.update(existing.id, { recurrence: EventRecurrence.WEEKLY, category: row.category });
+          }
+        }
+        continue;
+      }
+      const startsAt = nextWeekday(row.weekday, ...row.at);
+      await events.save(
+        events.create({
+          poi: place,
+          title: row.title,
+          startsAt,
+          // The office is open for a span; everything else is a start time.
+          endsAt:
+            row.category === EventCategory.OFFICE_HOURS
+              ? new Date(startsAt.getTime() + 2 * 60 * 60 * 1000)
+              : null,
+          location: row.location,
+          category: row.category,
+          recurrence: EventRecurrence.WEEKLY,
+        }),
+      );
+    }
+  }
+  console.log('Seeded weekly timetables');
+
+  // The timetable at the top of St. Mary's home page, just under its welcome.
+  const hasTimes = await blocks.count({
+    where: { poi: { id: stMarys.id }, type: PageBlockType.CELEBRATION_TIMES },
+  });
+  if (!hasTimes) {
+    const page = await blocks.find({ where: { poi: { id: stMarys.id } }, order: { position: 'ASC' } });
+    const insertAt = page.length > 0 && page[0].type === PageBlockType.TEXT ? 1 : 0;
+    for (const block of page.slice(insertAt)) block.position += 1;
+    await blocks.save(page);
+    await blocks.save(
+      blocks.create({ poi: stMarys, type: PageBlockType.CELEBRATION_TIMES, position: insertAt, itemCount: 3 }),
+    );
+    console.log('Added the timetable to St. Mary’s home page');
+  }
+
+  // Offerings as a diocese might set them, and who issues the receipts.
+  for (const [place, offering, legal] of [
+    [stMarys, 20, { legalName: 'St. Mary’s Community Association', legalTaxId: 'W123456789', legalAddress: '1 Church Street\nSpringfield', receiptSignatory: 'Fr. John Miller, parish priest' }],
+    [holyTrinity, 10, { legalName: 'Parroquia Santísima Trinidad', legalTaxId: 'R2800000A', legalAddress: 'Calle Mayor 1\n28001 Madrid', receiptSignatory: 'P. Luis García, párroco' }],
+  ] as const) {
+    if (place.massIntentionOffering == null) {
+      await pois.update(place.id, { massIntentionOffering: offering, ...legal });
+    }
+  }
+
+  // A project with a goal, and gifts towards it.
+  for (const [place, title, description, goal] of [
+    [stMarys, 'New roof', 'The church roof lets the rain in over the north aisle. Help us fix it before winter.', 25000],
+    [holyTrinity, 'Restauración del órgano', 'Nuestro órgano necesita una restauración completa.', 12000],
+  ] as const) {
+    const exists = await campaigns.count({ where: { poi: { id: place.id } } });
+    if (exists) continue;
+    const campaign = await campaigns.save(
+      campaigns.create({ poi: place, title, description, goalAmount: goal, active: true }),
+    );
+    const gifts = Array.from({ length: 24 }, (_, i) => {
+      const createdAt = new Date();
+      createdAt.setDate(createdAt.getDate() - i * 2);
+      return donations.create({
+        poi: place,
+        amount: [20, 50, 100, 250, 500][i % 5] * (place === stMarys ? 1.6 : 0.8),
+        purpose: DonationPurpose.CAMPAIGN,
+        campaign,
+        createdAt,
+      });
+    });
+    await donations.save(gifts);
+    console.log(`Seeded the campaign "${title}"`);
+  }
+
+  // A member with a request in progress, so the office has one to open.
+  let member = await users.findOne({ where: { phone: '+15550100200' } });
+  if (!member) {
+    member = await users.save(users.create({ phone: '+15550100200', firstName: 'Anna', lastName: 'Kowalski' }));
+    await memberships.save(memberships.create({ user: member, poi: stMarys, role: MemberRole.MEMBER }));
+  }
+  const hasRequest = await requests.count({ where: { poi: { id: stMarys.id } } });
+  if (!hasRequest) {
+    const now = Date.now();
+    const request = await requests.save(
+      requests.create({
+        poi: stMarys,
+        requester: member,
+        type: ServiceRequestType.BAPTISM,
+        status: ServiceRequestStatus.IN_PROGRESS,
+        contactName: 'Anna Kowalski',
+        contactPhone: '+1 555 010 0200',
+        details: 'We would like to have our daughter Sophie (born in June) baptised, ideally on a Sunday in November. Her godmother lives abroad.',
+        preferredDate: 'A Sunday in November',
+        lastMemberActivityAt: new Date(now - 60 * 60 * 1000),
+        lastStaffActivityAt: new Date(now - 2 * 60 * 60 * 1000),
+        memberSeenAt: new Date(now - 60 * 60 * 1000),
+      }),
+    );
+    const admin = await users.findOne({ where: { email: 'admin@stmarys.example' } });
+    await messages.save([
+      messages.create({
+        request,
+        author: admin,
+        fromStaff: true,
+        body: 'Thank you, Anna! Baptisms are on the second Sunday of the month. Could you send Sophie’s birth certificate? We will then set a meeting with Fr. John.',
+        createdAt: new Date(now - 2 * 60 * 60 * 1000),
+      }),
+      messages.create({
+        request,
+        author: member,
+        fromStaff: false,
+        body: 'Of course. Is a photo of it fine?',
+        createdAt: new Date(now - 60 * 60 * 1000),
+      }),
+    ]);
+    await documents.save(
+      documents.create({ request, label: 'Birth certificate of the child', note: 'A photo of the page is fine.' }),
+    );
+    console.log('Seeded a demo baptism request');
+  }
+
+  const hasIntentions = await intentions.count({ where: { poi: { id: stMarys.id } } });
+  if (!hasIntentions) {
+    const sunday = nextWeekday(0, 10);
+    await intentions.save([
+      intentions.create({ poi: stMarys, intention: 'For John Carter, who died last month', requesterName: 'Margaret Carter', celebrationAt: sunday, celebrationTitle: 'Sunday Mass', offeringAmount: 20, status: MassIntentionStatus.CONFIRMED }),
+      intentions.create({ poi: stMarys, intention: 'In thanksgiving for 50 years of marriage', requesterName: 'Robert and Linda', celebrationAt: sunday, celebrationTitle: 'Sunday Mass', offeringAmount: 20, status: MassIntentionStatus.CONFIRMED }),
+      intentions.create({ poi: stMarys, intention: 'For the souls in purgatory', requesterName: 'Susan', offeringAmount: 20, status: MassIntentionStatus.CONFIRMED, fromOffice: true }),
+    ]);
+    console.log('Seeded demo Mass intentions');
+  }
 }
 
 await seed();

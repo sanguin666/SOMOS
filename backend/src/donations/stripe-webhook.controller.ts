@@ -44,12 +44,19 @@ export class StripeWebhookController {
       const session = event.data.object;
       const donation = await this.donationsService.findBySessionId(session.id);
       if (donation) {
-        await this.donationsService.applySessionOutcome(
-          donation,
-          session.payment_status,
-          session.status,
-          session.payment_intent,
-        );
+        await this.donationsService.applySessionOutcome(donation, session);
+      }
+    }
+
+    // A monthly gift charged again. The first month's invoice is the
+    // checkout itself (billing_reason `subscription_create`), already
+    // recorded above, so only the renewals are new gifts.
+    if (event.type === 'invoice.paid') {
+      const invoice = event.data.object;
+      const subscription = invoice.parent?.subscription_details?.subscription;
+      const subscriptionId = typeof subscription === 'string' ? subscription : subscription?.id;
+      if (subscriptionId && invoice.id && invoice.billing_reason === 'subscription_cycle') {
+        await this.donationsService.recordRenewal(subscriptionId, invoice.id, invoice.amount_paid / 100);
       }
     }
 

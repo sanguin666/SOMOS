@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Donation, DonationStatus } from './entities/donation.entity.js';
+import { DonationCampaign } from './entities/donation-campaign.entity.js';
 import { DonationsService } from './donations.service.js';
 import { PoisService } from '../pois/pois.service.js';
 import { StripeService } from './stripe.service.js';
@@ -50,6 +51,7 @@ describe('DonationsService (Stripe checkout)', () => {
       providers: [
         DonationsService,
         { provide: getRepositoryToken(Donation), useValue: repository },
+        { provide: getRepositoryToken(DonationCampaign), useValue: {} },
         { provide: PoisService, useValue: { findOne: async () => poi } },
         { provide: StripeService, useValue: stripe },
       ],

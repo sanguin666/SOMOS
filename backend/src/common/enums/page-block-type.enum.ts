@@ -16,4 +16,7 @@ export enum PageBlockType {
   LATEST_ANNOUNCEMENTS = 'latest_announcements',
   NEXT_LIVESTREAM = 'next_livestream',
   DONATE = 'donate',
+  // The place's regular week (Masses, confessions, office hours), built
+  // from its repeating events: the short answer to "when is Mass?".
+  CELEBRATION_TIMES = 'celebration_times',
 }

@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { Poi } from '../../pois/entities/poi.entity.js';
+import { User } from '../../users/entities/user.entity.js';
+import { DonationCampaign } from './donation-campaign.entity.js';
 
 /**
  * Where a gift is in the payment flow. A gift made through Stripe starts
@@ -18,6 +20,20 @@ export enum DonationStatus {
   PENDING = 'pending',
   COMPLETED = 'completed',
   FAILED = 'failed',
+}
+
+/**
+ * What a gift is for. A Mass intention's offering is a gift too, so it
+ * goes through the same payment flow and shows in the same totals, but it
+ * can only be made through the Mass intentions module, never chosen by
+ * hand on the donate screen.
+ */
+export enum DonationPurpose {
+  GENERAL = 'general',
+  // The collection taken at Mass, given from the pew with a phone.
+  COLLECTION = 'collection',
+  CAMPAIGN = 'campaign',
+  MASS_INTENTION = 'mass_intention',
 }
 
 /**
@@ -65,6 +81,59 @@ export class Donation {
 
   @Column({ name: 'donor_name', nullable: true })
   donorName?: string;
+
+  @Column({ type: 'enum', enum: DonationPurpose, default: DonationPurpose.GENERAL })
+  purpose!: DonationPurpose;
+
+  // The project a campaign gift went to. A campaign that is deleted keeps
+  // its gifts, which simply stop being counted towards a goal.
+  @ManyToOne(() => DonationCampaign, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'campaign_id' })
+  campaign?: Relation<DonationCampaign> | null;
+
+  // Who gave, when they were signed in. Needed for a monthly gift (so the
+  // giver can stop it) and for "my tax receipt"; optional otherwise.
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'donor_id' })
+  donor?: Relation<User> | null;
+
+  // A monthly gift. The row that started it has no parent; each later
+  // month Stripe charges is a row of its own pointing back at it, so every
+  // payment still lands on the day it was made in the totals.
+  @Column({ default: false })
+  recurring!: boolean;
+
+  @Column('uuid', { name: 'recurring_parent_id', nullable: true })
+  recurringParentId?: string | null;
+
+  @Column('varchar', { name: 'stripe_subscription_id', nullable: true })
+  stripeSubscriptionId?: string | null;
+
+  // The Stripe invoice a later month's row was recorded from, so the same
+  // invoice arriving twice (Stripe retries webhooks) is recorded once.
+  @Column('varchar', { name: 'stripe_invoice_id', nullable: true, unique: true })
+  stripeInvoiceId?: string | null;
+
+  @Column('timestamptz', { name: 'recurring_cancelled_at', nullable: true })
+  recurringCancelledAt?: Date | null;
+
+  // A tax receipt needs to know who the giver is and where they live
+  // (and in Spain, their NIF). Asked only when the giver wants a receipt,
+  // and kept on the gift as given, as the receipt has to say.
+  @Column({ name: 'wants_receipt', default: false })
+  wantsReceipt!: boolean;
+
+  @Column('varchar', { name: 'donor_address', nullable: true })
+  donorAddress?: string | null;
+
+  @Column('varchar', { name: 'donor_postal_code', nullable: true })
+  donorPostalCode?: string | null;
+
+  @Column('varchar', { name: 'donor_city', nullable: true })
+  donorCity?: string | null;
+
+  @Column('varchar', { name: 'donor_tax_id', nullable: true })
+  donorTaxId?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

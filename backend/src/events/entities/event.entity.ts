@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { Poi } from '../../pois/entities/poi.entity.js';
+import { EventCategory, EventRecurrence } from './event-kinds.js';
 
 /**
  * A scheduled event posted by a POI (Mass times, baptisms, weddings,
@@ -29,6 +30,11 @@ export class Event {
   @Column({ name: 'starts_at', type: 'timestamptz' })
   startsAt!: Date;
 
+  // Optional: when it finishes, for what is shown as a span ("office open
+  // 10:00 – 12:00"). For a weekly event, the end of its first occurrence.
+  @Column('timestamptz', { name: 'ends_at', nullable: true })
+  endsAt?: Date | null;
+
   // The column type has to be spelled out: TypeORM reads it from the
   // property's reflected type, and a `string | null` union reflects as
   // `Object`, which Postgres has no data type for.
@@ -37,6 +43,21 @@ export class Event {
 
   @Column('text', { nullable: true })
   description?: string | null;
+
+  @Column({ type: 'enum', enum: EventCategory, default: EventCategory.OTHER })
+  category!: EventCategory;
+
+  // A weekly event repeats on the weekday and at the time of `startsAt`,
+  // which is its first occurrence. Occurrences are worked out by whoever
+  // reads the event (the app, the dashboard) rather than stored, so moving
+  // Sunday Mass by half an hour is one edit.
+  @Column({ type: 'enum', enum: EventRecurrence, default: EventRecurrence.NONE })
+  recurrence!: EventRecurrence;
+
+  // The last day a weekly event still happens (a summer timetable), or
+  // null when it carries on until someone changes it.
+  @Column('timestamptz', { name: 'repeat_until', nullable: true })
+  repeatUntil?: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

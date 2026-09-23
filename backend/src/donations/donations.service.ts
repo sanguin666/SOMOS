@@ -1,11 +1,24 @@
-import { Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import type Stripe from 'stripe';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
-import { Donation, DonationStatus } from './entities/donation.entity.js';
+import { And, In, IsNull, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { Donation, DonationPurpose, DonationStatus } from './entities/donation.entity.js';
+import { DonationCampaign } from './entities/donation-campaign.entity.js';
 import { PoisService } from '../pois/pois.service.js';
+import type { Poi } from '../pois/entities/poi.entity.js';
+import type { User } from '../users/entities/user.entity.js';
+import { Language } from '../common/enums/language.enum.js';
 import { CreateDonationDto } from './dto/create-donation.dto.js';
+import type { CreateCampaignDto, UpdateCampaignDto } from './dto/campaign.dto.js';
 import { StripeService } from './stripe.service.js';
+import { groupDonors, type ReceiptDonor } from './receipts.js';
 
 export type PeriodTotal = { total: number; count: number };
 
@@ -19,6 +32,69 @@ export type DailyTotal = { date: string; total: number; count: number };
 export type CheckoutResult =
   | { mode: 'demo'; donationId: string }
   | { mode: 'stripe'; donationId: string; checkoutUrl: string };
+
+/** A campaign as the app and the dashboard show it: with what it has raised. */
+export type CampaignView = {
+  id: string;
+  title: string;
+  description: string | null;
+  goalAmount: number | null;
+  endsAt: Date | null;
+  active: boolean;
+  raised: number;
+  giftCount: number;
+};
+
+/** Anything the Stripe session tells us about how a checkout ended. */
+export type SessionOutcome = {
+  payment_status?: string | null;
+  status?: string | null;
+  payment_intent?: unknown;
+  subscription?: unknown;
+};
+
+/** Options only the backend itself sets, never the request body. */
+export type CheckoutOptions = {
+  // The signed-in giver, if any.
+  donorUserId?: string;
+  // Set by the Mass intentions module for an intention's offering.
+  purpose?: DonationPurpose;
+};
+
+// What the payer reads on Stripe's page, in the place's own language.
+const PRODUCT_NAMES: Record<Language, Record<'gift' | 'monthly' | 'collection' | 'intention', string>> = {
+  [Language.EN]: {
+    gift: 'Donation to {name}',
+    monthly: 'Monthly donation to {name}',
+    collection: 'Collection — {name}',
+    intention: 'Mass intention — {name}',
+  },
+  [Language.FR]: {
+    gift: 'Don à {name}',
+    monthly: 'Don mensuel à {name}',
+    collection: 'Quête — {name}',
+    intention: 'Intention de messe — {name}',
+  },
+  [Language.ES]: {
+    gift: 'Donativo a {name}',
+    monthly: 'Donativo mensual a {name}',
+    collection: 'Colecta — {name}',
+    intention: 'Intención de misa — {name}',
+  },
+};
+
+function productName(poi: Poi, purpose: DonationPurpose, recurring: boolean): string {
+  const names = PRODUCT_NAMES[poi.language] ?? PRODUCT_NAMES[Language.EN];
+  const key =
+    purpose === DonationPurpose.MASS_INTENTION
+      ? 'intention'
+      : recurring
+        ? 'monthly'
+        : purpose === DonationPurpose.COLLECTION
+          ? 'collection'
+          : 'gift';
+  return names[key].replace('{name}', poi.name);
+}
 
 export type DonationStats = {
   dailyTotals: DailyTotal[];
@@ -76,6 +152,8 @@ export class DonationsService {
   constructor(
     @InjectRepository(Donation)
     private readonly donationsRepository: Repository<Donation>,
+    @InjectRepository(DonationCampaign)
+    private readonly campaignsRepository: Repository<DonationCampaign>,
     private readonly poisService: PoisService,
     private readonly stripeService: StripeService,
   ) {}
@@ -95,20 +173,54 @@ export class DonationsService {
     poiId: string,
     dto: CreateDonationDto,
     returnUrlBase: string,
+    options: CheckoutOptions = {},
   ): Promise<CheckoutResult> {
     const poi = await this.poisService.findOne(poiId);
+    const purpose = options.purpose ?? dto.purpose ?? DonationPurpose.GENERAL;
+    const recurring = dto.recurring === true;
+
+    // A monthly gift has to belong to someone who can come back and stop it.
+    if (recurring && !options.donorUserId) {
+      throw new UnauthorizedException('Sign in to give every month');
+    }
+
+    let campaign: DonationCampaign | null = null;
+    if (purpose === DonationPurpose.CAMPAIGN) {
+      campaign = await this.campaignsRepository.findOne({
+        where: { id: dto.campaignId, poi: { id: poiId }, active: true },
+      });
+      if (!campaign) throw new BadRequestException('This campaign is not open for gifts');
+    }
+
+    const fields: Partial<Donation> = {
+      amount: dto.amount,
+      donorName: dto.donorName,
+      poi,
+      purpose,
+      campaign,
+      donor: options.donorUserId ? ({ id: options.donorUserId } as User) : null,
+      recurring,
+      wantsReceipt: dto.wantsReceipt === true,
+      ...(dto.wantsReceipt
+        ? {
+            donorAddress: dto.donorAddress,
+            donorPostalCode: dto.donorPostalCode,
+            donorCity: dto.donorCity,
+            donorTaxId: dto.donorTaxId ?? null,
+          }
+        : {}),
+    };
 
     if (!this.stripeService.isConfigured) {
       const donation = await this.donationsRepository.save(
-        this.donationsRepository.create({ ...dto, poi, status: DonationStatus.COMPLETED }),
+        this.donationsRepository.create({ ...fields, status: DonationStatus.COMPLETED }),
       );
       return { mode: 'demo', donationId: donation.id };
     }
 
     const donation = await this.donationsRepository.save(
       this.donationsRepository.create({
-        ...dto,
-        poi,
+        ...fields,
         currency: this.stripeService.currency,
         status: DonationStatus.PENDING,
       }),
@@ -118,11 +230,12 @@ export class DonationsService {
     try {
       session = await this.stripeService.createCheckoutSession({
         amount: dto.amount,
-        poiName: poi.name,
+        productName: productName(poi, purpose, recurring),
         donationId: donation.id,
         poiId: poi.id,
         successUrl: `${returnUrlBase}/donations/return?status=success`,
         cancelUrl: `${returnUrlBase}/donations/return?status=cancelled`,
+        recurring,
       });
     } catch (error) {
       // A bad key or an unreachable Stripe shouldn't read as "the app is
@@ -150,35 +263,230 @@ export class DonationsService {
       where: { id: donationId, poi: { id: poiId } },
     });
     if (!donation) throw new NotFoundException('Donation not found');
-
-    if (donation.status === DonationStatus.PENDING && donation.stripeSessionId) {
-      const session = await this.stripeService.retrieveSession(donation.stripeSessionId);
-      await this.applySessionOutcome(donation, session.payment_status, session.status, session.payment_intent);
-    }
-
+    await this.refreshFromStripe(donation);
     return { status: donation.status, amount: donation.amount };
   }
 
+  /** Re-checks a pending gift with Stripe. A no-op for anything else. */
+  async refreshFromStripe(donation: Donation): Promise<void> {
+    if (donation.status === DonationStatus.PENDING && donation.stripeSessionId && this.stripeService.isConfigured) {
+      const session = await this.stripeService.retrieveSession(donation.stripeSessionId);
+      await this.applySessionOutcome(donation, session);
+    }
+  }
+
   /** Promotes (or fails) a pending gift from a Stripe session, webhook or poll. */
-  async applySessionOutcome(
-    donation: Donation,
-    paymentStatus: string | null | undefined,
-    sessionStatus: string | null | undefined,
-    paymentIntent: unknown,
-  ): Promise<void> {
+  async applySessionOutcome(donation: Donation, session: SessionOutcome): Promise<void> {
     if (donation.status !== DonationStatus.PENDING) return;
 
-    if (paymentStatus === 'paid') {
+    if (session.payment_status === 'paid') {
       donation.status = DonationStatus.COMPLETED;
       donation.stripePaymentIntentId =
-        typeof paymentIntent === 'string' ? paymentIntent : donation.stripePaymentIntentId;
-    } else if (sessionStatus === 'expired') {
+        typeof session.payment_intent === 'string' ? session.payment_intent : donation.stripePaymentIntentId;
+      // A monthly gift: remember the subscription, which is what later
+      // months' invoices and the giver's "stop" both refer to.
+      if (typeof session.subscription === 'string') {
+        donation.stripeSubscriptionId = session.subscription;
+      }
+    } else if (session.status === 'expired') {
       donation.status = DonationStatus.FAILED;
     } else {
       // Still open — the payer hasn't finished yet, so leave it pending.
       return;
     }
     await this.donationsRepository.save(donation);
+  }
+
+  /**
+   * A later month of a monthly gift, from Stripe's `invoice.paid`. The
+   * first month is the checkout itself, so only renewals land here, each
+   * as a completed gift of its own on the day it was charged.
+   */
+  async recordRenewal(subscriptionId: string, invoiceId: string, amount: number): Promise<void> {
+    const first = await this.donationsRepository.findOne({
+      where: { stripeSubscriptionId: subscriptionId, recurringParentId: IsNull() },
+      relations: { poi: true, campaign: true, donor: true },
+    });
+    if (!first) return;
+    const already = await this.donationsRepository.findOne({ where: { stripeInvoiceId: invoiceId } });
+    if (already) return;
+    await this.donationsRepository.save(
+      this.donationsRepository.create({
+        poi: first.poi,
+        amount,
+        currency: first.currency,
+        status: DonationStatus.COMPLETED,
+        purpose: first.purpose,
+        campaign: first.campaign,
+        donor: first.donor,
+        donorName: first.donorName,
+        recurring: true,
+        recurringParentId: first.id,
+        stripeSubscriptionId: subscriptionId,
+        stripeInvoiceId: invoiceId,
+        wantsReceipt: first.wantsReceipt,
+        donorAddress: first.donorAddress,
+        donorPostalCode: first.donorPostalCode,
+        donorCity: first.donorCity,
+        donorTaxId: first.donorTaxId,
+      }),
+    );
+  }
+
+  /** A signed-in giver's monthly gifts at this place that are still running. */
+  async listMyMonthly(poiId: string, userId: string): Promise<Donation[]> {
+    return this.donationsRepository.find({
+      where: {
+        poi: { id: poiId },
+        donor: { id: userId },
+        recurring: true,
+        recurringParentId: IsNull(),
+        recurringCancelledAt: IsNull(),
+        status: DonationStatus.COMPLETED,
+      },
+      relations: { campaign: true },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async stopMonthly(poiId: string, donationId: string, userId: string): Promise<void> {
+    const donation = await this.donationsRepository.findOne({
+      where: { id: donationId, poi: { id: poiId }, donor: { id: userId }, recurring: true },
+    });
+    if (!donation) throw new NotFoundException('Donation not found');
+    if (donation.recurringCancelledAt) return;
+    if (donation.stripeSubscriptionId && this.stripeService.isConfigured) {
+      try {
+        await this.stripeService.cancelSubscription(donation.stripeSubscriptionId);
+      } catch (error) {
+        this.logger.error(`Stripe cancel failed: ${(error as Error).message}`);
+        throw new ServiceUnavailableException('Could not stop the monthly gift');
+      }
+    }
+    donation.recurringCancelledAt = new Date();
+    await this.donationsRepository.save(donation);
+  }
+
+  // ---- Campaigns ----
+
+  async listCampaigns(poiId: string, includeInactive: boolean): Promise<CampaignView[]> {
+    const campaigns = await this.campaignsRepository.find({
+      where: { poi: { id: poiId }, ...(includeInactive ? {} : { active: true }) },
+      order: { createdAt: 'DESC' },
+    });
+    return this.withRaised(campaigns);
+  }
+
+  async createCampaign(poiId: string, dto: CreateCampaignDto): Promise<CampaignView> {
+    const poi = await this.poisService.findOne(poiId);
+    const campaign = await this.campaignsRepository.save(
+      this.campaignsRepository.create({
+        ...dto,
+        endsAt: dto.endsAt ? new Date(dto.endsAt) : null,
+        poi,
+      }),
+    );
+    return (await this.withRaised([campaign]))[0];
+  }
+
+  async updateCampaign(poiId: string, id: string, dto: UpdateCampaignDto): Promise<CampaignView> {
+    const campaign = await this.findCampaign(poiId, id);
+    Object.assign(campaign, {
+      ...dto,
+      endsAt: dto.endsAt === undefined ? campaign.endsAt : dto.endsAt ? new Date(dto.endsAt) : null,
+    });
+    await this.campaignsRepository.save(campaign);
+    return (await this.withRaised([campaign]))[0];
+  }
+
+  async removeCampaign(poiId: string, id: string): Promise<void> {
+    const campaign = await this.findCampaign(poiId, id);
+    await this.campaignsRepository.remove(campaign);
+  }
+
+  private async findCampaign(poiId: string, id: string): Promise<DonationCampaign> {
+    const campaign = await this.campaignsRepository.findOne({ where: { id, poi: { id: poiId } } });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+    return campaign;
+  }
+
+  private async withRaised(campaigns: DonationCampaign[]): Promise<CampaignView[]> {
+    if (campaigns.length === 0) return [];
+    const rows: { campaignId: string; total: string; count: string }[] = await this.donationsRepository
+      .createQueryBuilder('donation')
+      .select('donation.campaign_id', 'campaignId')
+      .addSelect('COALESCE(SUM(donation.amount), 0)', 'total')
+      .addSelect('COUNT(*)', 'count')
+      .where('donation.campaign_id IN (:...ids)', { ids: campaigns.map((c) => c.id) })
+      .andWhere('donation.status = :status', { status: DonationStatus.COMPLETED })
+      .groupBy('donation.campaign_id')
+      .getRawMany();
+    const byId = new Map(rows.map((row) => [row.campaignId, row]));
+    return campaigns.map((campaign) => ({
+      id: campaign.id,
+      title: campaign.title,
+      description: campaign.description ?? null,
+      goalAmount: campaign.goalAmount ?? null,
+      endsAt: campaign.endsAt ?? null,
+      active: campaign.active,
+      raised: round2(Number(byId.get(campaign.id)?.total ?? 0)),
+      giftCount: Number(byId.get(campaign.id)?.count ?? 0),
+    }));
+  }
+
+  // ---- Tax receipts ----
+
+  /** Every giver who asked for a receipt, with what they gave in `year`. */
+  async receiptDonors(poiId: string, year: number): Promise<ReceiptDonor[]> {
+    return groupDonors(await this.receiptDonations(poiId, year));
+  }
+
+  /**
+   * One giver's receipt data for `year`, by the key groupDonors gave them.
+   * `u:<userId>` also works for a signed-in giver asking for their own,
+   * even when their gifts are grouped under their tax number.
+   */
+  async receiptDonor(poiId: string, year: number, key: string): Promise<ReceiptDonor | null> {
+    const donations = await this.receiptDonations(poiId, year);
+    const grouped = groupDonors(donations).find((donor) => donor.key === key);
+    if (grouped) return grouped;
+    if (key.startsWith('u:')) {
+      const own = donations.filter((donation) => donation.donor?.id === key.slice(2));
+      const [donor] = groupDonors(own.map((d) => ({ ...d, donorTaxId: null }) as Donation));
+      return donor ? { ...donor, key, taxId: own.at(-1)?.donorTaxId ?? null } : null;
+    }
+    return null;
+  }
+
+  /** The years a signed-in giver has receipt-worthy gifts in, newest first. */
+  async myReceiptYears(poiId: string, userId: string): Promise<{ year: number; total: number }[]> {
+    const donations = await this.donationsRepository.find({
+      where: {
+        poi: { id: poiId },
+        donor: { id: userId },
+        wantsReceipt: true,
+        status: DonationStatus.COMPLETED,
+      },
+    });
+    const byYear = new Map<number, number>();
+    for (const donation of donations) {
+      const year = donation.createdAt.getFullYear();
+      byYear.set(year, round2((byYear.get(year) ?? 0) + donation.amount));
+    }
+    return [...byYear.entries()].sort((a, b) => b[0] - a[0]).map(([year, total]) => ({ year, total }));
+  }
+
+  private receiptDonations(poiId: string, year: number): Promise<Donation[]> {
+    return this.donationsRepository.find({
+      where: {
+        poi: { id: poiId },
+        wantsReceipt: true,
+        status: DonationStatus.COMPLETED,
+        createdAt: And(MoreThanOrEqual(new Date(year, 0, 1)), LessThan(new Date(year + 1, 0, 1))),
+      },
+      relations: { donor: true },
+      order: { createdAt: 'ASC' },
+    });
   }
 
   async findBySessionId(sessionId: string): Promise<Donation | null> {
@@ -188,9 +496,16 @@ export class DonationsService {
   findForPoi(poiId: string, limit = 20): Promise<Donation[]> {
     return this.donationsRepository.find({
       where: { poi: { id: poiId }, status: DonationStatus.COMPLETED },
+      relations: { campaign: true },
       order: { createdAt: 'DESC' },
       take: limit,
     });
+  }
+
+  /** For the Mass intentions module: the offerings behind its intentions. */
+  findByIds(ids: string[]): Promise<Donation[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    return this.donationsRepository.find({ where: { id: In(ids) } });
   }
 
   async getStats(poiId: string): Promise<DonationStats> {

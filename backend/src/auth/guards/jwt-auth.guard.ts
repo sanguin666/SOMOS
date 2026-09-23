@@ -24,7 +24,11 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Missing bearer token');
     }
     try {
-      const payload = await this.jwtService.verifyAsync<{ sub: string }>(token);
+      const payload = await this.jwtService.verifyAsync<{ sub?: unknown }>(token);
+      // A token that names nobody must not pass as somebody: the guards
+      // after this one look people up by this id, and TypeORM drops an
+      // undefined condition from a query instead of matching nothing.
+      if (typeof payload.sub !== 'string' || !payload.sub) throw new Error('No subject');
       (request as AuthenticatedRequest).userId = payload.sub;
       return true;
     } catch {
@@ -32,6 +36,34 @@ export class JwtAuthGuard implements CanActivate {
     }
   }
 }
+
+/**
+ * For routes anyone may call, where being signed in only adds something —
+ * a Mass intention or a gift made while signed in is remembered against
+ * the account. Sets `userId` when a valid token came with the request and
+ * lets the request through either way; a bad token is treated as none.
+ */
+@Injectable()
+export class OptionalJwtAuthGuard implements CanActivate {
+  constructor(private readonly jwtService: JwtService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
+    const token = extractBearerToken(request);
+    if (!token) return true;
+    try {
+      const payload = await this.jwtService.verifyAsync<{ sub?: unknown }>(token);
+      if (typeof payload.sub === 'string' && payload.sub) {
+        (request as AuthenticatedRequest).userId = payload.sub;
+      }
+    } catch {
+      // Signed out as far as this route is concerned.
+    }
+    return true;
+  }
+}
+
+export type MaybeAuthenticatedRequest = Request & { userId?: string };
 
 export function extractBearerToken(request: Request): string | undefined {
   const header = request.headers.authorization;

@@ -41,14 +41,19 @@ export class StripeService {
 
   createCheckoutSession(params: {
     amount: number;
-    poiName: string;
+    // What the payer sees on Stripe's page ("Donation to St. Mary's").
+    productName: string;
     donationId: string;
     poiId: string;
     successUrl: string;
     cancelUrl: string;
+    // Monthly: a subscription Stripe charges again every month until the
+    // giver stops it, instead of a one-off payment.
+    recurring?: boolean;
   }): Promise<Stripe.Checkout.Session> {
+    const metadata = { donationId: params.donationId, poiId: params.poiId };
     return this.stripe.checkout.sessions.create({
-      mode: 'payment',
+      mode: params.recurring ? 'subscription' : 'payment',
       // Stripe works in the currency's smallest unit, so euros become cents.
       // Rounding here rather than truncating keeps 10.005 from becoming 10.00.
       line_items: [
@@ -57,15 +62,16 @@ export class StripeService {
           price_data: {
             currency: this.currency,
             unit_amount: Math.round(params.amount * 100),
-            product_data: {
-              name: `Donation to ${params.poiName}`,
-            },
+            product_data: { name: params.productName },
+            ...(params.recurring ? { recurring: { interval: 'month' as const } } : {}),
           },
         },
       ],
       // Echoed back on the webhook event, which otherwise only knows Stripe's
-      // own ids and couldn't tell us which row to promote.
-      metadata: { donationId: params.donationId, poiId: params.poiId },
+      // own ids and couldn't tell us which row to promote. A subscription
+      // carries it too, so each later month's invoice can find its gift.
+      metadata,
+      ...(params.recurring ? { subscription_data: { metadata } } : {}),
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,
     });
@@ -73,6 +79,11 @@ export class StripeService {
 
   retrieveSession(sessionId: string): Promise<Stripe.Checkout.Session> {
     return this.stripe.checkout.sessions.retrieve(sessionId);
+  }
+
+  /** Stops a monthly gift: Stripe charges nothing more after this. */
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    await this.stripe.subscriptions.cancel(subscriptionId);
   }
 
   /**

@@ -3,7 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserPoi } from '../user-pois/entities/user-poi.entity.js';
-import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { JwtAuthGuard, OptionalJwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { requireJwtSecret } from './jwt-secret.js';
+import { SignedUrlService } from '../common/signed-url/signed-url.service.js';
 import { PoiAdminGuard } from './guards/poi-admin.guard.js';
 import { SelfGuard } from './guards/self.guard.js';
 
@@ -25,22 +27,6 @@ export const jwtModule = JwtModule.registerAsync({
   }),
 });
 
-// Development keeps a fixed fallback so the demo starts with no .env at
-// all, but production refuses to boot without a real secret: a predictable
-// signing key means anyone can mint a token for any account, including a
-// parish admin's.
-function requireJwtSecret(configService: ConfigService): string {
-  const secret = configService.get<string>('JWT_SECRET');
-  if (secret) {
-    return secret;
-  }
-  if (configService.get<string>('NODE_ENV', 'development') === 'production') {
-    throw new Error(
-      'JWT_SECRET must be set in production — see backend/.env.example.',
-    );
-  }
-  return 'dev-only-insecure-secret';
-}
 
 // Exported as well as imported: a guard named in `@UseGuards(...)` is
 // instantiated in the injector of the module whose controller uses it, so
@@ -49,7 +35,15 @@ const userPoiFeature = TypeOrmModule.forFeature([UserPoi]);
 
 @Module({
   imports: [jwtModule, userPoiFeature],
-  providers: [JwtAuthGuard, PoiAdminGuard, SelfGuard],
-  exports: [JwtAuthGuard, PoiAdminGuard, SelfGuard, jwtModule, userPoiFeature],
+  providers: [JwtAuthGuard, OptionalJwtAuthGuard, PoiAdminGuard, SelfGuard, SignedUrlService],
+  exports: [
+    JwtAuthGuard,
+    OptionalJwtAuthGuard,
+    PoiAdminGuard,
+    SelfGuard,
+    SignedUrlService,
+    jwtModule,
+    userPoiFeature,
+  ],
 })
 export class AuthGuardsModule {}

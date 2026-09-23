@@ -19,6 +19,8 @@ export class EventsService {
     const event = this.eventsRepository.create({
       ...dto,
       startsAt: new Date(dto.startsAt),
+      endsAt: dto.endsAt ? new Date(dto.endsAt) : null,
+      repeatUntil: dto.repeatUntil ? new Date(dto.repeatUntil) : null,
       poi,
     });
     return this.eventsRepository.save(event);
@@ -36,6 +38,13 @@ export class EventsService {
     Object.assign(event, {
       ...dto,
       startsAt: dto.startsAt ? new Date(dto.startsAt) : event.startsAt,
+      endsAt: dto.endsAt === undefined ? event.endsAt : dto.endsAt ? new Date(dto.endsAt) : null,
+      repeatUntil:
+        dto.repeatUntil === undefined
+          ? event.repeatUntil
+          : dto.repeatUntil
+            ? new Date(dto.repeatUntil)
+            : null,
     });
     return this.eventsRepository.save(event);
   }

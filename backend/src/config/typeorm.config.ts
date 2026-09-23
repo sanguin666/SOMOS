@@ -13,6 +13,11 @@ import { CommunityComment } from '../community/entities/community-comment.entity
 import { Donation } from '../donations/entities/donation.entity.js';
 import { PhoneVerificationCode } from '../auth/entities/phone-verification-code.entity.js';
 import { PoiPageBlock } from '../poi-page/entities/poi-page-block.entity.js';
+import { DonationCampaign } from '../donations/entities/donation-campaign.entity.js';
+import { ServiceRequest } from '../service-requests/entities/service-request.entity.js';
+import { ServiceRequestMessage } from '../service-requests/entities/service-request-message.entity.js';
+import { ServiceRequestDocument } from '../service-requests/entities/service-request-document.entity.js';
+import { MassIntention } from '../mass-intentions/entities/mass-intention.entity.js';
 
 // Every entity the app maps. Exported so the metadata check in
 // typeorm.config.spec.ts, and data-source.ts (which the TypeORM CLI loads
@@ -31,8 +36,13 @@ export const ENTITIES = [
   CommunityPost,
   CommunityComment,
   Donation,
+  DonationCampaign,
   PoiPageBlock,
   PhoneVerificationCode,
+  ServiceRequest,
+  ServiceRequestMessage,
+  ServiceRequestDocument,
+  MassIntention,
 ];
 
 export function buildTypeOrmConfig(

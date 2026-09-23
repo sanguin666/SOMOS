@@ -3,6 +3,7 @@ import { PoisService } from '../pois/pois.service.js';
 import { UpdateLanguageDto } from '../common/dto/update-language.dto.js';
 import { UpdatePoiProfileDto } from '../common/dto/update-poi-profile.dto.js';
 import { UpdateMenuOrderDto } from '../common/dto/update-menu-order.dto.js';
+import { UpdateReceiptSettingsDto } from '../common/dto/update-receipt-settings.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
@@ -32,6 +33,13 @@ export class PoiSettingsController {
   @Patch('menu-order')
   @UseGuards(JwtAuthGuard, PoiAdminGuard)
   updateMenuOrder(@Param('poiId') poiId: string, @Body() dto: UpdateMenuOrderDto) {
+    return this.poisService.update(poiId, dto);
+  }
+
+  // Who the place's tax receipts are issued by — see Poi.legalName.
+  @Patch('receipt-settings')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  updateReceiptSettings(@Param('poiId') poiId: string, @Body() dto: UpdateReceiptSettingsDto) {
     return this.poisService.update(poiId, dto);
   }
 }
