@@ -68,7 +68,7 @@ Seed two demo POIs (with all modules active and sample content) so the app has s
 npm run seed
 ```
 
-Safe to re-run — it only creates what's missing. This gives you two fixed, known places ("St. Mary's Parish", fetched by the app's demo flow via QR token, and "Holy Trinity Chapel") plus a demo admin account managing both:
+Safe to re-run — it only creates what's missing. This gives you two fixed, known places ("St. Mary's Community", fetched by the app's demo flow via QR token, and "Holy Trinity Chapel") plus a demo admin account managing both:
 
 ```
 email:    admin@stmarys.example

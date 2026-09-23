@@ -35,7 +35,7 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <form className="login-panel" onSubmit={handleSubmit}>
-        <LogoMark size={120} />
+        <LogoMark size={180} />
         <h1 className="login-wordmark">{t('login.heading')}</h1>
         <p className="login-subtitle">{t('login.subtitle')}</p>
 

@@ -534,7 +534,8 @@ select {
 
 /* ---------- Login: the app's welcome screen ---------- */
 
-/* The crowd illustration edge to edge, with the logo, the words and the
+/* The crowd illustration (Seb's own, 4128 × 2304 so it stays sharp on
+   a large screen) edge to edge, with the logo, the words and the
    form in one white box in the middle — the same white box, with the
    same light edge, as everywhere else. No halo, no fade (Seb, 22 Sep
    2026: the gradient looked like a stain). */
@@ -544,13 +545,13 @@ select {
   align-items: center;
   justify-content: center;
   padding: 32px 16px;
-  background: var(--color-bg) url('/onboarding-crowd.jpg') center / cover no-repeat;
+  background: var(--color-bg) url('/login-background.jpg') center / cover no-repeat;
 }
 
 .login-panel {
   width: 100%;
-  max-width: 560px;
-  padding: 56px 80px;
+  max-width: 520px;
+  padding: 40px 56px;
   background: var(--color-surface);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius);
