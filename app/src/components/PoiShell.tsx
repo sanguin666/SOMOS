@@ -33,9 +33,11 @@ export type HubTab = 'home' | 'more' | ModuleType;
 // scroll sideways.
 const MAX_TABS = 5;
 
-// Home takes the first button, leaving four for the place's modules —
-// and when it has more than four, the last of them becomes More.
-const BAR_SLOTS = MAX_TABS - 1;
+// Home takes the first button and More always takes the last (Seb, 23
+// Sep 2026): More also carries changing, adding and leaving a place, so
+// it is there even for a place whose modules all fit. That leaves three
+// buttons for modules.
+const BAR_SLOTS = MAX_TABS - 2;
 
 // Where a module sits in a place that has not arranged its own menu:
 // the three things people open the app for, then the two they come back
@@ -70,18 +72,16 @@ function orderedLiveModules(poi: Poi, live: Set<ModuleType>): ModuleType[] {
   return [...chosen, ...rest];
 }
 
-// How many modules keep a button of their own: all of them when they
-// fit, one fewer than the slots when More has to take the last one.
+// How many modules keep a button of their own: as many as fit.
 function barModuleCount(total: number): number {
-  return total <= BAR_SLOTS ? total : BAR_SLOTS - 1;
+  return Math.min(total, BAR_SLOTS);
 }
 
 export type HubMenu = {
   // The modules with a button of their own, in bar order.
   onBar: ModuleType[];
-  // The modules the More screen lists. Empty means no More button: a
-  // place with few modules gets a shorter bar rather than a button
-  // hiding a single thing.
+  // The modules the More screen lists, above the place actions. May be
+  // empty: the More button is there regardless.
   inMore: ModuleType[];
   // Whether the livestream is reached from the top of the events screen
   // instead of a button or a More row.
@@ -136,11 +136,7 @@ export function PoiShell({
 
   const { onBar, inMore, livestreamInEvents } = hubMenu(poi, modules);
 
-  const tabs: HubTab[] = ['home', ...onBar, ...(inMore.length > 0 ? (['more'] as HubTab[]) : [])];
-
-  // Home alone is not a menu: a place with nothing switched on shows its
-  // page and no bar at all.
-  const showTabBar = onBar.length > 0 || inMore.length > 0;
+  const tabs: HubTab[] = ['home', ...onBar, 'more'];
 
   // The button that lights up for the screen showing. A screen reached
   // from somewhere other than the bar still lights the button it lives
@@ -211,7 +207,7 @@ export function PoiShell({
     </View>
   );
 
-  const footer = showTabBar ? (
+  const footer = (
     <View style={styles.tabBar}>
       {tabs.map((tab) => {
         const { icon, label } = describe(tab, t);
@@ -227,7 +223,7 @@ export function PoiShell({
         );
       })}
     </View>
-  ) : null;
+  );
 
   return (
     <Screen

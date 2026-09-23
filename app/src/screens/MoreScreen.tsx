@@ -108,7 +108,9 @@ export function MoreScreen({
         </Pressable>
       ))}
 
-      <View style={styles.divider} />
+      {/* The line separates the modules from the place actions, so it
+          only appears when there are modules above it. */}
+      {rows.length > 0 && <View style={styles.divider} />}
 
       <Pressable
         accessibilityRole="button"

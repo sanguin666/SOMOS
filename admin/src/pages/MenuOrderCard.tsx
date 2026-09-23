@@ -4,9 +4,8 @@ import { updatePoiMenuOrder } from '../api/poiSettings';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 
 // Kept in step with the app's PoiShell: Home takes the first of five
-// buttons, so four are left for modules, and once a place has more than
-// four the last button becomes More.
-const BAR_SLOTS = 4;
+// buttons and More always takes the last, so three are left for modules.
+const BAR_SLOTS = 3;
 
 // The app's fallback order for modules a place never arranged, so the
 // preview here matches what the app would draw for the untouched part
@@ -90,15 +89,25 @@ export function MenuOrderCard({ poi, modules, onSaved }: Props) {
     }
   }
 
-  // The livestream never takes a menu button when it sits below the bar:
-  // the app shows it from the top of the Events screen instead. So it is
-  // labelled "Inside Events" rather than "Under More" when it overflows.
-  const barCount = order.length <= BAR_SLOTS + 1 ? order.length : BAR_SLOTS;
+  // The livestream never takes a menu button when it sits below the bar
+  // and Events is on: the app shows it from the top of the Events screen
+  // instead, and it gives up its place in the count. Same rule as the
+  // app's hubMenu.
+  const livestreamInEvents =
+    order.includes('livestreams') &&
+    order.includes('events') &&
+    order.indexOf('livestreams') >= Math.min(order.length, BAR_SLOTS);
+  const placed = livestreamInEvents ? order.filter((type) => type !== 'livestreams') : order;
+  const barCount = Math.min(placed.length, BAR_SLOTS);
 
-  function placement(type: ModuleType, index: number): string {
-    if (index < barCount) return t('menuOrder.onBar');
-    if (type === 'livestreams') return t('menuOrder.insideEvents');
+  function placement(type: ModuleType): string {
+    if (type === 'livestreams' && livestreamInEvents) return t('menuOrder.insideEvents');
+    if (placed.indexOf(type) < barCount) return t('menuOrder.onBar');
     return t('menuOrder.underMore');
+  }
+
+  function isOnBar(type: ModuleType): boolean {
+    return !(type === 'livestreams' && livestreamInEvents) && placed.indexOf(type) < barCount;
   }
 
   const dirty = order.join(',') !== initial.join(',');
@@ -124,8 +133,8 @@ export function MenuOrderCard({ poi, modules, onSaved }: Props) {
                   <p className="card-title" style={{ margin: 0 }}>
                     {moduleName(type, t)}
                   </p>
-                  <span className={`badge ${index < barCount ? 'badge-active' : ''}`}>
-                    {placement(type, index)}
+                  <span className={`badge ${isOnBar(type) ? 'badge-active' : ''}`}>
+                    {placement(type)}
                   </span>
                 </div>
               </div>
