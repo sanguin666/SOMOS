@@ -12,6 +12,7 @@ export type Translations = {
     back: string;
     loading: string;
     anonymous: string;
+    placeUnavailable: string;
   };
   home: {
     welcome: string;
@@ -378,6 +379,7 @@ const en: Translations = {
     back: 'Back',
     loading: 'Loading…',
     anonymous: 'Anonymous',
+    placeUnavailable: 'This place could not be loaded.',
   },
   home: {
     welcome: 'Welcome. Choose an action below.',
@@ -746,6 +748,7 @@ const es: Translations = {
     back: 'Atrás',
     loading: 'Cargando…',
     anonymous: 'Anónimo',
+    placeUnavailable: 'No se pudo cargar este lugar.',
   },
   home: {
     welcome: 'Bienvenido. Elige una acción a continuación.',
@@ -1114,6 +1117,7 @@ const fr: Translations = {
     back: 'Retour',
     loading: 'Chargement…',
     anonymous: 'Anonyme',
+    placeUnavailable: 'Impossible de charger ce lieu.',
   },
   home: {
     welcome: 'Bienvenue. Choisissez une action ci-dessous.',

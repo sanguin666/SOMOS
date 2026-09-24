@@ -42,7 +42,18 @@ function inputFrom(draft: Draft): BadgeInput {
  * messages the staff write. One white card lists them all in order; the
  * form beside it writes or edits a message.
  */
-export function BadgesSection({ poiId, modules }: { poiId: string; modules: ActiveModule[] }) {
+// The id the phone preview knows a message by while it is being typed.
+export const DRAFT_BADGE_ID = 'draft';
+
+type Props = {
+  poiId: string;
+  modules: ActiveModule[];
+  // The badges as the phone preview should show them, the message in the
+  // form included, and which of them differ from what is saved.
+  onPreview?: (badges: PoiBadge[], drafts: string[]) => void;
+};
+
+export function BadgesSection({ poiId, modules, onPreview }: Props) {
   const { t, language } = useI18n();
   const [badges, setBadges] = useState<PoiBadge[] | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -62,6 +73,37 @@ export function BadgesSection({ poiId, modules }: { poiId: string; modules: Acti
       // still offers "the most recent".
       .catch(() => {});
   }, [poiId]);
+
+  useEffect(() => {
+    if (!onPreview || !badges) return;
+    const input = inputFrom(draft);
+    if (editingId) {
+      const original = badges.find((b) => b.id === editingId);
+      const changed = !!original && JSON.stringify(draftFrom(original)) !== JSON.stringify(draft);
+      onPreview(
+        badges.map((b) => (b.id === editingId ? { ...b, ...input, text: input.text || b.text } : b)),
+        changed ? [editingId] : [],
+      );
+    } else if (input.text) {
+      // A new message lands last, which is where adding it will put it.
+      const typed: PoiBadge = {
+        id: DRAFT_BADGE_ID,
+        kind: 'message',
+        position: badges.length,
+        enabled: true,
+        campaignId: null,
+        createdAt: '',
+        updatedAt: '',
+        text: input.text,
+        important: draft.important,
+        linkModule: input.linkModule ?? null,
+        showUntil: input.showUntil ?? null,
+      };
+      onPreview([...badges, typed], [DRAFT_BADGE_ID]);
+    } else {
+      onPreview(badges, []);
+    }
+  }, [badges, draft, editingId]);
 
   const AUTO_TITLES: Record<Exclude<BadgeKind, 'message'>, string> = {
     next_mass: t('badges.nextMassTitle'),

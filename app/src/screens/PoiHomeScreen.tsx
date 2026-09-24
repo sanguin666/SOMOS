@@ -12,6 +12,7 @@ import { getLivestreams } from '../api/livestreams';
 import { TimetableRows } from '../components/Timetable';
 import { BadgeTiles } from '../components/BadgeTiles';
 import { badgeTiles } from '../utils/badges';
+import { usePreview } from '../preview/PreviewContext';
 import { formatWhen, isWeekly, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
 import type {
   ActiveModule,
@@ -92,8 +93,18 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
   const { t, language } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
-  const [blocks, setBlocks] = useState<PoiPageBlock[] | null>(null);
-  const [badges, setBadges] = useState<PoiBadge[]>([]);
+  const [savedBlocks, setBlocks] = useState<PoiPageBlock[] | null>(null);
+  const [savedBadges, setBadges] = useState<PoiBadge[]>([]);
+  // In the dashboard's live preview, the editor's badges and sections
+  // stand in for the saved ones, unsaved changes included.
+  const preview = usePreview();
+  const blocks = preview?.blocks
+    ? preview.blocks.length > 0
+      ? preview.blocks
+      : DEFAULT_BLOCKS
+    : savedBlocks;
+  const badges = preview?.badges ?? savedBadges;
+  const drafts = new Set(preview?.drafts ?? []);
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [events, setEvents] = useState<Event[] | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
@@ -208,7 +219,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
 
   // The badges come first, above everything the page holds.
   const tiles = badgeTiles(badges, { events, campaigns, isLive, now: new Date(), language, t });
-  const top = <BadgeTiles tiles={tiles} onOpen={onSelectTab} />;
+  const top = <BadgeTiles tiles={tiles} drafts={drafts} onOpen={onSelectTab} />;
 
   if (visible.length === 0) {
     return (
@@ -242,241 +253,254 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
     <>
       {top}
       {visible.map((block) => {
-        switch (block.type) {
-          case 'text':
-            return (
-              <View key={block.id} style={styles.section}>
-                {!!block.title && (
-                  <AccessibleText variant="bodyLarge" style={styles.blockTitle}>
-                    {block.title}
-                  </AccessibleText>
-                )}
-                {!!block.body && <AccessibleText variant="body">{block.body}</AccessibleText>}
-              </View>
-            );
-
-          case 'image':
-            if (!block.imageUrl) return null;
-            return (
-              <View key={block.id} style={styles.section}>
-                <Image
-                  source={{ uri: uploadUri(block.imageUrl) }}
-                  style={styles.image}
-                  resizeMode="cover"
-                  accessibilityLabel={block.title || poi.name}
-                />
-                {!!block.title && (
-                  <AccessibleText variant="caption" color={colors.textMuted}>
-                    {block.title}
-                  </AccessibleText>
-                )}
-              </View>
-            );
-
-          case 'celebration_times': {
-            // Succinct by design: the next Mass, then the week's Masses
-            // in a few lines. Confessions and the rest are one tap away.
-            const today = new Date(now);
-            const timetable = weeklyTimetable(events ?? [], today);
-            const [nextMass] = upcomingOccurrences(events ?? [], today, 1, (e) => e.category === 'mass');
-            const massTimes = timetable.find((section) => section.category === 'mass');
-            if (!nextMass && !massTimes) return null;
-            return (
-              <View key={block.id} style={styles.section}>
-                <SectionHeader
-                  label={block.title || t('hub.celebrationTimes')}
-                  accent={poiTheme.accentStrong}
-                  onSeeAll={() => onSelectTab('events')}
-                  seeAllLabel={t('hub.seeAll')}
-                />
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    nextMass
-                      ? `${t('hub.nextMass')}: ${formatWhen(nextMass.startsAt, today, language, {
-                          today: t('schedule.today'),
-                          tomorrow: t('schedule.tomorrow'),
-                        })}`
-                      : t('hub.celebrationTimes')
-                  }
-                  onPress={() => onSelectTab('events')}
-                  style={styles.timesCard}
-                >
-                  {nextMass && (
-                    <View style={styles.nextMass}>
-                      <AccessibleText variant="caption" color={poiTheme.accentStrong} style={styles.nextMassLabel}>
-                        {t('hub.nextMass')}
-                      </AccessibleText>
-                      <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                        {formatWhen(nextMass.startsAt, today, language, {
-                          today: t('schedule.today'),
-                          tomorrow: t('schedule.tomorrow'),
-                        })}
-                      </AccessibleText>
-                      {!!(nextMass.event.location || nextMass.event.title) && (
-                        <AccessibleText variant="caption" color={colors.textMuted}>
-                          {[nextMass.event.title, nextMass.event.location].filter(Boolean).join(' · ')}
-                        </AccessibleText>
-                      )}
-                    </View>
-                  )}
-                  {massTimes && <TimetableRows rows={massTimes.rows} />}
-                </Pressable>
-              </View>
-            );
-          }
-
-          case 'next_events':
-          case 'past_events': {
-            const list = block.type === 'next_events' ? upcoming : past;
-            const shown = list.slice(0, block.itemCount);
-            if (shown.length === 0) return null;
-            const fallbackHeading =
-              block.type === 'past_events'
-                ? t('hub.pastEvents')
-                : block.itemCount === 1
-                  ? t('hub.nextEvent')
-                  : t('hub.upcomingEvents');
-            return (
-              <View key={block.id} style={styles.section}>
-                <SectionHeader
-                  label={block.title || fallbackHeading}
-                  accent={poiTheme.accentStrong}
-                  onSeeAll={() => onSelectTab('events')}
-                  seeAllLabel={t('hub.seeAll')}
-                />
-                {shown.map((event) => (
-                  <Pressable
-                    key={event.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={event.title}
-                    onPress={() => onSelectTab('events')}
-                    style={styles.eventCard}
-                  >
-                    <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
-                      <AccessibleText variant="caption" color="#FFFFFF" style={styles.eventDateMonth}>
-                        {new Date(event.startsAt)
-                          .toLocaleDateString(undefined, { month: 'short' })
-                          .toUpperCase()}
-                      </AccessibleText>
-                      <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.eventDateDay}>
-                        {new Date(event.startsAt).getDate()}
-                      </AccessibleText>
-                    </View>
-                    <View style={styles.eventText}>
-                      <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                        {event.title}
-                      </AccessibleText>
-                      {!!event.location && (
-                        <AccessibleText variant="caption" color={colors.textMuted}>
-                          {event.location}
-                        </AccessibleText>
-                      )}
-                    </View>
-                    <ChevronRightIcon size={20} color={colors.textMuted} />
-                  </Pressable>
-                ))}
-              </View>
-            );
-          }
-
-          case 'latest_announcements': {
-            const shown = (announcements ?? []).slice(0, block.itemCount);
-            if (shown.length === 0) return null;
-            return (
-              <View key={block.id} style={styles.section}>
-                <SectionHeader
-                  label={block.title || t('hub.latestAnnouncements')}
-                  accent={poiTheme.accentStrong}
-                  onSeeAll={() => onSelectTab('announcements')}
-                  seeAllLabel={t('hub.seeAll')}
-                />
-                {shown.map((item) => (
-                  <Pressable
-                    key={item.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={item.title}
-                    onPress={() => onSelectTab('announcements')}
-                    style={styles.feedCard}
-                  >
-                    <View style={styles.feedCardHeader}>
-                      <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                        {item.title}
-                      </AccessibleText>
-                      <AccessibleText variant="caption">{formatShortDate(item.createdAt)}</AccessibleText>
-                    </View>
-                    {!!item.body && (
-                      <AccessibleText variant="body" color={colors.textMuted} numberOfLines={2}>
-                        {item.body}
-                      </AccessibleText>
-                    )}
-                  </Pressable>
-                ))}
-              </View>
-            );
-          }
-
-          case 'next_livestream': {
-            if (!nextLivestream) return null;
-            return (
-              <View key={block.id} style={styles.section}>
-                <SectionHeader
-                  label={block.title || t('hub.nextLivestream')}
-                  accent={poiTheme.accentStrong}
-                  onSeeAll={() => onSelectTab('livestreams')}
-                  seeAllLabel={t('hub.seeAll')}
-                />
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={nextLivestream.title}
-                  onPress={() => onSelectTab('livestreams')}
-                  style={styles.feedCard}
-                >
-                  <View style={styles.livestreamRow}>
-                    <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
-                      <PlayIcon size={22} color="#FFFFFF" />
-                    </View>
-                    <View style={styles.eventText}>
-                      <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                        {nextLivestream.title}
-                      </AccessibleText>
-                      <AccessibleText variant="caption" color={colors.textMuted}>
-                        {formatShortDate(nextLivestream.scheduledAt)}
-                      </AccessibleText>
-                    </View>
-                    <ChevronRightIcon size={20} color={colors.textMuted} />
-                  </View>
-                </Pressable>
-              </View>
-            );
-          }
-
-          case 'donate':
-            return (
-              <View key={block.id} style={styles.section}>
-                {!!block.title && (
-                  <AccessibleText variant="bodyLarge" style={styles.blockTitle}>
-                    {block.title}
-                  </AccessibleText>
-                )}
-                {!!block.body && (
-                  <AccessibleText variant="body" color={colors.textMuted}>
-                    {block.body}
-                  </AccessibleText>
-                )}
-                <AccessibleButton
-                  label={t('hub.donationsLabel')}
-                  onPress={() => onSelectTab('donations')}
-                />
-              </View>
-            );
-
-          default:
-            return null;
-        }
+        const drawn = renderBlock(block);
+        // An unsaved section in the dashboard's preview, outlined so the
+        // editor can tell it from what members see today.
+        return drawn && drafts.has(block.id) ? (
+          <View key={block.id} style={styles.draft}>
+            {drawn}
+          </View>
+        ) : (
+          drawn
+        );
       })}
     </>
   );
+
+  function renderBlock(block: PoiPageBlock) {
+    switch (block.type) {
+      case 'text':
+        return (
+          <View key={block.id} style={styles.section}>
+            {!!block.title && (
+              <AccessibleText variant="bodyLarge" style={styles.blockTitle}>
+                {block.title}
+              </AccessibleText>
+            )}
+            {!!block.body && <AccessibleText variant="body">{block.body}</AccessibleText>}
+          </View>
+        );
+
+      case 'image':
+        if (!block.imageUrl) return null;
+        return (
+          <View key={block.id} style={styles.section}>
+            <Image
+              source={{ uri: uploadUri(block.imageUrl) }}
+              style={styles.image}
+              resizeMode="cover"
+              accessibilityLabel={block.title || poi.name}
+            />
+            {!!block.title && (
+              <AccessibleText variant="caption" color={colors.textMuted}>
+                {block.title}
+              </AccessibleText>
+            )}
+          </View>
+        );
+
+      case 'celebration_times': {
+        // Succinct by design: the next Mass, then the week's Masses
+        // in a few lines. Confessions and the rest are one tap away.
+        const today = new Date(now);
+        const timetable = weeklyTimetable(events ?? [], today);
+        const [nextMass] = upcomingOccurrences(events ?? [], today, 1, (e) => e.category === 'mass');
+        const massTimes = timetable.find((section) => section.category === 'mass');
+        if (!nextMass && !massTimes) return null;
+        return (
+          <View key={block.id} style={styles.section}>
+            <SectionHeader
+              label={block.title || t('hub.celebrationTimes')}
+              accent={poiTheme.accentStrong}
+              onSeeAll={() => onSelectTab('events')}
+              seeAllLabel={t('hub.seeAll')}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                nextMass
+                  ? `${t('hub.nextMass')}: ${formatWhen(nextMass.startsAt, today, language, {
+                      today: t('schedule.today'),
+                      tomorrow: t('schedule.tomorrow'),
+                    })}`
+                  : t('hub.celebrationTimes')
+              }
+              onPress={() => onSelectTab('events')}
+              style={styles.timesCard}
+            >
+              {nextMass && (
+                <View style={styles.nextMass}>
+                  <AccessibleText variant="caption" color={poiTheme.accentStrong} style={styles.nextMassLabel}>
+                    {t('hub.nextMass')}
+                  </AccessibleText>
+                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+                    {formatWhen(nextMass.startsAt, today, language, {
+                      today: t('schedule.today'),
+                      tomorrow: t('schedule.tomorrow'),
+                    })}
+                  </AccessibleText>
+                  {!!(nextMass.event.location || nextMass.event.title) && (
+                    <AccessibleText variant="caption" color={colors.textMuted}>
+                      {[nextMass.event.title, nextMass.event.location].filter(Boolean).join(' · ')}
+                    </AccessibleText>
+                  )}
+                </View>
+              )}
+              {massTimes && <TimetableRows rows={massTimes.rows} />}
+            </Pressable>
+          </View>
+        );
+      }
+
+      case 'next_events':
+      case 'past_events': {
+        const list = block.type === 'next_events' ? upcoming : past;
+        const shown = list.slice(0, block.itemCount);
+        if (shown.length === 0) return null;
+        const fallbackHeading =
+          block.type === 'past_events'
+            ? t('hub.pastEvents')
+            : block.itemCount === 1
+              ? t('hub.nextEvent')
+              : t('hub.upcomingEvents');
+        return (
+          <View key={block.id} style={styles.section}>
+            <SectionHeader
+              label={block.title || fallbackHeading}
+              accent={poiTheme.accentStrong}
+              onSeeAll={() => onSelectTab('events')}
+              seeAllLabel={t('hub.seeAll')}
+            />
+            {shown.map((event) => (
+              <Pressable
+                key={event.id}
+                accessibilityRole="button"
+                accessibilityLabel={event.title}
+                onPress={() => onSelectTab('events')}
+                style={styles.eventCard}
+              >
+                <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
+                  <AccessibleText variant="caption" color="#FFFFFF" style={styles.eventDateMonth}>
+                    {new Date(event.startsAt)
+                      .toLocaleDateString(undefined, { month: 'short' })
+                      .toUpperCase()}
+                  </AccessibleText>
+                  <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.eventDateDay}>
+                    {new Date(event.startsAt).getDate()}
+                  </AccessibleText>
+                </View>
+                <View style={styles.eventText}>
+                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+                    {event.title}
+                  </AccessibleText>
+                  {!!event.location && (
+                    <AccessibleText variant="caption" color={colors.textMuted}>
+                      {event.location}
+                    </AccessibleText>
+                  )}
+                </View>
+                <ChevronRightIcon size={20} color={colors.textMuted} />
+              </Pressable>
+            ))}
+          </View>
+        );
+      }
+
+      case 'latest_announcements': {
+        const shown = (announcements ?? []).slice(0, block.itemCount);
+        if (shown.length === 0) return null;
+        return (
+          <View key={block.id} style={styles.section}>
+            <SectionHeader
+              label={block.title || t('hub.latestAnnouncements')}
+              accent={poiTheme.accentStrong}
+              onSeeAll={() => onSelectTab('announcements')}
+              seeAllLabel={t('hub.seeAll')}
+            />
+            {shown.map((item) => (
+              <Pressable
+                key={item.id}
+                accessibilityRole="button"
+                accessibilityLabel={item.title}
+                onPress={() => onSelectTab('announcements')}
+                style={styles.feedCard}
+              >
+                <View style={styles.feedCardHeader}>
+                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+                    {item.title}
+                  </AccessibleText>
+                  <AccessibleText variant="caption">{formatShortDate(item.createdAt)}</AccessibleText>
+                </View>
+                {!!item.body && (
+                  <AccessibleText variant="body" color={colors.textMuted} numberOfLines={2}>
+                    {item.body}
+                  </AccessibleText>
+                )}
+              </Pressable>
+            ))}
+          </View>
+        );
+      }
+
+      case 'next_livestream': {
+        if (!nextLivestream) return null;
+        return (
+          <View key={block.id} style={styles.section}>
+            <SectionHeader
+              label={block.title || t('hub.nextLivestream')}
+              accent={poiTheme.accentStrong}
+              onSeeAll={() => onSelectTab('livestreams')}
+              seeAllLabel={t('hub.seeAll')}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={nextLivestream.title}
+              onPress={() => onSelectTab('livestreams')}
+              style={styles.feedCard}
+            >
+              <View style={styles.livestreamRow}>
+                <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
+                  <PlayIcon size={22} color="#FFFFFF" />
+                </View>
+                <View style={styles.eventText}>
+                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
+                    {nextLivestream.title}
+                  </AccessibleText>
+                  <AccessibleText variant="caption" color={colors.textMuted}>
+                    {formatShortDate(nextLivestream.scheduledAt)}
+                  </AccessibleText>
+                </View>
+                <ChevronRightIcon size={20} color={colors.textMuted} />
+              </View>
+            </Pressable>
+          </View>
+        );
+      }
+
+      case 'donate':
+        return (
+          <View key={block.id} style={styles.section}>
+            {!!block.title && (
+              <AccessibleText variant="bodyLarge" style={styles.blockTitle}>
+                {block.title}
+              </AccessibleText>
+            )}
+            {!!block.body && (
+              <AccessibleText variant="body" color={colors.textMuted}>
+                {block.body}
+              </AccessibleText>
+            )}
+            <AccessibleButton
+              label={t('hub.donationsLabel')}
+              onPress={() => onSelectTab('donations')}
+            />
+          </View>
+        );
+
+      default:
+        return null;
+    }
+  }
 }
 
 function SectionHeader({
@@ -506,6 +530,13 @@ function SectionHeader({
 }
 
 const styles = StyleSheet.create({
+  draft: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: colors.primaryStrong,
+    borderRadius: radii.lg,
+    padding: spacing.sm,
+  },
   section: {
     gap: spacing.sm,
   },

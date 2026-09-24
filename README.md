@@ -198,6 +198,8 @@ Each POI activates modules à la carte (`active_modules`). Currently built:
 
 Every place's home page opens with small tiles, its **badges** (`src/poi-badges`, `pois/:poiId/badges`): next Mass, office open or closed, next confessions and a campaign's progress, all worked out on the phone (`app/src/utils/badges.ts`), plus short messages the office writes (40 characters, an important one in orange, an optional last day and a module a tap opens). The dashboard's Home page adds as many as the place wants, switches them on and off and sets their order; a place that never touched them shows the next Mass and the office hours.
 
+The dashboard's Home page shows the place's home page in a phone beside the editor, updated as you type, before anything is saved (unsaved badges and sections are outlined in dashes). The phone is the real app: its web version, opened with `?preview=<poi id>` (`app/src/preview/`), which the dashboard feeds its editor's content through `postMessage`. It loads from `VITE_APP_PREVIEW_URL` (default `http://localhost:8081`, where `npm run start` in `app/` serves the web version), so the app has to be running for the preview to show.
+
 Donations also gained campaigns with a goal (`pois/:poiId/campaigns`), the Sunday collection as a purpose, monthly gifts (Stripe subscriptions, signed-in givers only, stoppable from the app) and yearly tax receipts: a printable receipt per giver and a CSV export for the treasurer (in Spain, the starting point of the modelo 182). The community's legal details for the receipts are set on the dashboard's Donations page.
 
 More modules can be added following the same pattern (an entry in `ModuleType`, its own tables, its own NestJS module).

@@ -7,6 +7,8 @@ import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/th
 
 type Props = {
   tiles: BadgeTile[];
+  // Unsaved in the dashboard's preview: drawn with a dashed edge.
+  drafts?: Set<string>;
   onOpen: (module: ModuleType) => void;
 };
 
@@ -37,7 +39,7 @@ function TileIcon({ icon, color }: { icon: BadgeTile['icon']; color: string }) {
  * An important message is the one strong orange on the page. Each tile
  * opens its module when there is one to open.
  */
-export function BadgeTiles({ tiles, onOpen }: Props) {
+export function BadgeTiles({ tiles, drafts, onOpen }: Props) {
   if (tiles.length === 0) return null;
   return (
     <View style={styles.grid}>
@@ -71,6 +73,7 @@ export function BadgeTiles({ tiles, onOpen }: Props) {
           styles.tile,
           tile.wide && styles.wide,
           tile.important && styles.important,
+          drafts?.has(tile.id) && styles.draft,
         ];
         const spoken = [tile.label, tile.value].filter(Boolean).join(', ');
         const opens = tile.opens;
@@ -121,6 +124,11 @@ const styles = StyleSheet.create({
     // The darker coral, not the brand's: white text on it has to clear
     // 4.5:1, and this is text at body size.
     backgroundColor: colors.primaryStrong,
+    borderColor: colors.primaryStrong,
+  },
+  draft: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
     borderColor: colors.primaryStrong,
   },
   pressed: {

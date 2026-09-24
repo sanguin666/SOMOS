@@ -110,6 +110,8 @@ echo   All set!
 echo     Backend:          http://localhost:3000
 echo     Admin dashboard:  http://localhost:5173
 echo     Mobile app:       scan the QR code in its window
+echo     App in a browser: http://localhost:8081 ^(also the phone preview on the
+echo                       dashboard's Home page, so keep the App window open^)
 echo.
 echo     Demo admin login: admin@stmarys.example / demo1234
 echo.

@@ -262,6 +262,13 @@ export type Translations = {
     celebrationTimesNote: string;
     sectionsTitle: string;
   };
+  preview: {
+    title: string;
+    frameTitle: string;
+    languageLabel: string;
+    hint: string;
+    notRunning: string;
+  };
   badges: {
     title: string;
     loading: string;
@@ -757,6 +764,13 @@ const en: Translations = {
     blockCelebrationTimes: 'Celebration times',
     celebrationTimesNote: 'This section is built from your weekly events (Masses, confessions, office hours): set their kind and "Every week" on the Events page.',
     sectionsTitle: 'Page sections',
+  },
+  preview: {
+    title: 'Live preview',
+    frameTitle: 'Preview of the home page on a phone',
+    languageLabel: 'Preview language',
+    hint: 'What a member sees when they open your place. You can scroll the phone. Dashed outlines show what is not saved yet.',
+    notRunning: 'The app is not running, so there is nothing to preview. Start it with start.bat, then reload this page.',
   },
   badges: {
     title: 'Badges at the top of the page',
@@ -1254,6 +1268,13 @@ const es: Translations = {
     celebrationTimesNote: 'Esta sección se construye con tus eventos semanales (misas, confesiones, horario de despacho): indica su tipo y «Cada semana» en la página Eventos.',
     sectionsTitle: 'Secciones de la página',
   },
+  preview: {
+    title: 'Vista previa en directo',
+    frameTitle: 'Vista previa de la página de inicio en un teléfono',
+    languageLabel: 'Idioma de la vista previa',
+    hint: 'Lo que ve un miembro al abrir su lugar. Puede desplazarse por el teléfono. Lo que aún no está guardado aparece con borde discontinuo.',
+    notRunning: 'La app no está en marcha, así que no hay nada que mostrar. Iníciela con start.bat y vuelva a cargar esta página.',
+  },
   badges: {
     title: 'Insignias en la parte superior de la página',
     loading: 'Cargando las insignias…',
@@ -1749,6 +1770,13 @@ const fr: Translations = {
     blockCelebrationTimes: 'Horaires des célébrations',
     celebrationTimesNote: "Cette section est construite à partir de vos événements hebdomadaires (messes, confessions, heures d'accueil) : indiquez leur type et « Chaque semaine » dans la page Événements.",
     sectionsTitle: 'Sections de la page',
+  },
+  preview: {
+    title: 'Aperçu en direct',
+    frameTitle: 'Aperçu de la page d’accueil sur un téléphone',
+    languageLabel: 'Langue de l’aperçu',
+    hint: 'Ce que voit un membre en ouvrant votre lieu. On peut faire défiler le téléphone. Ce qui n’est pas encore enregistré est entouré en pointillés.',
+    notRunning: 'L’app n’est pas lancée, il n’y a donc rien à afficher. Lancez-la avec start.bat, puis rechargez cette page.',
   },
   badges: {
     title: 'Badges en haut de la page',

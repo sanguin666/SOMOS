@@ -8,6 +8,7 @@ import { ScanQRScreen } from './src/screens/ScanQRScreen';
 import { PoiHubScreen } from './src/screens/PoiHubScreen';
 import { PhoneLoginScreen } from './src/screens/PhoneLoginScreen';
 import { PlaceSwitcher } from './src/components/PlaceSwitcher';
+import { PreviewApp, previewPoiId } from './src/preview/PreviewApp';
 import { I18nProvider } from './src/i18n/I18nContext';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
 import { joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
@@ -248,11 +249,14 @@ function AppRoutes() {
 // AuthProvider has to sit above anything calling useAuth, so the routes
 // live in their own component rather than in App itself.
 export default function App() {
+  // Inside the dashboard's phone frame, the app shows one place and
+  // nothing else: no welcome, no sign-in.
+  const preview = previewPoiId();
   return (
     <SafeAreaProvider>
       <I18nProvider>
         <AuthProvider>
-          <AppRoutes />
+          {preview ? <PreviewApp poiId={preview} /> : <AppRoutes />}
         </AuthProvider>
       </I18nProvider>
     </SafeAreaProvider>

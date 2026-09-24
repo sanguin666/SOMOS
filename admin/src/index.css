@@ -198,7 +198,8 @@ a {
   font-size: 22px;
 }
 
-.main > div > .muted:first-of-type {
+.main > div > .muted:first-of-type,
+.page-editor > .muted:first-of-type {
   margin-top: 0;
   margin-bottom: 24px;
 }
@@ -1075,5 +1076,115 @@ a.btn {
   }
   .print-area .card-row {
     padding: 8px 0;
+  }
+}
+
+/* ---------- Home page: the editor with a live phone beside it ---------- */
+
+/* This page needs the room for both, so it lifts the usual cap. */
+.main:has(.page-with-preview) {
+  max-width: 1340px;
+}
+
+.page-with-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 40px;
+  align-items: start;
+}
+
+.phone-preview {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.phone-preview-title {
+  align-self: stretch;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.phone-preview-live {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(225, 102, 63, 0.2);
+}
+
+.phone-frame {
+  position: relative;
+  width: 356px;
+  height: 740px;
+  max-height: calc(100vh - 170px);
+  min-height: 520px;
+  border: 8px solid #1d1d1d;
+  border-radius: 36px;
+  overflow: hidden;
+  background: var(--color-bg);
+  box-shadow: 0 10px 26px rgba(58, 42, 20, 0.2);
+}
+
+.phone-frame iframe {
+  /* The app is laid out for a 390-point phone, then shrunk to the frame,
+     so its lines break where they would on a real phone. */
+  --phone-scale: calc(340 / 390);
+  display: block;
+  width: 390px;
+  height: calc(100% / var(--phone-scale));
+  border: 0;
+  transform: scale(var(--phone-scale));
+  transform-origin: 0 0;
+}
+
+.phone-preview-missing {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-size: 16px;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+}
+
+.phone-preview-hint {
+  margin: 0;
+  max-width: 340px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Not enough width for both: the phone goes under the editor. */
+@media (max-width: 1320px) {
+  .page-with-preview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .phone-preview {
+    position: static;
+  }
+
+  .phone-frame {
+    max-height: none;
+  }
+}
+
+@media print {
+  .phone-preview {
+    display: none;
   }
 }
