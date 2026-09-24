@@ -56,12 +56,12 @@ function Home() {
       </div>
     );
   }
-  return <Navigate to={`/poi/${firstPoi.id}/donations`} replace />;
+  return <Navigate to={`/poi/${firstPoi.id}/home-page`} replace />;
 }
 
 function PoiIndexRedirect() {
   const { poiId } = useParams<{ poiId: string }>();
-  return <Navigate to={`/poi/${poiId}/donations`} replace />;
+  return <Navigate to={`/poi/${poiId}/home-page`} replace />;
 }
 
 function AppRoutes() {
