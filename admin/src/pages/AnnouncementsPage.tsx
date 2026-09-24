@@ -5,22 +5,96 @@ import {
   createAnnouncement,
   deleteAnnouncement,
   getAnnouncements,
+  removeAnnouncementImage,
   updateAnnouncement,
+  uploadAnnouncementImage,
 } from '../api/announcements';
+import { API_BASE_URL } from '../api/client';
 import type { Announcement } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
 
+type Draft = { title: string; body: string; important: boolean; photo: File | null };
+
+const EMPTY_DRAFT: Draft = { title: '', body: '', important: false, photo: null };
+
+function imageSrc(url: string) {
+  return /^https?:\/\//.test(url) ? url : `${API_BASE_URL}${url}`;
+}
+
+function PostFields({
+  draft,
+  onChange,
+  currentPhoto,
+  onRemovePhoto,
+}: {
+  draft: Draft;
+  onChange: (patch: Partial<Draft>) => void;
+  currentPhoto?: string | null;
+  onRemovePhoto?: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <>
+      <label>
+        {t('announcements.titleLabel')}
+        <input value={draft.title} onChange={(e) => onChange({ title: e.target.value })} required />
+      </label>
+      <label>
+        {t('announcements.bodyLabel')}
+        <textarea value={draft.body} onChange={(e) => onChange({ body: e.target.value })} />
+      </label>
+      <div className="form-row">
+        <span>{t('announcements.styleLabel')}</span>
+        <div className="chips" role="radiogroup" aria-label={t('announcements.styleLabel')}>
+          {[false, true].map((important) => (
+            <button
+              key={String(important)}
+              type="button"
+              role="radio"
+              aria-checked={draft.important === important}
+              className={`chip ${draft.important === important ? 'chip-selected' : ''}`}
+              onClick={() => onChange({ important })}
+            >
+              {important ? t('announcements.styleImportant') : t('announcements.styleNormal')}
+            </button>
+          ))}
+        </div>
+      </div>
+      <label>
+        {currentPhoto ? t('announcements.photoChange') : t('announcements.photoLabel')}
+        <input type="file" accept="image/*" onChange={(e) => onChange({ photo: e.target.files?.[0] ?? null })} />
+        <span className="field-hint">{t('announcements.photoHint')}</span>
+      </label>
+      {currentPhoto && (
+        <div className="form-row">
+          <img className="campaign-photo" src={imageSrc(currentPhoto)} alt="" />
+          {onRemovePhoto && (
+            <button type="button" className="link-button" onClick={onRemovePhoto}>
+              {t('announcements.photoRemove')}
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * News posts for the app's News tab: a title, text, an optional photo and
+ * an "Important" label. The newest one opens the tab, big, with its photo.
+ */
 export function AnnouncementsPage() {
   const poiId = usePoiId();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [items, setItems] = useState<Announcement[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editBody, setEditBody] = useState('');
+  const [editDraft, setEditDraft] = useState<Draft>(EMPTY_DRAFT);
+  // Remounts the new-post form after a save, which is the only way to
+  // empty its file picker.
+  const [formKey, setFormKey] = useState(0);
 
   function load() {
     getAnnouncements(poiId)
@@ -30,18 +104,30 @@ export function AnnouncementsPage() {
 
   useEffect(load, [poiId]);
 
+  function replace(updated: Announcement) {
+    setItems((current) => current?.map((a) => (a.id === updated.id ? updated : a)) ?? null);
+  }
+
   async function handleCreate(event: FormEvent) {
     event.preventDefault();
-    if (!title.trim()) return;
+    if (!draft.title.trim()) return;
     setSubmitting(true);
+    setError(null);
     try {
-      const created = await createAnnouncement(poiId, {
-        title: title.trim(),
-        body: body.trim() || undefined,
+      let created = await createAnnouncement(poiId, {
+        title: draft.title.trim(),
+        body: draft.body.trim() || undefined,
+        important: draft.important,
       });
+      if (draft.photo) {
+        created = await uploadAnnouncementImage(poiId, created.id, draft.photo).catch(() => {
+          setError(t('announcements.photoError'));
+          return created;
+        });
+      }
       setItems((current) => [created, ...(current ?? [])]);
-      setTitle('');
-      setBody('');
+      setDraft(EMPTY_DRAFT);
+      setFormKey((key) => key + 1);
     } catch {
       setError(t('announcements.createError'));
     } finally {
@@ -51,20 +137,31 @@ export function AnnouncementsPage() {
 
   function startEdit(item: Announcement) {
     setEditingId(item.id);
-    setEditTitle(item.title);
-    setEditBody(item.body ?? '');
+    setEditDraft({ title: item.title, body: item.body ?? '', important: item.important, photo: null });
   }
 
   async function saveEdit(id: string) {
+    setError(null);
     try {
-      const updated = await updateAnnouncement(poiId, id, {
-        title: editTitle.trim(),
-        body: editBody.trim() || undefined,
+      let updated = await updateAnnouncement(poiId, id, {
+        title: editDraft.title.trim(),
+        body: editDraft.body.trim() || undefined,
+        important: editDraft.important,
       });
-      setItems((current) => current?.map((a) => (a.id === id ? updated : a)) ?? null);
+      if (editDraft.photo) updated = await uploadAnnouncementImage(poiId, id, editDraft.photo);
+      replace(updated);
       setEditingId(null);
     } catch {
       setError(t('announcements.saveError'));
+    }
+  }
+
+  async function removePhoto(id: string) {
+    setError(null);
+    try {
+      replace(await removeAnnouncementImage(poiId, id));
+    } catch {
+      setError(t('announcements.photoError'));
     }
   }
 
@@ -82,16 +179,9 @@ export function AnnouncementsPage() {
       <h2>{t('announcements.title')}</h2>
       <p className="muted">{t('announcements.subtitle')}</p>
 
-      <form className="form card" onSubmit={handleCreate}>
-        <label>
-          {t('announcements.titleLabel')}
-          <input value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </label>
-        <label>
-          {t('announcements.bodyLabel')}
-          <textarea value={body} onChange={(e) => setBody(e.target.value)} />
-        </label>
-        <button type="submit" className="btn btn-primary" disabled={submitting || !title.trim()}>
+      <form key={formKey} className="form card" onSubmit={handleCreate}>
+        <PostFields draft={draft} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} />
+        <button type="submit" className="btn btn-primary" disabled={submitting || !draft.title.trim()}>
           {submitting ? t('announcements.publishing') : t('announcements.publish')}
         </button>
       </form>
@@ -102,16 +192,19 @@ export function AnnouncementsPage() {
       {items?.map((item) =>
         editingId === item.id ? (
           <div key={item.id} className="card form">
-            <label>
-              {t('announcements.titleLabel')}
-              <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-            </label>
-            <label>
-              {t('announcements.bodyLabel')}
-              <textarea value={editBody} onChange={(e) => setEditBody(e.target.value)} />
-            </label>
+            <PostFields
+              draft={editDraft}
+              onChange={(patch) => setEditDraft((d) => ({ ...d, ...patch }))}
+              currentPhoto={item.imageUrl}
+              onRemovePhoto={() => removePhoto(item.id)}
+            />
             <div className="card-actions">
-              <button type="button" className="btn btn-primary" onClick={() => saveEdit(item.id)}>
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={!editDraft.title.trim()}
+                onClick={() => saveEdit(item.id)}
+              >
                 {t('announcements.save')}
               </button>
               <button type="button" className="btn" onClick={() => setEditingId(null)}>
@@ -121,10 +214,14 @@ export function AnnouncementsPage() {
           </div>
         ) : (
           <div key={item.id} className="card">
+            {item.imageUrl && <img className="campaign-photo" src={imageSrc(item.imageUrl)} alt={item.title} />}
+            {item.important && <span className="badge badge-active">{t('announcements.styleImportant')}</span>}
             <p className="card-title">{item.title}</p>
             {item.body && <p>{item.body}</p>}
             {item.audioUrl && <p className="muted">{t('announcements.includesVoice')}</p>}
-            <p className="card-meta">{new Date(item.createdAt).toLocaleString()}</p>
+            <p className="card-meta">
+              {new Date(item.createdAt).toLocaleString(language, { dateStyle: 'long', timeStyle: 'short' })}
+            </p>
             <div className="card-actions">
               <button type="button" className="btn" onClick={() => startEdit(item)}>
                 {t('announcements.edit')}

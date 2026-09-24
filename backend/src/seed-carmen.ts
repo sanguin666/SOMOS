@@ -288,6 +288,16 @@ export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
     ]);
   }
 
+  // Databases seeded before news posts had photos: give the bell tower
+  // post the church's picture, so the News tab opens on a photo.
+  const bellTowerNote = await announcements.findOne({
+    where: { ...where, title: 'Gracias por la campaña del campanario' },
+  });
+  if (bellTowerNote && !bellTowerNote.imageUrl) {
+    bellTowerNote.imageUrl = CARMEN_PICTURE;
+    await announcements.save(bellTowerNote);
+  }
+
   if (!(await prayers.count({ where }))) {
     await prayers.save([
       prayers.create({ poi: place, authorName: 'Pilar', message: 'Por mi madre, que está ingresada en La Fe. Que se recupere pronto.', prayerCount: 23 }),

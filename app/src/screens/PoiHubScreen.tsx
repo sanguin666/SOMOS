@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
 import { PoiShell, hubMenu, type HubTab } from '../components/PoiShell';
 import { AnnouncementsScreen } from './AnnouncementsScreen';
+import { AnnouncementScreen } from './AnnouncementScreen';
 import { CommunityScreen } from './CommunityScreen';
 import { CommunityThreadScreen } from './CommunityThreadScreen';
 import { ComposeAnnouncementScreen } from './ComposeAnnouncementScreen';
@@ -20,7 +21,7 @@ import { RequestDetailScreen } from './RequestDetailScreen';
 import { RequestsScreen } from './RequestsScreen';
 import { useAuth } from '../auth/AuthContext';
 import { getActiveModules } from '../api/pois';
-import type { ActiveModule, CommunityPost, Poi } from '../api/types';
+import type { ActiveModule, Announcement, CommunityPost, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
@@ -36,6 +37,7 @@ type Props = {
 type Drilldown =
   | { kind: 'list' }
   | { kind: 'compose-announcement' }
+  | { kind: 'announcement'; item: Announcement }
   | { kind: 'community-thread'; post: CommunityPost }
   | { kind: 'new-request' }
   | { kind: 'request'; id: string }
@@ -118,7 +120,7 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
       onBack={tab === 'home' && drilldown.kind === 'list' ? undefined : goBack}
       onOpenPlaces={onOpenPlaces}
       onOpenProfile={() => setProfileOpen(true)}
-      scrollKey={`${tab}:${drilldown.kind}:${drilldown.kind === 'project' ? projectKey(drilldown.project) : ''}`}
+      scrollKey={`${tab}:${drilldown.kind}:${drilldown.kind === 'project' ? projectKey(drilldown.project) : drilldown.kind === 'announcement' ? drilldown.item.id : ''}`}
     >
       <ProfileScreen
         visible={profileOpen}
@@ -126,7 +128,17 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
         onSignIn={onSignIn}
       />
 
-      {tab === 'home' && <PoiHomeScreen poi={poi} modules={modules} onSelectTab={selectTab} />}
+      {tab === 'home' && (
+        <PoiHomeScreen
+          poi={poi}
+          modules={modules}
+          onSelectTab={selectTab}
+          onOpenAnnouncement={(item) => {
+            setTab('announcements');
+            setDrilldown({ kind: 'announcement', item });
+          }}
+        />
+      )}
 
       {tab === 'more' && (
         <MoreScreen
@@ -186,11 +198,14 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
             onBack={() => setDrilldown({ kind: 'list' })}
             onCreated={() => setDrilldown({ kind: 'list' })}
           />
+        ) : drilldown.kind === 'announcement' ? (
+          <AnnouncementScreen key={drilldown.item.id} item={drilldown.item} />
         ) : (
           <AnnouncementsScreen
             poi={poi}
             canCompose={isStaff}
             onCompose={() => setDrilldown({ kind: 'compose-announcement' })}
+            onOpen={(item) => setDrilldown({ kind: 'announcement', item })}
           />
         ))}
 

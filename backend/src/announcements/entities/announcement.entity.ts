@@ -35,6 +35,17 @@ export class Announcement {
   @Column({ name: 'audio_url', nullable: true })
   audioUrl?: string;
 
+  // Relative path (/uploads/announcements/<file>.jpg) or a full URL to the
+  // post's photo, added from the admin. Shown big on the News tab when the
+  // post is the newest, as a thumbnail in the list otherwise.
+  @Column({ name: 'image_url', type: 'varchar', nullable: true })
+  imageUrl?: string | null;
+
+  // Marked by the office as something members must not miss; the app puts
+  // an "Important" label on it, in the same dark orange as home messages.
+  @Column({ default: false })
+  important!: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

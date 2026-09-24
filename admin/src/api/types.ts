@@ -112,6 +112,9 @@ export type Announcement = {
   title: string;
   body: string | null;
   audioUrl: string | null;
+  // A relative /uploads/... path or a full URL.
+  imageUrl: string | null;
+  important: boolean;
   createdAt: string;
 };
 

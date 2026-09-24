@@ -85,6 +85,10 @@ export type Announcement = {
   // Relative path (e.g. /uploads/announcements/<file>.m4a) — prefix with
   // API_BASE_URL (see api/client.ts) to get a playable URL.
   audioUrl: string | null;
+  // The post's photo: a relative /uploads/... path or a full URL — go
+  // through uploadUri (api/client.ts).
+  imageUrl: string | null;
+  important: boolean;
   createdAt: string;
 };
 

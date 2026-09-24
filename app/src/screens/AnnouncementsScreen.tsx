@@ -1,31 +1,35 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
-import { PlayIcon, PlusIcon } from '../components/icons';
+import { ChevronRightIcon, PlusIcon } from '../components/icons';
 import { getAnnouncements } from '../api/announcements';
-import { API_BASE_URL } from '../api/client';
+import { uploadUri } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import type { Announcement, Poi } from '../api/types';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { formatNewsDate, ImportantLabel } from './AnnouncementScreen';
 
 type Props = {
   poi: Poi;
   onCompose: () => void;
-  // Announcements are the parish speaking to its members, so only staff
+  onOpen: (item: Announcement) => void;
+  // Announcements are the community speaking to its members, so only staff
   // get the compose button. See the backend's announcements controller.
   canCompose: boolean;
 };
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
+// A post this recent is flagged "New" above its title.
+const NEW_FOR_MS = 7 * 24 * 60 * 60 * 1000;
 
-export function AnnouncementsScreen({ poi, onCompose, canCompose }: Props) {
+/**
+ * The News tab: the newest post big, with its photo and the start of its
+ * text, then every earlier one as a row in one white box — the same list
+ * as the projects on the Donations tab. Any post opens its own page.
+ */
+export function AnnouncementsScreen({ poi, onCompose, onOpen, canCompose }: Props) {
   const { t } = useI18n();
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
   const [error, setError] = useState(false);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,10 +45,14 @@ export function AnnouncementsScreen({ poi, onCompose, canCompose }: Props) {
     };
   }, [poi.id]);
 
+  const [latest, ...earlier] = announcements ?? [];
+
   return (
     <>
       <View style={styles.headerRow}>
-        <AccessibleText variant="title">{t('announcements.title')}</AccessibleText>
+        <AccessibleText variant="title" style={styles.title} accessibilityRole="header">
+          {t('announcements.title')}
+        </AccessibleText>
         {canCompose && (
           <Pressable
             accessibilityRole="button"
@@ -75,82 +83,128 @@ export function AnnouncementsScreen({ poi, onCompose, canCompose }: Props) {
         </AccessibleText>
       )}
 
-      {announcements?.map((item) => (
-        <AnnouncementCard
-          key={item.id}
-          item={item}
-          expanded={expandedId === item.id}
-          onToggleExpand={() => setExpandedId(expandedId === item.id ? null : item.id)}
-        />
-      ))}
+      {latest && <LatestPost item={latest} onPress={() => onOpen(latest)} />}
+
+      {earlier.length > 0 && (
+        <>
+          <AccessibleText variant="caption" style={styles.sectionLabel}>
+            {t('announcements.earlier')}
+          </AccessibleText>
+          <View style={styles.listCard}>
+            {earlier.map((item, index) => (
+              <PostRow key={item.id} item={item} divider={index > 0} onPress={() => onOpen(item)} />
+            ))}
+          </View>
+        </>
+      )}
     </>
   );
 }
 
-function AnnouncementCard({
-  item,
-  expanded,
-  onToggleExpand,
-}: {
-  item: Announcement;
-  expanded: boolean;
-  onToggleExpand: () => void;
-}) {
+function LatestPost({ item, onPress }: { item: Announcement; onPress: () => void }) {
   const { t } = useI18n();
-  const audioSource = item.audioUrl ? `${API_BASE_URL}${item.audioUrl}` : undefined;
-  const player = useAudioPlayer(audioSource);
-  const playerStatus = useAudioPlayerStatus(player);
-
-  // The audio button is a sibling of the expand-toggle Pressable rather than
-  // nested inside it: react-native-web renders accessibilityRole="button"
-  // as a real <button>, and a <button> inside a <button> is invalid HTML —
-  // the browser's click handling for that is undefined, and it triggered a
-  // React hydration warning.
+  const isNew = Date.now() - new Date(item.createdAt).getTime() < NEW_FOR_MS;
+  const date = formatNewsDate(item.createdAt);
   return (
-    <View style={styles.card}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={item.title}
-        onPress={onToggleExpand}
-        style={styles.cardHeaderTouchable}
-      >
-        <View style={styles.cardHeader}>
-          <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-            {item.title}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${item.title}, ${date}`}
+      accessibilityHint={t('announcements.readMore')}
+      onPress={onPress}
+      style={styles.latestCard}
+    >
+      {item.imageUrl ? (
+        <Image source={{ uri: uploadUri(item.imageUrl) }} style={styles.latestPhoto} resizeMode="cover" />
+      ) : null}
+      <View style={styles.latestText}>
+        <View style={styles.metaRow}>
+          {item.important && <ImportantLabel />}
+          <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.meta}>
+            {isNew ? `${t('announcements.new')} · ${date}` : date}
           </AccessibleText>
-          <AccessibleText variant="caption">{formatDate(item.createdAt)}</AccessibleText>
         </View>
-
+        <AccessibleText variant="bodyLarge" style={styles.bold}>
+          {item.title}
+        </AccessibleText>
         {!!item.body && (
-          <AccessibleText variant="body" color={colors.textMuted} numberOfLines={expanded ? undefined : 2}>
+          <AccessibleText variant="body" color={colors.textMuted} numberOfLines={3}>
             {item.body}
           </AccessibleText>
         )}
-      </Pressable>
-
-      {!!item.audioUrl && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={playerStatus.playing ? t('announcements.pauseVoice') : t('announcements.playVoice')}
-          onPress={() => (playerStatus.playing ? player.pause() : player.play())}
-          style={styles.audioButton}
-        >
-          <PlayIcon size={16} color="#FFFFFF" />
-          <AccessibleText variant="caption" color="#FFFFFF" style={styles.audioLabel}>
-            {playerStatus.playing ? t('announcements.pauseVoice') : t('announcements.playVoice')}
+        {!item.body && !!item.audioUrl && (
+          <AccessibleText variant="body" color={colors.textMuted}>
+            {t('announcements.voiceMessage')}
           </AccessibleText>
-        </Pressable>
+        )}
+        <AccessibleText variant="body" color={colors.primaryStrong} style={styles.bold}>
+          {t('announcements.readMore')} ›
+        </AccessibleText>
+      </View>
+    </Pressable>
+  );
+}
+
+/** An earlier post: its photo, or its date on a coral tile, then its title. */
+function PostRow({ item, divider, onPress }: { item: Announcement; divider: boolean; onPress: () => void }) {
+  const { t } = useI18n();
+  const created = new Date(item.createdAt);
+  const date = formatNewsDate(item.createdAt);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${item.title}, ${date}`}
+      onPress={onPress}
+      style={[styles.row, divider && styles.divider]}
+    >
+      {item.imageUrl ? (
+        <Image source={{ uri: uploadUri(item.imageUrl) }} style={styles.thumb} resizeMode="cover" />
+      ) : (
+        <View style={[styles.thumb, styles.dateTile]}>
+          <AccessibleText variant="bodyLarge" color={colors.primaryStrong} style={styles.dateDay}>
+            {created.getDate()}
+          </AccessibleText>
+          <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.dateMonth}>
+            {created.toLocaleDateString(undefined, { month: 'short' }).replace('.', '')}
+          </AccessibleText>
+        </View>
       )}
-    </View>
+      <View style={styles.flex}>
+        {item.important && <ImportantLabel />}
+        <AccessibleText variant="bodyLarge" style={styles.bold}>
+          {item.title}
+        </AccessibleText>
+        {/* A date tile already says the day, so the line under the title
+            only repeats it next to a photo. */}
+        {(!!item.imageUrl || !!item.audioUrl) && (
+          <AccessibleText variant="caption">
+            {[item.imageUrl ? date : null, item.audioUrl ? t('announcements.voiceMessage') : null]
+              .filter(Boolean)
+              .join(' · ')}
+          </AccessibleText>
+        )}
+      </View>
+      <ChevronRightIcon size={22} color={colors.textMuted} />
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+    gap: 2,
+    alignItems: 'flex-start',
+  },
+  bold: {
+    fontWeight: '700',
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  title: {
+    fontSize: 28,
   },
   iconButton: {
     width: 44,
@@ -160,41 +214,70 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  titleBlock: {
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-  },
-  card: {
+  latestCard: {
     ...cardSurface,
     borderRadius: radii.lg,
-    padding: spacing.lg,
-    gap: spacing.sm,
+    overflow: 'hidden',
   },
-  cardHeaderTouchable: {
-    gap: spacing.sm,
+  latestPhoto: {
+    width: '100%',
+    aspectRatio: 16 / 9,
   },
-  cardHeader: {
+  latestText: {
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
+  metaRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     gap: spacing.sm,
   },
-  cardTitle: {
+  meta: {
     fontWeight: '700',
-    flex: 1,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
-  audioButton: {
+  sectionLabel: {
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginTop: spacing.md,
+  },
+  listCard: {
+    ...cardSurface,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
+  },
+  row: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: minTouchTarget,
+    padding: spacing.md,
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+  },
+  thumb: {
+    width: 60,
+    height: 60,
+    borderRadius: radii.md,
+  },
+  // Not a box inside the white one: a filled tile, like the thumbnails.
+  dateTile: {
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
-    minHeight: 44,
-    borderRadius: 9999,
-    backgroundColor: colors.primary,
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.md,
   },
-  audioLabel: {
+  dateDay: {
+    fontWeight: '800',
+    lineHeight: 26,
+  },
+  dateMonth: {
     fontWeight: '700',
+    fontSize: 13,
+    lineHeight: 15,
+    textTransform: 'uppercase',
   },
 });

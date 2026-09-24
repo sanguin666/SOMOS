@@ -212,6 +212,11 @@ export type Translations = {
     empty: string;
     playVoice: string;
     pauseVoice: string;
+    new: string;
+    earlier: string;
+    readMore: string;
+    voiceMessage: string;
+    important: string;
   };
   composeAnnouncement: {
     title: string;
@@ -611,13 +616,18 @@ const en: Translations = {
     empty: 'No upcoming events yet.',
   },
   announcements: {
-    title: 'Announcements',
+    title: 'News',
     newAria: 'New announcement',
     error: "Couldn't load announcements. Pull up the app again to retry.",
     loading: 'Loading…',
     empty: 'No announcements yet.',
     playVoice: 'Play voice message',
     pauseVoice: 'Pause voice message',
+    new: 'New',
+    earlier: 'Earlier',
+    readMore: 'Read more',
+    voiceMessage: 'Voice message',
+    important: 'Important',
   },
   composeAnnouncement: {
     title: 'New Announcement',
@@ -1017,13 +1027,18 @@ const es: Translations = {
     empty: 'Todavía no hay próximos eventos.',
   },
   announcements: {
-    title: 'Anuncios',
+    title: 'Noticias',
     newAria: 'Nuevo anuncio',
     error: 'No se pudieron cargar los anuncios. Vuelve a abrir la app para reintentar.',
     loading: 'Cargando…',
     empty: 'Todavía no hay anuncios.',
     playVoice: 'Reproducir mensaje de voz',
     pauseVoice: 'Pausar mensaje de voz',
+    new: 'Nuevo',
+    earlier: 'Anteriores',
+    readMore: 'Leer más',
+    voiceMessage: 'Mensaje de voz',
+    important: 'Importante',
   },
   composeAnnouncement: {
     title: 'Nuevo anuncio',
@@ -1423,13 +1438,18 @@ const fr: Translations = {
     empty: "Aucun événement à venir pour l'instant.",
   },
   announcements: {
-    title: 'Annonces',
+    title: 'Actualités',
     newAria: 'Nouvelle annonce',
     error: "Impossible de charger les annonces. Rouvrez l'app pour réessayer.",
     loading: 'Chargement…',
     empty: "Aucune annonce pour l'instant.",
     playVoice: 'Lire le message vocal',
     pauseVoice: 'Mettre en pause le message vocal',
+    new: 'Nouveau',
+    earlier: 'Plus anciennes',
+    readMore: 'Lire la suite',
+    voiceMessage: 'Message vocal',
+    important: 'Important',
   },
   composeAnnouncement: {
     title: 'Nouvelle annonce',
