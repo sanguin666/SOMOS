@@ -13,7 +13,7 @@ import { TimetableRows } from '../components/Timetable';
 import { BadgeTiles } from '../components/BadgeTiles';
 import { badgeTiles } from '../utils/badges';
 import { usePreview } from '../preview/PreviewContext';
-import { formatWhen, isWeekly, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
+import { formatWhen, repeats, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
 import type {
   ActiveModule,
   Announcement,
@@ -236,7 +236,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
   // The next and past event blocks are for one-off events. The weekly
   // ones have the timetable block, and would otherwise sit in "past"
   // forever, their first occurrence being long gone.
-  const oneOffs = (events ?? []).filter((e) => !isWeekly(e));
+  const oneOffs = (events ?? []).filter((e) => !repeats(e));
   const upcoming = oneOffs
     .filter((e) => new Date(e.startsAt).getTime() >= now)
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
@@ -346,7 +346,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
                   )}
                 </View>
               )}
-              {massTimes && <TimetableRows rows={massTimes.rows} />}
+              {massTimes && <TimetableRows rows={massTimes.rows} notes={massTimes.notes} />}
             </Pressable>
           </View>
         );

@@ -4,7 +4,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { CompactTimetable } from '../components/Timetable';
 import { getEvents } from '../api/events';
-import { isWeekly, occurrencesOf, weeklyTimetable } from '../utils/schedule';
+import { repeats, occurrencesOf, weeklyTimetable } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
 import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import type { Event, Poi } from '../api/types';
@@ -53,7 +53,7 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
   // then the one-off events still to come, soonest first.
   const now = new Date();
   const timetable = weeklyTimetable(events ?? [], now);
-  const oneOffs = (events ?? []).filter((event) => !isWeekly(event) && occurrencesOf(event, now, 1).length > 0);
+  const oneOffs = (events ?? []).filter((event) => !repeats(event) && occurrencesOf(event, now, 1).length > 0);
 
   return (
     <>

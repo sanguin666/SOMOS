@@ -111,8 +111,9 @@ describe('weeklyTimetable', () => {
           { days: [6], times: ['18:30'] },
           { days: [0], times: ['10:00', '18:30'] },
         ],
+        notes: [],
       },
-      { category: 'confession', rows: [{ days: [6], times: ['17:00'] }] },
+      { category: 'confession', rows: [{ days: [6], times: ['17:00'] }], notes: [] },
     ]);
   });
 
@@ -188,5 +189,83 @@ describe('occurrencesOnDay', () => {
   it('starts weeks on Monday', () => {
     const start = startOfWeek(new Date(2026, 9, 4, 18, 0));
     expect([start.getFullYear(), start.getMonth(), start.getDate(), start.getHours()]).toEqual([2026, 8, 28, 0]);
+  });
+});
+
+describe('repeat rules', () => {
+  it('repeats on the chosen weekdays', () => {
+    const weekdays = event({ startsAt: at(2026, 9, 1, 8, 30).toISOString(), repeatDays: [1, 2, 3, 4, 5] });
+    const next = occurrencesOf(weekdays, at(2026, 9, 11, 12), 3);
+    expect(next.map((o) => o.startsAt)).toEqual([at(2026, 9, 14, 8, 30), at(2026, 9, 15, 8, 30), at(2026, 9, 16, 8, 30)]);
+  });
+
+  it('never happens before its first day', () => {
+    const daily = event({ startsAt: at(2026, 9, 10, 8).toISOString(), repeatDays: [0, 1, 2, 3, 4, 5, 6] });
+    expect(occurrencesOnDay([daily], at(2026, 9, 9))).toEqual([]);
+    expect(occurrencesOnDay([daily], at(2026, 9, 10))).toHaveLength(1);
+  });
+
+  it('skips its days off', () => {
+    const daily = event({
+      startsAt: at(2026, 9, 1, 8).toISOString(),
+      repeatDays: [0, 1, 2, 3, 4, 5, 6],
+      exceptions: [{ date: '2026-09-15', reason: 'Retreat' }],
+    });
+    expect(occurrencesOnDay([daily], at(2026, 9, 15))).toEqual([]);
+    expect(occurrencesOf(daily, at(2026, 9, 14, 9), 2).map((o) => o.startsAt)).toEqual([
+      at(2026, 9, 16, 8),
+      at(2026, 9, 17, 8),
+    ]);
+  });
+
+  it('finds the first Friday of each month', () => {
+    const firstFriday = event({
+      recurrence: 'monthly',
+      startsAt: at(2026, 9, 1, 19).toISOString(),
+      monthlyWeek: 1,
+      monthlyWeekday: 5,
+    });
+    expect(occurrencesOf(firstFriday, MONDAY, 3).map((o) => o.startsAt)).toEqual([
+      at(2026, 10, 2, 19),
+      at(2026, 11, 6, 19),
+      at(2026, 12, 4, 19),
+    ]);
+  });
+
+  it('finds the last Saturday and a day of the month', () => {
+    const lastSaturday = event({
+      recurrence: 'monthly',
+      startsAt: at(2026, 9, 1, 18).toISOString(),
+      monthlyWeek: -1,
+      monthlyWeekday: 6,
+    });
+    expect(occurrencesOf(lastSaturday, MONDAY, 2).map((o) => o.startsAt)).toEqual([
+      at(2026, 9, 26, 18),
+      at(2026, 10, 31, 18),
+    ]);
+    const fifteenth = event({ recurrence: 'monthly', startsAt: at(2026, 9, 1, 12).toISOString(), monthlyDay: 15 });
+    expect(occurrencesOf(fifteenth, at(2026, 9, 16), 1).map((o) => o.startsAt)).toEqual([at(2026, 10, 15, 12)]);
+  });
+
+  it('lists weekday and monthly lines, and the days off coming up', () => {
+    const [masses] = weeklyTimetable(
+      [
+        event({
+          startsAt: at(2026, 9, 1, 8, 30).toISOString(),
+          repeatDays: [1, 2, 3, 4, 5],
+          exceptions: [
+            { date: '2026-09-16', reason: 'No Mass: retreat' },
+            { date: '2026-09-19' }, // a Saturday: not a day it would be on
+          ],
+        }),
+        event({ recurrence: 'monthly', startsAt: at(2026, 9, 1, 19).toISOString(), monthlyWeek: 1, monthlyWeekday: 5 }),
+      ],
+      MONDAY,
+    );
+    expect(masses.rows).toEqual([
+      { days: [1, 2, 3, 4, 5], times: ['08:30'] },
+      { days: [], times: ['19:00'], monthly: { week: 1, weekday: 5, day: null } },
+    ]);
+    expect(masses.notes).toEqual([{ startsAt: at(2026, 9, 16, 8, 30), reason: 'No Mass: retreat' }]);
   });
 });

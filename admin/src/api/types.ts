@@ -117,9 +117,13 @@ export type Announcement = {
 
 export type EventCategory = 'mass' | 'confession' | 'adoration' | 'prayer' | 'office_hours' | 'other';
 
-// A weekly event repeats on the weekday and at the time of `startsAt`,
-// which is its first occurrence.
-export type EventRecurrence = 'none' | 'weekly';
+// A repeating event's `startsAt` is the first day it can happen and its
+// time every time. Weekly: on `repeatDays` (or the weekday of `startsAt`).
+// Monthly: the nth weekday of the month, or a day of the month.
+export type EventRecurrence = 'none' | 'weekly' | 'monthly';
+
+// A day a repeating event doesn't happen, as YYYY-MM-DD.
+export type EventException = { date: string; reason?: string | null };
 
 export type Event = {
   id: string;
@@ -131,8 +135,14 @@ export type Event = {
   description: string | null;
   category: EventCategory;
   recurrence: EventRecurrence;
-  // The last day a weekly event still happens, or null for "until changed".
+  // The last day a repeating event still happens, or null for "until changed".
   repeatUntil: string | null;
+  repeatDays?: number[];
+  // 1–4, or -1 for the last one.
+  monthlyWeek?: number | null;
+  monthlyWeekday?: number | null;
+  monthlyDay?: number | null;
+  exceptions?: EventException[];
 };
 
 export type LivestreamStatus = 'upcoming' | 'live' | 'ended';

@@ -14,35 +14,24 @@ import {
 import type { Event, MassIntention, MassIntentionStatus } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
 import { CURRENCY, formatMoney, fromLocalInputValue } from '../format';
+import { occurrencesBetween } from '../schedule';
 
 // How far ahead the celebration picker offers the community's Masses.
 const PICKER_WEEKS = 6;
 
 type Celebration = { at: string; title: string };
 
-// The Masses coming up in the next few weeks. A weekly one is worked out
-// from its first occurrence (see Event.recurrence): same weekday, same
-// wall-clock time, until its last day if it has one.
+// The Masses coming up in the next few weeks, repeating ones included
+// (see schedule.ts).
 function upcomingMasses(events: Event[]): Celebration[] {
   const now = new Date();
   const horizon = new Date(now);
   horizon.setDate(horizon.getDate() + PICKER_WEEKS * 7);
-  const result: Celebration[] = [];
-  for (const event of events) {
-    if (event.category !== 'mass') continue;
-    const at = new Date(event.startsAt);
-    if (event.recurrence !== 'weekly') {
-      if (at >= now && at <= horizon) result.push({ at: at.toISOString(), title: event.title });
-      continue;
-    }
-    const until = event.repeatUntil ? new Date(event.repeatUntil) : null;
-    while (at < now) at.setDate(at.getDate() + 7);
-    while (at <= horizon && (!until || at <= until)) {
-      result.push({ at: at.toISOString(), title: event.title });
-      at.setDate(at.getDate() + 7);
-    }
-  }
-  return result.sort((a, b) => a.at.localeCompare(b.at));
+  const masses = events.filter((event) => event.category === 'mass');
+  return occurrencesBetween(masses, now, horizon).map(({ event, at }) => ({
+    at: at.toISOString(),
+    title: event.title,
+  }));
 }
 
 // Which celebration the picker is on: '' for "whenever the community can",

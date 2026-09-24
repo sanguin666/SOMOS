@@ -1,10 +1,45 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity.js';
+import { EventRecurrence } from './entities/event-kinds.js';
 import { PoisService } from '../pois/pois.service.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
 import { UpdateEventDto } from './dto/update-event.dto.js';
+
+/**
+ * Keeps only what the event's kind of repetition uses, so switching a
+ * weekly Mass to once a month (or to a one-off) leaves nothing behind that
+ * a reader could misread, and refuses a monthly event with no rule.
+ */
+function normalised(event: Event): Event {
+  const weekly = event.recurrence === EventRecurrence.WEEKLY;
+  const monthly = event.recurrence === EventRecurrence.MONTHLY;
+  event.repeatDays = weekly ? [...new Set(event.repeatDays ?? [])].sort((a, b) => a - b) : [];
+  if (monthly) {
+    const byWeekday = event.monthlyWeek != null && event.monthlyWeekday != null;
+    if (!byWeekday && event.monthlyDay == null) {
+      throw new BadRequestException('Say which day of the month');
+    }
+    if (byWeekday) event.monthlyDay = null;
+    else {
+      event.monthlyWeek = null;
+      event.monthlyWeekday = null;
+    }
+  } else {
+    event.monthlyWeek = null;
+    event.monthlyWeekday = null;
+    event.monthlyDay = null;
+  }
+  if (event.recurrence === EventRecurrence.NONE) {
+    event.repeatUntil = null;
+    event.exceptions = [];
+  }
+  event.exceptions = [...(event.exceptions ?? [])]
+    .map((e) => ({ date: e.date, reason: e.reason ?? null }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  return event;
+}
 
 @Injectable()
 export class EventsService {
@@ -23,7 +58,7 @@ export class EventsService {
       repeatUntil: dto.repeatUntil ? new Date(dto.repeatUntil) : null,
       poi,
     });
-    return this.eventsRepository.save(event);
+    return this.eventsRepository.save(normalised(event));
   }
 
   findForPoi(poiId: string): Promise<Event[]> {
@@ -46,7 +81,7 @@ export class EventsService {
             ? new Date(dto.repeatUntil)
             : null,
     });
-    return this.eventsRepository.save(event);
+    return this.eventsRepository.save(normalised(event));
   }
 
   async remove(poiId: string, id: string): Promise<void> {

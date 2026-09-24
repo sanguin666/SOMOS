@@ -9,6 +9,7 @@ import { getEvents } from '../api/events';
 import type { Campaign, DashboardSummary, DonationStats, Event, ModuleType } from '../api/types';
 import { formatMoney } from '../format';
 import { typeName } from '../requestTypes';
+import { occurrencesBetween } from '../schedule';
 
 type T = ReturnType<typeof useI18n>['t'];
 
@@ -35,24 +36,11 @@ function listed(items: string[], t: T): string {
   return items.length > 2 ? `${shown} ${t('dashboard.andMore', { n: items.length - 2 })}` : shown;
 }
 
-// The events of the next seven days, a weekly one worked out from its
-// first occurrence (same weekday, same time) until its last day.
+// The events of the next seven days, repeating ones included.
 function occurrencesThisWeek(events: Event[], now: Date): { event: Event; at: Date }[] {
-  const horizon = new Date(now.getTime() + WEEK_MS);
-  const result: { event: Event; at: Date }[] = [];
-  for (const event of events) {
-    // The office's opening hours are not something that happens.
-    if (event.category === 'office_hours') continue;
-    const at = new Date(event.startsAt);
-    if (event.recurrence !== 'weekly') {
-      if (at >= now && at <= horizon) result.push({ event, at });
-      continue;
-    }
-    const until = event.repeatUntil ? new Date(event.repeatUntil) : null;
-    while (at < now) at.setDate(at.getDate() + 7);
-    if (at <= horizon && (!until || at <= until)) result.push({ event, at: new Date(at) });
-  }
-  return result;
+  // The office's opening hours are not something that happens.
+  const happenings = events.filter((event) => event.category !== 'office_hours');
+  return occurrencesBetween(happenings, now, new Date(now.getTime() + WEEK_MS));
 }
 
 function todoRows(summary: DashboardSummary, t: T, formatWhen: (iso: string) => string): TodoRow[] {

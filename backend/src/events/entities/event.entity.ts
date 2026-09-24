@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { Poi } from '../../pois/entities/poi.entity.js';
-import { EventCategory, EventRecurrence } from './event-kinds.js';
+import { EventCategory, EventRecurrence, type EventException } from './event-kinds.js';
 
 /**
  * A scheduled event posted by a POI (Mass times, baptisms, weddings,
@@ -47,14 +47,34 @@ export class Event {
   @Column({ type: 'enum', enum: EventCategory, default: EventCategory.OTHER })
   category!: EventCategory;
 
-  // A weekly event repeats on the weekday and at the time of `startsAt`,
-  // which is its first occurrence. Occurrences are worked out by whoever
-  // reads the event (the app, the dashboard) rather than stored, so moving
-  // Sunday Mass by half an hour is one edit.
+  // A repeating event starts on the day of `startsAt` and happens at its
+  // time on every day its rule picks (see EventRecurrence). Occurrences
+  // are worked out by whoever reads the event (the app, the dashboard)
+  // rather than stored, so moving Sunday Mass by half an hour is one edit.
   @Column({ type: 'enum', enum: EventRecurrence, default: EventRecurrence.NONE })
   recurrence!: EventRecurrence;
 
-  // The last day a weekly event still happens (a summer timetable), or
+  // Weekly: the weekdays it happens on, 0 for Sunday. Empty means the
+  // weekday of `startsAt`, which is how every weekly event began.
+  @Column('smallint', { name: 'repeat_days', array: true, default: () => "'{}'" })
+  repeatDays!: number[];
+
+  // Monthly, on the nth weekday: 1 to 4, or -1 for the last one.
+  @Column('smallint', { name: 'monthly_week', nullable: true })
+  monthlyWeek?: number | null;
+
+  @Column('smallint', { name: 'monthly_weekday', nullable: true })
+  monthlyWeekday?: number | null;
+
+  // Monthly, on a date: 1 to 31 (a month without it is skipped).
+  @Column('smallint', { name: 'monthly_day', nullable: true })
+  monthlyDay?: number | null;
+
+  // Days a repeating event does not happen, each with an optional reason.
+  @Column('jsonb', { default: () => "'[]'" })
+  exceptions!: EventException[];
+
+  // The last day a repeating event still happens (a summer timetable), or
   // null when it carries on until someone changes it.
   @Column('timestamptz', { name: 'repeat_until', nullable: true })
   repeatUntil?: Date | null;

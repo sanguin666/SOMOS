@@ -1,6 +1,14 @@
 import { StyleSheet, View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
-import { formatDays, type TimetableRow, type TimetableSection } from '../utils/schedule';
+import {
+  formatDays,
+  timeKey,
+  weekdayName,
+  type MonthlyRule,
+  type TimetableNote,
+  type TimetableRow,
+  type TimetableSection,
+} from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
 import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
@@ -17,7 +25,7 @@ export function TimetableCard({ section }: { section: TimetableSection }) {
       <AccessibleText variant="bodyLarge" style={styles.heading}>
         {t(`schedule.category_${section.category}`)}
       </AccessibleText>
-      <TimetableRows rows={section.rows} />
+      <TimetableRows rows={section.rows} notes={section.notes} />
     </View>
   );
 }
@@ -36,24 +44,55 @@ export function CompactTimetable({ sections }: { sections: TimetableSection[] })
           <AccessibleText variant="body" style={styles.heading}>
             {t(`schedule.category_${section.category}`)}
           </AccessibleText>
-          <TimetableRows rows={section.rows} compact />
+          <TimetableRows rows={section.rows} notes={section.notes} compact />
         </View>
       ))}
     </View>
   );
 }
 
-/** The lines of a timetable, for a card that brings its own heading. */
-export function TimetableRows({ rows, compact = false }: { rows: TimetableRow[]; compact?: boolean }) {
-  const { language } = useI18n();
+const NTH_KEYS: Record<string, 'schedule.nth_1' | 'schedule.nth_2' | 'schedule.nth_3' | 'schedule.nth_4' | 'schedule.nth_last'> = {
+  '1': 'schedule.nth_1',
+  '2': 'schedule.nth_2',
+  '3': 'schedule.nth_3',
+  '4': 'schedule.nth_4',
+  '-1': 'schedule.nth_last',
+};
+
+const DATE_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', fr: 'fr-FR' };
+
+/**
+ * The lines of a timetable, for a card that brings its own heading, then
+ * the days off coming up: "Not on Wednesday 11 November at 08:30".
+ */
+export function TimetableRows({
+  rows,
+  notes = [],
+  compact = false,
+}: {
+  rows: TimetableRow[];
+  notes?: TimetableNote[];
+  compact?: boolean;
+}) {
+  const { t, language } = useI18n();
+  const monthlyLabel = (rule: MonthlyRule) => {
+    const text =
+      rule.day != null
+        ? t('schedule.monthlyDay', { day: rule.day })
+        : t('schedule.monthlyNth', {
+            nth: t(NTH_KEYS[String(rule.week)] ?? 'schedule.nth_1'),
+            weekday: weekdayName(rule.weekday ?? 0, language),
+          });
+    return text.charAt(0).toLocaleUpperCase() + text.slice(1);
+  };
   return (
     <>
       {rows.map((row) => {
-        const days = formatDays(row.days, language);
+        const days = row.monthly ? monthlyLabel(row.monthly) : formatDays(row.days, language);
         const times = row.times.join(' · ');
         return (
           <View
-            key={row.days.join()}
+            key={days}
             style={compact ? styles.compactRow : styles.row}
             accessible
             accessibilityLabel={`${days}: ${row.times.join(', ')}`}
@@ -65,6 +104,24 @@ export function TimetableRows({ rows, compact = false }: { rows: TimetableRow[];
               {times}
             </AccessibleText>
           </View>
+        );
+      })}
+      {notes.map((note) => {
+        const date = note.startsAt.toLocaleDateString(DATE_LOCALES[language] ?? language, {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        });
+        const values = { date, time: timeKey(note.startsAt), reason: note.reason ?? '' };
+        return (
+          <AccessibleText
+            key={note.startsAt.toISOString()}
+            variant="body"
+            color={colors.primaryStrong}
+            style={styles.note}
+          >
+            {t(note.reason ? 'schedule.dayOffReason' : 'schedule.dayOff', values)}
+          </AccessibleText>
         );
       })}
     </>
@@ -115,6 +172,10 @@ const styles = StyleSheet.create({
   },
   days: {
     flexShrink: 1,
+  },
+  note: {
+    fontWeight: '700',
+    paddingVertical: spacing.xs,
   },
   times: {
     fontWeight: '700',

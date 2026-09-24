@@ -102,17 +102,29 @@ export type EventCategory =
 export type Event = {
   id: string;
   title: string;
-  // For a weekly event, its first occurrence: the weekday and time it
-  // repeats on (see utils/schedule.ts).
+  // For a repeating event, the first day it can happen and the time it
+  // starts at every time (see utils/schedule.ts).
   startsAt: string;
   endsAt: string | null;
   location: string | null;
   description: string | null;
   category: EventCategory;
-  recurrence: 'none' | 'weekly';
-  // The last day a weekly event still happens, or null for no end.
+  recurrence: 'none' | 'weekly' | 'monthly';
+  // The last day a repeating event still happens, or null for no end.
   repeatUntil: string | null;
+  // Weekly: the weekdays it happens on (0 is Sunday); empty means the
+  // weekday of `startsAt`.
+  repeatDays?: number[];
+  // Monthly: the nth (1–4, or -1 for the last) given weekday of the
+  // month, or else a day of the month.
+  monthlyWeek?: number | null;
+  monthlyWeekday?: number | null;
+  monthlyDay?: number | null;
+  // Days a repeating event doesn't happen on, as YYYY-MM-DD.
+  exceptions?: EventException[];
 };
+
+export type EventException = { date: string; reason?: string | null };
 
 export type PrayerRequest = {
   id: string;

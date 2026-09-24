@@ -107,6 +107,34 @@ export type Translations = {
     untilDate: string;
     weeklyHeading: string;
     weeklyHint: string;
+    recurrenceDaily: string;
+    recurrenceDays: string;
+    recurrenceMonthly: string;
+    daysLabel: string;
+    shortcutAll: string;
+    shortcutWeekdays: string;
+    shortcutWeekend: string;
+    monthlyLabel: string;
+    monthlyByWeekday: string;
+    monthlyByDate: string;
+    nth_1: string;
+    nth_2: string;
+    nth_3: string;
+    nth_4: string;
+    nth_last: string;
+    monthlyNth: string;
+    monthlyDay: string;
+    dayOfMonthLabel: string;
+    exceptionsLabel: string;
+    exceptionReasonPlaceholder: string;
+    addException: string;
+    removeException: string;
+    summaryLabel: string;
+    everyDay: string;
+    weekdaysOnly: string;
+    weekendOnly: string;
+    exceptDates: string;
+    noDays: string;
     onceHeading: string;
   };
   announcements: {
@@ -637,13 +665,41 @@ const en: Translations = {
     recurrenceLabel: 'Repeats',
     recurrenceNone: 'Only once',
     recurrenceWeekly: 'Every week',
-    firstStartsAtLabel: 'First date & time',
+    firstStartsAtLabel: 'Starts from (first day and time)',
     endTimeLabel: 'Ends at (optional)',
     repeatUntilLabel: 'Last date (optional — leave empty to keep it going)',
     everyWeekday: 'Every {{day}}',
     fromDate: 'from {{date}}',
     untilDate: 'until {{date}}',
-    weeklyHeading: 'Every week',
+    weeklyHeading: 'Regular events',
+    recurrenceDaily: 'Every day',
+    recurrenceDays: 'Some days of the week',
+    recurrenceMonthly: 'Once a month',
+    daysLabel: 'On these days',
+    shortcutAll: 'Every day',
+    shortcutWeekdays: 'Monday to Friday',
+    shortcutWeekend: 'The weekend',
+    monthlyLabel: 'Which day of the month',
+    monthlyByWeekday: 'A day of the week (e.g. the first Friday)',
+    monthlyByDate: 'A date (e.g. the 15th)',
+    nth_1: 'first',
+    nth_2: 'second',
+    nth_3: 'third',
+    nth_4: 'fourth',
+    nth_last: 'last',
+    monthlyNth: 'The {{nth}} {{weekday}} of the month',
+    monthlyDay: 'Day {{day}} of each month',
+    dayOfMonthLabel: 'Day of the month',
+    exceptionsLabel: 'Except these days',
+    exceptionReasonPlaceholder: 'Reason, shown in the app (optional)',
+    addException: '+ Add a day without this event',
+    removeException: 'Remove',
+    summaryLabel: 'Summary',
+    everyDay: 'Every day',
+    weekdaysOnly: 'Monday to Friday',
+    weekendOnly: 'Saturday and Sunday',
+    exceptDates: 'except {{dates}}',
+    noDays: 'Pick at least one day',
     weeklyHint: "Your community's regular week. The app shows it as your timetable, and the Celebration times section of your home page is built from it.",
     onceHeading: 'Dates',
   },
@@ -1176,13 +1232,41 @@ const es: Translations = {
     recurrenceLabel: 'Se repite',
     recurrenceNone: 'Solo una vez',
     recurrenceWeekly: 'Cada semana',
-    firstStartsAtLabel: 'Primera fecha y hora',
+    firstStartsAtLabel: 'A partir de (primer día y hora)',
     endTimeLabel: 'Termina a las (opcional)',
     repeatUntilLabel: 'Última fecha (opcional; déjala vacía para que continúe)',
     everyWeekday: 'Cada {{day}}',
     fromDate: 'desde el {{date}}',
     untilDate: 'hasta el {{date}}',
-    weeklyHeading: 'Cada semana',
+    weeklyHeading: 'Eventos regulares',
+    recurrenceDaily: 'Todos los días',
+    recurrenceDays: 'Algunos días de la semana',
+    recurrenceMonthly: 'Una vez al mes',
+    daysLabel: 'Estos días',
+    shortcutAll: 'Todos los días',
+    shortcutWeekdays: 'De lunes a viernes',
+    shortcutWeekend: 'El fin de semana',
+    monthlyLabel: 'Qué día del mes',
+    monthlyByWeekday: 'Un día de la semana (p. ej., el primer viernes)',
+    monthlyByDate: 'Una fecha (p. ej., el 15)',
+    nth_1: 'primer',
+    nth_2: 'segundo',
+    nth_3: 'tercer',
+    nth_4: 'cuarto',
+    nth_last: 'último',
+    monthlyNth: 'El {{nth}} {{weekday}} del mes',
+    monthlyDay: 'El día {{day}} de cada mes',
+    dayOfMonthLabel: 'Día del mes',
+    exceptionsLabel: 'Excepto estos días',
+    exceptionReasonPlaceholder: 'Motivo, visible en la app (opcional)',
+    addException: '+ Añadir un día sin este evento',
+    removeException: 'Quitar',
+    summaryLabel: 'Resumen',
+    everyDay: 'Todos los días',
+    weekdaysOnly: 'De lunes a viernes',
+    weekendOnly: 'Sábado y domingo',
+    exceptDates: 'excepto el {{dates}}',
+    noDays: 'Elige al menos un día',
     weeklyHint: 'La semana habitual de tu comunidad. La app la muestra como tu horario, y la sección Horarios de celebraciones de tu página de inicio se construye con ella.',
     onceHeading: 'Fechas',
   },
@@ -1715,13 +1799,41 @@ const fr: Translations = {
     recurrenceLabel: 'Répétition',
     recurrenceNone: 'Une seule fois',
     recurrenceWeekly: 'Chaque semaine',
-    firstStartsAtLabel: 'Première date et heure',
+    firstStartsAtLabel: 'À partir du (premier jour et heure)',
     endTimeLabel: 'Se termine à (facultatif)',
     repeatUntilLabel: 'Dernière date (facultatif — laissez vide pour continuer)',
     everyWeekday: 'Chaque {{day}}',
     fromDate: 'à partir du {{date}}',
     untilDate: "jusqu'au {{date}}",
-    weeklyHeading: 'Chaque semaine',
+    weeklyHeading: 'Événements réguliers',
+    recurrenceDaily: 'Tous les jours',
+    recurrenceDays: 'Plusieurs jours par semaine',
+    recurrenceMonthly: 'Une fois par mois',
+    daysLabel: 'Les jours',
+    shortcutAll: 'Tous les jours',
+    shortcutWeekdays: 'Du lundi au vendredi',
+    shortcutWeekend: 'Le week-end',
+    monthlyLabel: 'Quel jour du mois',
+    monthlyByWeekday: 'Un jour de la semaine (ex. le 1er vendredi)',
+    monthlyByDate: 'Une date (ex. le 15)',
+    nth_1: '1er',
+    nth_2: '2e',
+    nth_3: '3e',
+    nth_4: '4e',
+    nth_last: 'dernier',
+    monthlyNth: 'Le {{nth}} {{weekday}} du mois',
+    monthlyDay: 'Le {{day}} de chaque mois',
+    dayOfMonthLabel: 'Jour du mois',
+    exceptionsLabel: 'Sauf ces jours-là',
+    exceptionReasonPlaceholder: "Raison, affichée dans l'app (facultatif)",
+    addException: '+ Ajouter un jour sans cet événement',
+    removeException: 'Retirer',
+    summaryLabel: 'Résumé',
+    everyDay: 'Tous les jours',
+    weekdaysOnly: 'Du lundi au vendredi',
+    weekendOnly: 'Samedi et dimanche',
+    exceptDates: 'sauf le {{dates}}',
+    noDays: 'Choisissez au moins un jour',
     weeklyHint: "La semaine habituelle de votre communauté. L'application l'affiche comme vos horaires, et la section Horaires des célébrations de votre page d'accueil est construite à partir d'elle.",
     onceHeading: 'Dates',
   },

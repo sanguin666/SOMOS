@@ -576,6 +576,39 @@ async function seedChurchModules({
   }
   console.log('Seeded weekly timetables');
 
+  // Repeat rules: the weekday Mass runs Monday to Friday with one day off
+  // coming up, and a Mass on the first Friday of each month.
+  const weekdayMass = await events.findOne({ where: { poi: { id: stMarys.id }, title: 'Weekday Mass' } });
+  if (weekdayMass && weekdayMass.repeatDays.length === 0) {
+    const dayOff = new Date();
+    dayOff.setDate(dayOff.getDate() + 10);
+    while (dayOff.getDay() === 0 || dayOff.getDay() === 6) dayOff.setDate(dayOff.getDate() + 1);
+    const key = `${dayOff.getFullYear()}-${String(dayOff.getMonth() + 1).padStart(2, '0')}-${String(dayOff.getDate()).padStart(2, '0')}`;
+    await events.update(weekdayMass.id, {
+      repeatDays: [1, 2, 3, 4, 5],
+      exceptions: [{ date: key, reason: 'No Mass: Father Tom is on retreat' }],
+    });
+  }
+  const firstFriday = await events.findOne({ where: { poi: { id: stMarys.id }, title: 'First Friday Mass' } });
+  if (!firstFriday) {
+    const startsAt = new Date();
+    startsAt.setDate(1);
+    startsAt.setHours(19, 0, 0, 0);
+    await events.save(
+      events.create({
+        poi: stMarys,
+        title: 'First Friday Mass',
+        startsAt,
+        location: 'Main church',
+        category: EventCategory.MASS,
+        recurrence: EventRecurrence.MONTHLY,
+        monthlyWeek: 1,
+        monthlyWeekday: 5,
+      }),
+    );
+  }
+  console.log('Seeded repeat rules');
+
   // The timetable at the top of St. Mary's home page, just under its welcome.
   const hasTimes = await blocks.count({
     where: { poi: { id: stMarys.id }, type: PageBlockType.CELEBRATION_TIMES },

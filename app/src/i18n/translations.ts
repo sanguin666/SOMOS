@@ -291,6 +291,15 @@ export type Translations = {
     category_prayer: string;
     category_office_hours: string;
     category_other: string;
+    nth_1: string;
+    nth_2: string;
+    nth_3: string;
+    nth_4: string;
+    nth_last: string;
+    monthlyNth: string;
+    monthlyDay: string;
+    dayOff: string;
+    dayOffReason: string;
   };
   requests: {
     title: string;
@@ -671,6 +680,15 @@ const en: Translations = {
     category_prayer: 'Prayer',
     category_office_hours: 'Office hours',
     category_other: 'Also every week',
+    nth_1: 'First',
+    nth_2: 'Second',
+    nth_3: 'Third',
+    nth_4: 'Fourth',
+    nth_last: 'Last',
+    monthlyNth: '{{nth}} {{weekday}} of the month',
+    monthlyDay: 'Day {{day}} of each month',
+    dayOff: 'Not on {{date}} at {{time}}.',
+    dayOffReason: 'Not on {{date}} at {{time}}: {{reason}}',
   },
   requests: {
     title: 'Requests',
@@ -1051,6 +1069,15 @@ const es: Translations = {
     category_prayer: 'Oración',
     category_office_hours: 'Horario de despacho',
     category_other: 'También cada semana',
+    nth_1: 'Primer',
+    nth_2: 'Segundo',
+    nth_3: 'Tercer',
+    nth_4: 'Cuarto',
+    nth_last: 'Último',
+    monthlyNth: '{{nth}} {{weekday}} del mes',
+    monthlyDay: 'El día {{day}} de cada mes',
+    dayOff: 'No el {{date}} a las {{time}}.',
+    dayOffReason: 'No el {{date}} a las {{time}}: {{reason}}',
   },
   requests: {
     title: 'Solicitudes',
@@ -1431,6 +1458,15 @@ const fr: Translations = {
     category_prayer: 'Prière',
     category_office_hours: 'Accueil',
     category_other: 'Aussi chaque semaine',
+    nth_1: '1er',
+    nth_2: '2e',
+    nth_3: '3e',
+    nth_4: '4e',
+    nth_last: 'Dernier',
+    monthlyNth: '{{nth}} {{weekday}} du mois',
+    monthlyDay: 'Le {{day}} de chaque mois',
+    dayOff: 'Pas le {{date}} à {{time}}.',
+    dayOffReason: 'Pas le {{date}} à {{time}} : {{reason}}',
   },
   requests: {
     title: 'Demandes',

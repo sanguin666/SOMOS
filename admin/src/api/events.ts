@@ -1,5 +1,5 @@
 import { apiDelete, apiGet, apiPatch, apiPost } from './client';
-import type { Event, EventCategory, EventRecurrence } from './types';
+import type { Event, EventCategory, EventException, EventRecurrence } from './types';
 
 // null clears endsAt / repeatUntil on an update.
 export type EventInput = {
@@ -11,6 +11,11 @@ export type EventInput = {
   category?: EventCategory;
   recurrence?: EventRecurrence;
   repeatUntil?: string | null;
+  repeatDays?: number[];
+  monthlyWeek?: number | null;
+  monthlyWeekday?: number | null;
+  monthlyDay?: number | null;
+  exceptions?: EventException[];
 };
 
 export function getEvents(poiId: string): Promise<Event[]> {

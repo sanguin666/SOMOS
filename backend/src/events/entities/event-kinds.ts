@@ -15,11 +15,26 @@ export enum EventCategory {
 }
 
 /**
- * Whether an event happens once or every week at the same time. Weekly
- * is what turns the events list into a timetable: "Sunday Mass at 10:30"
- * is one row the community writes once, not fifty-two.
+ * Whether an event happens once or repeats. Repeating is what turns the
+ * events list into a timetable: "Sunday Mass at 10:30" is one row the
+ * community writes once, not fifty-two.
+ *
+ * - WEEKLY: on the weekdays in `repeatDays` (all seven for "every day"),
+ *   or on the weekday of `startsAt` when that is empty.
+ * - MONTHLY: once a month, either on the nth weekday (`monthlyWeek` of
+ *   `monthlyWeekday`, e.g. the first Friday; -1 is the last) or on a date
+ *   (`monthlyDay`, e.g. the 15th).
  */
 export enum EventRecurrence {
   NONE = 'none',
   WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
 }
+
+/** A day a repeating event does not happen: Christmas, a retreat. */
+export type EventException = {
+  // YYYY-MM-DD, the place's local date.
+  date: string;
+  // Shown to members: "the priest is on retreat".
+  reason?: string | null;
+};
