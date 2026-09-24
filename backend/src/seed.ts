@@ -1,3 +1,4 @@
+import { config as loadEnv } from 'dotenv';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './users/entities/user.entity.js';
@@ -46,6 +47,10 @@ const DEMO_QR_TOKEN = 'DEMO-STMARYS';
 const DEMO_QR_TOKEN_2 = 'DEMO-HOLYTRINITY';
 const DEMO_ADMIN_EMAIL = 'admin@stmarys.example';
 const DEMO_ADMIN_PASSWORD = 'demo1234';
+
+// The seed runs outside Nest, so nothing has read .env for us here:
+// without this it tried the default password, not the one in .env.
+loadEnv();
 
 const dataSource = new DataSource({
   type: 'postgres',
