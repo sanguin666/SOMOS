@@ -12,10 +12,6 @@ import { Poi } from '../../pois/entities/poi.entity.js';
 import { BadgeKind } from '../../common/enums/badge-kind.enum.js';
 import { ModuleType } from '../../common/enums/module-type.enum.js';
 
-// The most badges a member sees at once. Past that they stop being the
-// few things worth knowing before anything else.
-export const MAX_SHOWN_BADGES = 4;
-
 // A message has to fit a small tile on a phone.
 export const MAX_BADGE_TEXT = 40;
 

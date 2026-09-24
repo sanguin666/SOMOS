@@ -136,7 +136,7 @@ describe('badgeTiles', () => {
     expect(badgeTiles([lastDay], context({ now: at(2026, 9, 8, 0, 5) }))).toHaveLength(0);
   });
 
-  it('leaves out what has nothing to say, and keeps the first four of the rest', () => {
+  it('leaves out what has nothing to say, and keeps all the rest', () => {
     const none = badgeTiles(
       [badge('next_mass'), badge('office_hours'), badge('campaign')],
       context({ isLive: (m) => m !== 'events', campaigns: [] }),
@@ -153,6 +153,6 @@ describe('badgeTiles', () => {
       ],
       context(),
     );
-    expect(many.map((tile) => tile.id)).toEqual(['a', 'next_mass', 'office_hours', 'next_confession']);
+    expect(many.map((tile) => tile.id)).toEqual(['a', 'next_mass', 'office_hours', 'next_confession', 'campaign']);
   });
 });

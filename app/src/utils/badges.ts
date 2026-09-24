@@ -3,9 +3,6 @@ import type { Campaign } from '../api/donations';
 import type { useI18n } from '../i18n/I18nContext';
 import { formatShortWhen, occurrencesOf, timeKey, upcomingOccurrences } from './schedule';
 
-// The most tiles at the top of a home page. The dashboard says the same.
-export const MAX_TILES = 4;
-
 /** One tile, ready to draw: a small label over a bold value. */
 export type BadgeTile = {
   id: string;
@@ -39,9 +36,10 @@ function localDay(date: Date): string {
 }
 
 /**
- * What each badge says right now. An automatic badge with nothing to say
- * (no Mass on the timetable, events switched off) is left out rather than
- * drawn empty, and only the first few that remain are kept.
+ * What each badge says right now, in the staff's order. An automatic
+ * badge with nothing to say (no Mass on the timetable, events switched
+ * off) is left out rather than drawn empty. There is no cap: a place
+ * shows as many as it switches on.
  */
 export function badgeTiles(badges: PoiBadge[], ctx: BadgeContext): BadgeTile[] {
   const { events, campaigns, isLive, now, language, t } = ctx;
@@ -60,7 +58,6 @@ export function badgeTiles(badges: PoiBadge[], ctx: BadgeContext): BadgeTile[] {
   for (const badge of badges) {
     const tile = tileFor(badge);
     if (tile) tiles.push(tile);
-    if (tiles.length === MAX_TILES) break;
   }
   return tiles;
 
