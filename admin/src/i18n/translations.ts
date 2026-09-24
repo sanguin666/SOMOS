@@ -533,6 +533,7 @@ export type Translations = {
     giftCountOne: string;
     giftCountMany: string;
     progressLabel: string;
+    photoLabel: string;
     photoAdd: string;
     photoChange: string;
     photoRemove: string;
@@ -1106,6 +1107,7 @@ const en: Translations = {
     giftCountOne: '1 gift',
     giftCountMany: '{{n}} gifts',
     progressLabel: 'Progress of {{title}}',
+    photoLabel: 'Photo (optional)',
     photoAdd: 'Add a photo',
     photoChange: 'Change the photo',
     photoRemove: 'Remove the photo',
@@ -1679,6 +1681,7 @@ const es: Translations = {
     giftCountOne: '1 donativo',
     giftCountMany: '{{n}} donativos',
     progressLabel: 'Progreso de {{title}}',
+    photoLabel: 'Foto (opcional)',
     photoAdd: 'Añadir una foto',
     photoChange: 'Cambiar la foto',
     photoRemove: 'Quitar la foto',
@@ -2252,6 +2255,7 @@ const fr: Translations = {
     giftCountOne: '1 don',
     giftCountMany: '{{n}} dons',
     progressLabel: 'Progression de {{title}}',
+    photoLabel: 'Photo (facultatif)',
     photoAdd: 'Ajouter une photo',
     photoChange: 'Changer la photo',
     photoRemove: 'Retirer la photo',

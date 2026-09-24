@@ -1442,3 +1442,9 @@ label.link-button:focus-within {
   clip: rect(0 0 0 0);
   border: 0;
 }
+
+/* A line of help under a field, inside its row. */
+.field-hint {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}

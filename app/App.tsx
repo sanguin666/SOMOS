@@ -11,7 +11,7 @@ import { PlaceSwitcher } from './src/components/PlaceSwitcher';
 import { PreviewApp, previewPoiId } from './src/preview/PreviewApp';
 import { I18nProvider } from './src/i18n/I18nContext';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
-import { joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
+import { demoSignIn, joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
 import { getPoi } from './src/api/pois';
 import { forgetPlace, getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
 import { landingPoi } from './src/landing';
@@ -35,7 +35,7 @@ type Route =
  * screen.
  */
 function AppRoutes() {
-  const { ready, me, refresh } = useAuth();
+  const { ready, me, refresh, signIn } = useAuth();
   const [stack, setStack] = useState<Route[]>([]);
   // Whether the opening route has been worked out for this session. The
   // stack alone can't say: "empty" is also what signing out leaves.
@@ -83,6 +83,24 @@ function AppRoutes() {
     setStack(poi ? [{ name: 'hub', poi }] : [{ name: 'addPlace' }]);
     setLanded(true);
   }, [ready, me, landed]);
+
+  /**
+   * "Sign in" during the demo goes straight into the demo member's
+   * account; anywhere without one (or if asking fails) it is the phone
+   * login as always. Landing is the effect above's job once `me` arrives.
+   */
+  async function startSignIn() {
+    try {
+      const accessToken = await demoSignIn();
+      if (accessToken) {
+        await signIn(accessToken);
+        return;
+      }
+    } catch {
+      // Fall through to the phone login.
+    }
+    push({ name: 'signIn' });
+  }
 
   function push(route: Route) {
     setStack((s) => [...s, route]);
@@ -185,7 +203,7 @@ function AppRoutes() {
       {ready && !me && current?.name !== 'signIn' && (
         <OnboardingScreen
           onSignUp={() => push({ name: 'signIn' })}
-          onSignIn={() => push({ name: 'signIn' })}
+          onSignIn={startSignIn}
         />
       )}
 
@@ -219,7 +237,7 @@ function AppRoutes() {
           onOpenPlaces={() => setSwitcherOpen(true)}
           onAddPlace={() => push({ name: 'scan' })}
           onLeavePlace={() => leaveCurrentPoi(current.poi)}
-          onSignIn={() => push({ name: 'signIn' })}
+          onSignIn={startSignIn}
         />
       )}
 

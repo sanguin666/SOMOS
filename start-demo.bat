@@ -83,7 +83,9 @@ echo.
 echo     Open the ANSAE app on your phone - it already
 echo     points at the public URL above.
 echo.
-echo     Demo admin login: admin@stmarys.example / demo1234
+echo     Demo admin login: admin@carmen.example / demo1234
+echo     ^(Nuestra Senora del Carmen; "Iniciar sesion" in the app
+echo      opens the demo member directly, no code^)
 echo.
 echo   Leave both windows open for the whole demo. Closing
 echo   THIS window does not stop them - close their own

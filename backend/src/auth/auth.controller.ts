@@ -58,6 +58,17 @@ export class AuthController {
     return this.phoneAuthService.verifyCode(dto.phone, dto.code, dto.firstName);
   }
 
+  // The demo: whether "sign in" skips the code, and the sign-in itself.
+  @Get('demo')
+  demoAvailable() {
+    return { enabled: this.phoneAuthService.demoLoginEnabled() };
+  }
+
+  @Post('demo')
+  demoSignIn() {
+    return this.phoneAuthService.demoSignIn();
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   me(@Req() request: AuthenticatedRequest) {

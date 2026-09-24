@@ -30,6 +30,6 @@ Announcements can carry an optional recorded voice message instead of (or alongs
 
 - `npm run start:dev` — dev server with hot reload
 - `npm run build` — production build (`dist/`)
-- `npm run seed` — creates a demo POI ("St. Mary's Community", QR token `DEMO-STMARYS`) with all modules active and sample content (announcements, prayer requests, livestreams), for the app's demo flow. Safe to re-run.
+- `npm run seed` — creates the default demo POI ("Nuestra Señora del Carmen", QR token `DEMO-CARMEN`, admin `admin@carmen.example` / `demo1234`) plus the older St. Mary's and Holy Trinity demos, with all modules active and sample content (announcements, prayer requests, livestreams), for the app's demo flow. Safe to re-run.
 - `npm run test` / `npm run test:e2e` — tests (vitest)
 - `npm run lint` — lint (oxlint)

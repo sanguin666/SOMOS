@@ -44,6 +44,18 @@ export function verifyPhoneCode(
   });
 }
 
+/**
+ * The demo account, when the backend offers one (no SMS sender, not in
+ * production): "sign in" then goes straight into it, with no code. Null
+ * means there is none and the phone login is the way in.
+ */
+export async function demoSignIn(): Promise<string | null> {
+  const { enabled } = await apiGet<{ enabled: boolean }>('/auth/demo');
+  if (!enabled) return null;
+  const { accessToken } = await apiPost<{ accessToken: string }>('/auth/demo', {});
+  return accessToken;
+}
+
 export function getMe(): Promise<Me> {
   return apiGet<Me>('/auth/me');
 }

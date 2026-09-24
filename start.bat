@@ -113,7 +113,9 @@ echo     Mobile app:       scan the QR code in its window
 echo     App in a browser: http://localhost:8081 ^(also the phone preview on the
 echo                       dashboard's Home page, so keep the App window open^)
 echo.
-echo     Demo admin login: admin@stmarys.example / demo1234
+echo     Demo admin login: admin@carmen.example / demo1234
+echo     ^(Nuestra Senora del Carmen; "Iniciar sesion" in the app
+echo      opens the demo member directly, no code^)
 echo.
 echo   Phone must be on the same Wi-Fi as this PC. Demoing
 echo   somewhere else? Use start-demo.bat and the APK instead.

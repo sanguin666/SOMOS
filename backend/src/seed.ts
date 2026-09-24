@@ -33,6 +33,7 @@ import {
 import { ServiceRequestMessage } from './service-requests/entities/service-request-message.entity.js';
 import { ServiceRequestDocument } from './service-requests/entities/service-request-document.entity.js';
 import { MassIntention, MassIntentionStatus } from './mass-intentions/entities/mass-intention.entity.js';
+import { CARMEN_ADMIN_EMAIL, CARMEN_ADMIN_PASSWORD, seedCarmen } from './seed-carmen.js';
 
 /**
  * Seeds two demo POIs with fixed QR tokens, so the app has something real
@@ -449,6 +450,9 @@ async function seed() {
     holyTrinity: poi2,
   });
 
+  // The default demo since 24 Sep 2026.
+  const carmen = await seedCarmen(dataSource);
+
   console.log('\nDemo POI ready:');
   console.log(`  id:       ${poi.id}`);
   console.log(`  QR token: ${poi.qrCodeToken}`);
@@ -456,6 +460,9 @@ async function seed() {
   console.log('\nDemo admin dashboard login:');
   console.log(`  email:    ${DEMO_ADMIN_EMAIL}`);
   console.log(`  password: ${DEMO_ADMIN_PASSWORD}`);
+  console.log(`\nDefault demo: ${carmen.name} (QR token: ${carmen.qrCodeToken})`);
+  console.log(`  admin:    ${CARMEN_ADMIN_EMAIL} / ${CARMEN_ADMIN_PASSWORD}`);
+  console.log('  app:      "Iniciar sesión" opens the demo member directly');
 
   // Seb, 23 Sep 2026: nothing shown anywhere should say "parish" — the
   // word is "community". The rows above are only created when missing,

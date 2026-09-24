@@ -14,9 +14,11 @@ import type { Campaign } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
 import { CURRENCY, endOfDayFromDateInput, formatMoney, toDateInputValue } from '../format';
 
-type Draft = { title: string; description: string; goal: string; endsOn: string };
+// `photo` is a picture picked but not sent yet: it goes up once the
+// project exists, since it is stored against the project.
+type Draft = { title: string; description: string; goal: string; endsOn: string; photo: File | null };
 
-const EMPTY_DRAFT: Draft = { title: '', description: '', goal: '', endsOn: '' };
+const EMPTY_DRAFT: Draft = { title: '', description: '', goal: '', endsOn: '', photo: null };
 
 function draftFrom(campaign: Campaign): Draft {
   return {
@@ -24,6 +26,7 @@ function draftFrom(campaign: Campaign): Draft {
     description: campaign.description ?? '',
     goal: campaign.goalAmount === null ? '' : String(campaign.goalAmount),
     endsOn: campaign.endsAt ? toDateInputValue(campaign.endsAt) : '',
+    photo: null,
   };
 }
 
@@ -70,6 +73,11 @@ function CampaignFields({ draft, onChange }: { draft: Draft; onChange: (patch: P
         {t('campaigns.endsOnLabel')}
         <input type="date" value={draft.endsOn} onChange={(e) => onChange({ endsOn: e.target.value })} />
       </label>
+      <label>
+        {t('campaigns.photoLabel')}
+        <input type="file" accept="image/*" onChange={(e) => onChange({ photo: e.target.files?.[0] ?? null })} />
+        <span className="field-hint">{t('campaigns.photoHint')}</span>
+      </label>
     </>
   );
 }
@@ -87,6 +95,9 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<Draft>(EMPTY_DRAFT);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  // Remounts the new-project form after a save, which is the only way to
+  // empty its file picker.
+  const [formKey, setFormKey] = useState(0);
 
   useEffect(() => {
     getCampaigns(poiId)
@@ -104,9 +115,14 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
     setSubmitting(true);
     setError(null);
     try {
-      const created = await createCampaign(poiId, inputFrom(draft));
+      let created = await createCampaign(poiId, inputFrom(draft));
+      if (draft.photo) created = await uploadCampaignImage(poiId, created.id, draft.photo).catch(() => {
+        setError(t('campaigns.photoError'));
+        return created;
+      });
       setItems((current) => [created, ...(current ?? [])]);
       setDraft(EMPTY_DRAFT);
+      setFormKey((key) => key + 1);
     } catch {
       setError(t('campaigns.createError'));
     } finally {
@@ -118,7 +134,9 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
     if (!editDraft.title.trim()) return;
     setError(null);
     try {
-      replace(await updateCampaign(poiId, id, inputFrom(editDraft)));
+      let updated = await updateCampaign(poiId, id, inputFrom(editDraft));
+      if (editDraft.photo) updated = await uploadCampaignImage(poiId, id, editDraft.photo);
+      replace(updated);
       setEditingId(null);
     } catch {
       setError(t('campaigns.saveError'));
@@ -175,7 +193,7 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
       </h3>
       <p className="muted">{t('campaigns.subtitle')}</p>
 
-      <form className="form card" onSubmit={handleCreate}>
+      <form key={formKey} className="form card" onSubmit={handleCreate}>
         <CampaignFields draft={draft} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} />
         <button type="submit" className="btn btn-primary" disabled={submitting || !draft.title.trim()}>
           {submitting ? t('campaigns.creating') : t('campaigns.create')}
@@ -190,6 +208,9 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
         if (editingId === campaign.id) {
           return (
             <div key={campaign.id} className="card form">
+              {campaign.imageUrl && (
+                <img className="campaign-photo" src={`${API_BASE_URL}${campaign.imageUrl}`} alt={campaign.title} />
+              )}
               <CampaignFields draft={editDraft} onChange={(patch) => setEditDraft((d) => ({ ...d, ...patch }))} />
               <div className="card-actions">
                 <button
@@ -278,7 +299,6 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
                   {t('campaigns.photoRemove')}
                 </button>
               )}
-              {!campaign.imageUrl && <span className="muted">{t('campaigns.photoHint')}</span>}
             </div>
             <div className="card-actions">
               <button

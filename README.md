@@ -68,12 +68,16 @@ Seed two demo POIs (with all modules active and sample content) so the app has s
 npm run seed
 ```
 
-Safe to re-run — it only creates what's missing. This gives you two fixed, known places ("St. Mary's Community", fetched by the app's demo flow via QR token, and "Holy Trinity Chapel") plus a demo admin account managing both:
+Safe to re-run — it only creates what's missing. The default demo is "Nuestra Señora del Carmen" (L'Eliana, Spain, QR token `DEMO-CARMEN`) with a full week of Masses, office hours, giving, requests and Mass intentions. Its admin login:
 
 ```
-email:    admin@stmarys.example
+email:    admin@carmen.example
 password: demo1234
 ```
+
+In the app, "sign in" goes straight into the demo member (María García, +34600000001) with no code, as long as the backend has no SMS sender and is not in production. Set `DEMO_LOGIN=off` to get the normal phone login back.
+
+The older demo places are still there ("St. Mary's Community" and "Holy Trinity Chapel"), managed by `admin@stmarys.example` / `demo1234`.
 
 ### 3. Mobile app (Expo Go)
 

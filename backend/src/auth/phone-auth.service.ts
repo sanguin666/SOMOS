@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PhoneVerificationCode } from './entities/phone-verification-code.entity.js';
 import { SmsSender } from './sms/sms-sender.js';
 import { UsersService } from '../users/users.service.js';
+import { DEMO_MEMBER_PHONE } from '../common/demo/demo-account.js';
 
 const CODE_LENGTH = 6;
 const CODE_TTL_SECONDS = 10 * 60;
@@ -166,6 +168,17 @@ export class PhoneAuthService {
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
+  }
+
+  /** Whether "sign in" goes straight into the demo account (see DEMO_MEMBER_PHONE). */
+  demoLoginEnabled(): boolean {
+    return this.configService.get<string>('DEMO_LOGIN') !== 'off' && this.shouldRevealCode();
+  }
+
+  async demoSignIn(): Promise<{ accessToken: string }> {
+    const user = this.demoLoginEnabled() ? await this.usersService.findByPhone(DEMO_MEMBER_PHONE) : null;
+    if (!user) throw new NotFoundException('No demo account here');
+    return { accessToken: await this.jwtService.signAsync({ sub: user.id }) };
   }
 
   // Never in production, even if someone deploys without configuring a real
