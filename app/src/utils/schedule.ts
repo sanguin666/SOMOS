@@ -231,3 +231,36 @@ export function formatShortWhen(
   }
   return `${day} ${timeKey(date)}`;
 }
+
+/**
+ * What happens on one day, in the phone's own time: every one-off event
+ * that starts that day, and every weekly one whose weekday it is, from its
+ * first week to its last. Earliest first. For the calendar.
+ */
+export function occurrencesOnDay(events: Event[], day: Date): Occurrence[] {
+  const dayStart = new Date(day);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = endOfDay(dayStart);
+  const found: Occurrence[] = [];
+  for (const event of events) {
+    const first = new Date(event.startsAt);
+    if (!isWeekly(event)) {
+      if (first >= dayStart && first <= dayEnd) found.push(occurrence(event, first));
+      continue;
+    }
+    if (first.getDay() !== dayStart.getDay() || first > dayEnd) continue;
+    if (event.repeatUntil && endOfDay(new Date(event.repeatUntil)) < dayStart) continue;
+    const start = new Date(dayStart);
+    start.setHours(first.getHours(), first.getMinutes(), 0, 0);
+    found.push(occurrence(event, start));
+  }
+  return found.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+}
+
+/** The first day (at midnight) of the week holding `date`. */
+export function startOfWeek(date: Date, firstDay = 1): Date {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - ((start.getDay() - firstDay + 7) % 7));
+  return start;
+}

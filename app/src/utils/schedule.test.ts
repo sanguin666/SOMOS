@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { Event } from '../api/types';
-import { formatDays, formatWhen, occurrencesOf, upcomingOccurrences, weeklyTimetable } from './schedule';
+import {
+  formatDays,
+  formatWhen,
+  occurrencesOf,
+  occurrencesOnDay,
+  startOfWeek,
+  upcomingOccurrences,
+  weeklyTimetable,
+} from './schedule';
 
 // Local wall-clock dates, so the tests read the same in any time zone.
 const at = (y: number, m: number, d: number, h = 0, min = 0) => new Date(y, m - 1, d, h, min);
@@ -150,5 +158,35 @@ describe('formatWhen', () => {
     expect(formatWhen(at(2026, 9, 12, 10), MONDAY, 'en', words)).toBe('Saturday · 10:00');
     expect(formatWhen(at(2026, 9, 20, 10), MONDAY, 'fr', words)).toBe('Dimanche 20 septembre · 10:00');
     expect(formatWhen(at(2026, 8, 20, 9, 15), MONDAY, 'en', words)).toBe('20 August · 09:15');
+  });
+});
+
+describe('occurrencesOnDay', () => {
+  it('puts weekly events on their weekday, within their first and last week, and one-offs on their day', () => {
+    const events = [
+      event({ id: 'sun', title: 'Mass', startsAt: new Date(2026, 8, 6, 10, 0).toISOString(), recurrence: 'weekly' }),
+      event({
+        id: 'ended',
+        title: 'Old Mass',
+        startsAt: new Date(2026, 8, 6, 8, 0).toISOString(),
+        recurrence: 'weekly',
+        repeatUntil: new Date(2026, 8, 13).toISOString(),
+      }),
+      event({ id: 'vigil', title: 'Vigil', startsAt: new Date(2026, 9, 4, 20, 0).toISOString(), recurrence: 'none' }),
+    ];
+    const sunday = occurrencesOnDay(events, new Date(2026, 9, 4, 15, 0));
+    expect(sunday.map((o) => [o.event.id, o.startsAt.getHours()])).toEqual([
+      ['sun', 10],
+      ['vigil', 20],
+    ]);
+    expect(occurrencesOnDay(events, new Date(2026, 8, 13)).map((o) => o.event.id)).toEqual(['ended', 'sun']);
+    // Before a weekly event's first week, and on other weekdays: nothing.
+    expect(occurrencesOnDay(events, new Date(2026, 7, 30))).toEqual([]);
+    expect(occurrencesOnDay(events, new Date(2026, 9, 5))).toEqual([]);
+  });
+
+  it('starts weeks on Monday', () => {
+    const start = startOfWeek(new Date(2026, 9, 4, 18, 0));
+    expect([start.getFullYear(), start.getMonth(), start.getDate(), start.getHours()]).toEqual([2026, 8, 28, 0]);
   });
 });

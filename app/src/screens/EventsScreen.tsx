@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
-import { BellIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
-import { TimetableCard } from '../components/Timetable';
+import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
+import { CompactTimetable } from '../components/Timetable';
 import { getEvents } from '../api/events';
 import { isWeekly, occurrencesOf, weeklyTimetable } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
@@ -14,6 +14,8 @@ type Props = {
   // Set only where the place also streams: the livestream has no button
   // of its own in the bottom menu, it sits at the top of this screen.
   onWatchLive?: () => void;
+  // Opens the week as a calendar, one day at a time.
+  onOpenCalendar?: () => void;
 };
 
 function formatDetails(event: Event): string {
@@ -24,7 +26,7 @@ function formatDetails(event: Event): string {
   return event.location ? `${time} · ${event.location}` : time;
 }
 
-export function EventsScreen({ poi, onWatchLive }: Props) {
+export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
   const { t } = useI18n();
   const [events, setEvents] = useState<Event[] | null>(null);
   const [error, setError] = useState(false);
@@ -58,6 +60,29 @@ export function EventsScreen({ poi, onWatchLive }: Props) {
       <View style={styles.titleBlock}>
         <AccessibleText variant="title">{t('events.title')}</AccessibleText>
       </View>
+
+      {onOpenCalendar && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${t('events.openCalendar')}. ${t('events.openCalendarHint')}`}
+          onPress={onOpenCalendar}
+          style={styles.calendarCard}
+        >
+          <View style={styles.calendarIcon}>
+            <CalendarIcon size={30} color={colors.primaryStrong} />
+          </View>
+          <View style={styles.liveText}>
+            <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.liveTitle}>
+              {t('events.openCalendar')}
+            </AccessibleText>
+            {/* White on this orange only clears contrast as large bold text. */}
+            <AccessibleText variant="body" color="#FFFFFF" style={styles.calendarHint}>
+              {t('events.openCalendarHint')}
+            </AccessibleText>
+          </View>
+          <ChevronRightIcon size={22} color="#FFFFFF" />
+        </Pressable>
+      )}
 
       {onWatchLive && (
         <Pressable
@@ -104,9 +129,7 @@ export function EventsScreen({ poi, onWatchLive }: Props) {
           {t('schedule.everyWeek')}
         </AccessibleText>
       )}
-      {timetable.map((section) => (
-        <TimetableCard key={section.category} section={section} />
-      ))}
+      {timetable.length > 0 && <CompactTimetable sections={timetable} />}
 
       {timetable.length > 0 && oneOffs.length > 0 && (
         <AccessibleText variant="caption" style={styles.sectionLabel}>
@@ -172,6 +195,28 @@ const styles = StyleSheet.create({
     minHeight: minTouchTarget,
     borderRadius: radii.lg,
     backgroundColor: colors.primaryStrong,
+  },
+  // The same shape as the live card below it, in the orange every call to
+  // action wears, so the two read as a pair of ways into the week.
+  calendarCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    minHeight: minTouchTarget,
+    borderRadius: radii.lg,
+    backgroundColor: colors.primary,
+  },
+  calendarIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: radii.md,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calendarHint: {
+    fontWeight: '700',
   },
   liveIcon: {
     width: 52,

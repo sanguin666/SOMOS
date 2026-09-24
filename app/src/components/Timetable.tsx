@@ -22,8 +22,29 @@ export function TimetableCard({ section }: { section: TimetableSection }) {
   );
 }
 
+/**
+ * The whole weekly timetable in one white card, kept tight: each kind of
+ * celebration a small heading over its lines, the kinds split by a
+ * hairline. For the Events page, where the week has to fit on a screen.
+ */
+export function CompactTimetable({ sections }: { sections: TimetableSection[] }) {
+  const { t } = useI18n();
+  return (
+    <View style={styles.compactCard}>
+      {sections.map((section, index) => (
+        <View key={section.category} style={[styles.group, index > 0 && styles.groupDivider]}>
+          <AccessibleText variant="body" style={styles.heading}>
+            {t(`schedule.category_${section.category}`)}
+          </AccessibleText>
+          <TimetableRows rows={section.rows} compact />
+        </View>
+      ))}
+    </View>
+  );
+}
+
 /** The lines of a timetable, for a card that brings its own heading. */
-export function TimetableRows({ rows }: { rows: TimetableRow[] }) {
+export function TimetableRows({ rows, compact = false }: { rows: TimetableRow[]; compact?: boolean }) {
   const { language } = useI18n();
   return (
     <>
@@ -33,7 +54,7 @@ export function TimetableRows({ rows }: { rows: TimetableRow[] }) {
         return (
           <View
             key={row.days.join()}
-            style={styles.row}
+            style={compact ? styles.compactRow : styles.row}
             accessible
             accessibilityLabel={`${days}: ${row.times.join(', ')}`}
           >
@@ -71,6 +92,26 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
+  },
+  compactCard: {
+    ...cardSurface,
+    borderRadius: radii.lg,
+    paddingHorizontal: spacing.md,
+  },
+  group: {
+    paddingVertical: spacing.sm,
+  },
+  groupDivider: {
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+  },
+  compactRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    paddingVertical: 2,
   },
   days: {
     flexShrink: 1,

@@ -179,6 +179,8 @@ export type Translations = {
     title: string;
     watchLive: string;
     watchLiveHint: string;
+    openCalendar: string;
+    openCalendarHint: string;
     notifyOn: string;
     notifyOff: string;
     loading: string;
@@ -268,6 +270,15 @@ export type Translations = {
     opens: string;
     raised: string;
     give: string;
+  };
+  calendar: {
+    title: string;
+    weekOf: string;
+    previousWeek: string;
+    nextWeek: string;
+    nothing: string;
+    itemsOnDay: string;
+    now: string;
   };
   schedule: {
     everyWeek: string;
@@ -548,6 +559,8 @@ const en: Translations = {
     title: 'Events',
     watchLive: 'Watch live',
     watchLiveHint: 'What is on air now and what is coming',
+    openCalendar: 'See the calendar',
+    openCalendarHint: 'What is on, day by day',
     notifyOn: 'Turn off notifications for {{title}}',
     notifyOff: 'Turn on notifications for {{title}}',
     loading: 'Loading…',
@@ -637,6 +650,15 @@ const en: Translations = {
     opens: 'opens {{when}}',
     raised: '{{percent}}% raised',
     give: 'Give',
+  },
+  calendar: {
+    title: 'Calendar',
+    weekOf: 'Week of {{date}}',
+    previousWeek: 'Previous week',
+    nextWeek: 'Next week',
+    nothing: 'Nothing planned that day.',
+    itemsOnDay: '{{n}} planned',
+    now: 'Now',
   },
   schedule: {
     everyWeek: 'EVERY WEEK',
@@ -917,6 +939,8 @@ const es: Translations = {
     title: 'Eventos',
     watchLive: 'Ver en vivo',
     watchLiveHint: 'Lo que se emite ahora y lo que viene',
+    openCalendar: 'Ver el calendario',
+    openCalendarHint: 'Lo que hay, día a día',
     notifyOn: 'Desactivar notificaciones de {{title}}',
     notifyOff: 'Activar notificaciones de {{title}}',
     loading: 'Cargando…',
@@ -1006,6 +1030,15 @@ const es: Translations = {
     opens: 'abre {{when}}',
     raised: '{{percent}} % recaudado',
     give: 'Donar',
+  },
+  calendar: {
+    title: 'Calendario',
+    weekOf: 'Semana del {{date}}',
+    previousWeek: 'Semana anterior',
+    nextWeek: 'Semana siguiente',
+    nothing: 'Nada previsto ese día.',
+    itemsOnDay: '{{n}} previsto(s)',
+    now: 'Ahora',
   },
   schedule: {
     everyWeek: 'CADA SEMANA',
@@ -1286,6 +1319,8 @@ const fr: Translations = {
     title: 'Événements',
     watchLive: 'Regarder en direct',
     watchLiveHint: "Ce qui est diffusé maintenant et ce qui arrive",
+    openCalendar: 'Voir le calendrier',
+    openCalendarHint: 'Ce qui se passe, jour par jour',
     notifyOn: 'Désactiver les notifications pour {{title}}',
     notifyOff: 'Activer les notifications pour {{title}}',
     loading: 'Chargement…',
@@ -1375,6 +1410,15 @@ const fr: Translations = {
     opens: 'ouvre {{when}}',
     raised: '{{percent}} % collectés',
     give: 'Faire un don',
+  },
+  calendar: {
+    title: 'Calendrier',
+    weekOf: 'Semaine du {{date}}',
+    previousWeek: 'Semaine précédente',
+    nextWeek: 'Semaine suivante',
+    nothing: 'Rien de prévu ce jour-là.',
+    itemsOnDay: '{{n}} prévu(s)',
+    now: 'Maintenant',
   },
   schedule: {
     everyWeek: 'CHAQUE SEMAINE',

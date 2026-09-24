@@ -7,6 +7,7 @@ import { CommunityThreadScreen } from './CommunityThreadScreen';
 import { ComposeAnnouncementScreen } from './ComposeAnnouncementScreen';
 import { DonateScreen } from './DonateScreen';
 import { EventsScreen } from './EventsScreen';
+import { CalendarScreen } from './CalendarScreen';
 import { LivestreamScreen } from './LivestreamScreen';
 import { MassIntentionsScreen } from './MassIntentionsScreen';
 import { MoreScreen } from './MoreScreen';
@@ -36,7 +37,8 @@ type Drilldown =
   | { kind: 'compose-announcement' }
   | { kind: 'community-thread'; post: CommunityPost }
   | { kind: 'new-request' }
-  | { kind: 'request'; id: string };
+  | { kind: 'request'; id: string }
+  | { kind: 'calendar' };
 
 /**
  * Everything under one POI. The banner and the bottom menu live in
@@ -154,14 +156,18 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
 
       {tab === 'mass_intentions' && <MassIntentionsScreen poi={poi} />}
 
-      {tab === 'events' && (
-        <EventsScreen
-          poi={poi}
-          onWatchLive={
-            hubMenu(poi, modules).livestreamInEvents ? () => setTab('livestreams') : undefined
-          }
-        />
-      )}
+      {tab === 'events' &&
+        (drilldown.kind === 'calendar' ? (
+          <CalendarScreen poi={poi} />
+        ) : (
+          <EventsScreen
+            poi={poi}
+            onWatchLive={
+              hubMenu(poi, modules).livestreamInEvents ? () => setTab('livestreams') : undefined
+            }
+            onOpenCalendar={() => setDrilldown({ kind: 'calendar' })}
+          />
+        ))}
 
       {tab === 'announcements' &&
         (drilldown.kind === 'compose-announcement' ? (
