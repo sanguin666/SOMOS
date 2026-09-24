@@ -12,14 +12,8 @@ type Props = { poi: Poi };
 
 const DAY_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', fr: 'fr-FR' };
 
-// How tall one hour is on the day's grid: room for a title and its time
-// in the app's large text.
-const HOUR_HEIGHT = 64;
-// The grid runs from the hour of the day's first event to the end of its
-// last, and never shows fewer hours than this, so a day with one Mass
-// still reads as a slice of a day rather than a lone box.
-const MIN_HOURS = 3;
-// A Mass has no end time; it is drawn as a block of this many minutes.
+// A Mass has no end time; it counts as this many minutes long when
+// working out whether it is still under way.
 const DEFAULT_MINUTES = 60;
 
 // A pale fill and a strong edge per kind, so the kinds tell apart at a
@@ -48,39 +42,11 @@ function endOf(o: Occurrence): Date {
 }
 
 /**
- * Side by side where times overlap (the office open while a Mass starts):
- * each event gets a column within its group of overlapping events, and the
- * group's width is shared out between its columns.
- */
-function layOut(items: Occurrence[]): Map<Occurrence, { column: number; columns: number }> {
-  const placed = new Map<Occurrence, { column: number; columns: number }>();
-  let group: Occurrence[] = [];
-  let columnEnds: number[] = [];
-  let groupEnd = 0;
-  const close = () => {
-    for (const o of group) placed.get(o)!.columns = columnEnds.length;
-    group = [];
-    columnEnds = [];
-  };
-  for (const o of items) {
-    const start = o.startsAt.getTime();
-    if (group.length && start >= groupEnd) close();
-    let column = columnEnds.findIndex((end) => end <= start);
-    if (column === -1) column = columnEnds.push(0) - 1;
-    columnEnds[column] = endOf(o).getTime();
-    groupEnd = Math.max(group.length ? groupEnd : 0, endOf(o).getTime());
-    group.push(o);
-    placed.set(o, { column, columns: 1 });
-  }
-  close();
-  return placed;
-}
-
-/**
  * The week as a calendar: the seven days along the top, a dot under each
- * for every thing happening that day, and the chosen day's hours below,
- * each event a block at its time, the way a diary or Outlook shows a day.
- * One day at a time, so the text stays large enough to read.
+ * for every thing happening that day, and the chosen day below as a list,
+ * one full-width row per event with its title and place written out in
+ * full. It was an hour grid until 24 Sep 2026: side by side, overlapping
+ * events cut their titles to a few letters (Seb).
  */
 export function CalendarScreen({ poi }: Props) {
   const { t, language } = useI18n();
@@ -111,20 +77,8 @@ export function CalendarScreen({ poi }: Props) {
   );
   const items = week.find((d) => sameDay(d.date, day))?.items ?? [];
 
-  const firstHour = items.length ? Math.min(...items.map((o) => o.startsAt.getHours())) : 0;
-  const lastEnd = Math.max(
-    firstHour,
-    ...items.map((o) => {
-      const end = endOf(o);
-      return sameDay(end, day) ? end.getHours() + (end.getMinutes() > 0 ? 1 : 0) : 24;
-    }),
-  );
-  const lastHour = Math.min(24, Math.max(lastEnd, firstHour + MIN_HOURS));
-  const layout = layOut(items);
-  const [gridWidth, setGridWidth] = useState(0);
-  const lane = Math.max(0, gridWidth - HOUR_LABEL_WIDTH - spacing.sm);
-  const hours = Array.from({ length: lastHour - firstHour }, (_, i) => firstHour + i);
-  const offset = (date: Date) => ((date.getHours() - firstHour) * 60 + date.getMinutes()) * (HOUR_HEIGHT / 60);
+  // Where "now" falls: before the first event still to come today.
+  const nowIndex = sameDay(now, day) ? items.findIndex((o) => endOf(o) > now) : -1;
 
   const time = (date: Date) => timeKey(date);
   const weekLabel = t('calendar.weekOf', {
@@ -218,67 +172,40 @@ export function CalendarScreen({ poi }: Props) {
       )}
 
       {events !== null && items.length > 0 && (
-        <View
-          style={[styles.grid, { height: hours.length * HOUR_HEIGHT }]}
-          onLayout={(e) => setGridWidth(e.nativeEvent.layout.width)}
-        >
-          {hours.map((hour, i) => (
-            <View
-              key={hour}
-              style={[styles.hour, { top: i * HOUR_HEIGHT }, i === 0 && styles.firstHour]}
-              importantForAccessibility="no-hide-descendants"
-              accessibilityElementsHidden
-            >
-              <AccessibleText variant="caption" color={colors.textMuted} style={styles.hourLabel}>
-                {`${String(hour).padStart(2, '0')}:00`}
-              </AccessibleText>
-            </View>
-          ))}
-
-          {items.map((o) => {
-            const end = endOf(o);
-            const top = offset(o.startsAt);
-            const bottom = sameDay(end, day) ? offset(end) : hours.length * HOUR_HEIGHT;
-            const { column, columns } = layout.get(o)!;
-            const width = lane / columns;
+        <View style={styles.list}>
+          {items.map((o, i) => {
             const tone = CATEGORY_COLORS[o.event.category] ?? CATEGORY_COLORS.other;
-            const when = o.endsAt ? `${time(o.startsAt)} – ${time(o.endsAt)}` : time(o.startsAt);
-            const details = o.event.location ? `${when} · ${o.event.location}` : when;
+            const when = o.endsAt ? `${time(o.startsAt)} – ${time(o.endsAt)}` : null;
+            const details = [when, o.event.location].filter(Boolean).join(' · ');
+            const past = sameDay(now, day) && endOf(o) <= now;
             return (
-              <View
-                key={`${o.event.id}|${o.startsAt.toISOString()}`}
-                accessible
-                accessibilityLabel={`${o.event.title}, ${details}`}
-                style={[
-                  styles.block,
-                  {
-                    top: top + 2,
-                    left: HOUR_LABEL_WIDTH + column * width,
-                    width: width - (columns > 1 ? 4 : 0),
-                    minHeight: Math.max(bottom - top - 4, HOUR_HEIGHT - 8),
-                    backgroundColor: tone.fill,
-                    borderLeftColor: tone.edge,
-                  },
-                ]}
-              >
-                <AccessibleText variant="body" style={styles.blockTitle} numberOfLines={2}>
-                  {o.event.title}
-                </AccessibleText>
-                <AccessibleText variant="caption" color={colors.text} numberOfLines={2}>
-                  {details}
-                </AccessibleText>
+              <View key={`${o.event.id}|${o.startsAt.toISOString()}`}>
+                {i === nowIndex && <NowLine label={`${t('calendar.now')} ${time(now)}`} />}
+                <View
+                  accessible
+                  accessibilityLabel={`${time(o.startsAt)}, ${o.event.title}${details ? `, ${details}` : ''}`}
+                  style={[styles.row, i > 0 && i !== nowIndex && styles.rowDivider, past && styles.past]}
+                >
+                  <AccessibleText variant="bodyLarge" style={styles.rowTime}>
+                    {time(o.startsAt)}
+                  </AccessibleText>
+                  <View style={[styles.rowEdge, { backgroundColor: tone.edge }]} />
+                  <View style={styles.rowText}>
+                    <AccessibleText variant="bodyLarge" style={styles.rowTitle}>
+                      {o.event.title}
+                    </AccessibleText>
+                    {details !== '' && (
+                      <AccessibleText variant="body" color={colors.textMuted}>
+                        {details}
+                      </AccessibleText>
+                    )}
+                  </View>
+                </View>
               </View>
             );
           })}
-
-          {sameDay(now, day) && now.getHours() >= firstHour && now.getHours() < lastHour && (
-            <View
-              style={[styles.nowLine, { top: offset(now) }]}
-              accessible
-              accessibilityLabel={`${t('calendar.now')} ${time(now)}`}
-            >
-              <View style={styles.nowDot} />
-            </View>
+          {sameDay(now, day) && nowIndex === -1 && (
+            <NowLine label={`${t('calendar.now')} ${time(now)}`} />
           )}
         </View>
       )}
@@ -286,7 +213,17 @@ export function CalendarScreen({ poi }: Props) {
   );
 }
 
-const HOUR_LABEL_WIDTH = 64;
+function NowLine({ label }: { label: string }) {
+  return (
+    <View style={styles.now} accessible accessibilityLabel={label}>
+      <View style={styles.nowDot} />
+      <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.nowLabel}>
+        {label}
+      </AccessibleText>
+      <View style={styles.nowLine} />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   weekHead: {
@@ -350,50 +287,57 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     padding: spacing.md,
   },
-  grid: {
+  list: {
     ...cardSurface,
     borderRadius: radii.lg,
     overflow: 'hidden',
-    position: 'relative',
   },
-  hour: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: HOUR_HEIGHT,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 4,
+  },
+  rowDivider: {
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
   },
-  firstHour: {
-    borderTopWidth: 0,
+  past: {
+    opacity: 0.55,
   },
-  hourLabel: {
-    position: 'absolute',
-    left: spacing.sm,
-    top: 4,
-    fontWeight: '700',
+  rowTime: {
+    fontWeight: '800',
+    minWidth: 64,
   },
-  block: {
-    position: 'absolute',
-    borderRadius: radii.md,
-    borderLeftWidth: 5,
-    paddingHorizontal: spacing.sm,
+  rowEdge: {
+    width: 5,
+    alignSelf: 'stretch',
+    borderRadius: 3,
+  },
+  rowText: {
+    flex: 1,
+    gap: 2,
+  },
+  rowTitle: {
+    fontWeight: '800',
+  },
+  now: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
     paddingVertical: 4,
   },
-  blockTitle: {
+  nowLabel: {
     fontWeight: '800',
   },
   nowLine: {
-    position: 'absolute',
-    left: HOUR_LABEL_WIDTH - 8,
-    right: 0,
+    flex: 1,
     height: 2,
     backgroundColor: colors.primary,
   },
   nowDot: {
-    position: 'absolute',
-    left: -5,
-    top: -4,
     width: 10,
     height: 10,
     borderRadius: 5,
