@@ -43,6 +43,11 @@ export class DonationCampaign {
   @Column('timestamptz', { name: 'ends_at', nullable: true })
   endsAt?: Date | null;
 
+  // A picture of what the money is for, shown on the project's page
+  // (a path under /uploads, like every other uploaded image).
+  @Column('varchar', { name: 'image_url', nullable: true })
+  imageUrl?: string | null;
+
   // Off: hidden from the app, still listed (with its gifts) in the dashboard.
   @Column({ default: true })
   active!: boolean;

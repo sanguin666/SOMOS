@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing } from '../theme/theme';
@@ -16,6 +16,10 @@ type Props = {
   // deal at the bottom, for the home indicator / gesture bar.
   footer?: ReactNode;
   footerStyle?: StyleProp<ViewStyle>;
+  // Changes when what the screen shows changes (a tab, a page opened from
+  // a list): the scroll goes back to the top, rather than opening the new
+  // page halfway down.
+  scrollKey?: string;
 };
 
 /**
@@ -36,7 +40,12 @@ export function Screen({
   headerStyle,
   footer,
   footerStyle,
+  scrollKey,
 }: Props) {
+  const scrollRef = useRef<ScrollView>(null);
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [scrollKey]);
   const insets = useSafeAreaInsets();
 
   // Whichever element touches an edge absorbs that edge's inset: a bar if
@@ -50,7 +59,7 @@ export function Screen({
 
   const Content = scroll ? ScrollView : View;
   const contentProps = scroll
-    ? { contentContainerStyle: [styles.content, contentInsets], style: styles.scrollFlex }
+    ? { contentContainerStyle: [styles.content, contentInsets], style: styles.scrollFlex, ref: scrollRef }
     : { style: [styles.content, contentInsets] };
 
   return (

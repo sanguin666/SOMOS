@@ -1401,3 +1401,44 @@ a.btn {
 .event-summary strong {
   color: var(--color-primary-strong);
 }
+
+/* ---------- Donations: a project's photo ---------- */
+
+.campaign-photo {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.campaign-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+label.link-button {
+  cursor: pointer;
+}
+
+label.link-button:focus-within {
+  text-decoration: underline;
+}
+
+/* Out of sight but still reachable by keyboard and screen readers: the
+   file picker behind a "Add a photo" label. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}

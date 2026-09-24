@@ -533,6 +533,12 @@ export type Translations = {
     giftCountOne: string;
     giftCountMany: string;
     progressLabel: string;
+    photoAdd: string;
+    photoChange: string;
+    photoRemove: string;
+    photoUploading: string;
+    photoError: string;
+    photoHint: string;
     endsOn: string;
     loading: string;
     empty: string;
@@ -1100,6 +1106,12 @@ const en: Translations = {
     giftCountOne: '1 gift',
     giftCountMany: '{{n}} gifts',
     progressLabel: 'Progress of {{title}}',
+    photoAdd: 'Add a photo',
+    photoChange: 'Change the photo',
+    photoRemove: 'Remove the photo',
+    photoUploading: 'Uploading…',
+    photoError: 'The photo could not be saved.',
+    photoHint: 'Shown at the top of the project’s page in the app.',
     endsOn: 'Ends on {{date}}',
     loading: 'Loading…',
     empty: 'No campaigns yet.',
@@ -1667,6 +1679,12 @@ const es: Translations = {
     giftCountOne: '1 donativo',
     giftCountMany: '{{n}} donativos',
     progressLabel: 'Progreso de {{title}}',
+    photoAdd: 'Añadir una foto',
+    photoChange: 'Cambiar la foto',
+    photoRemove: 'Quitar la foto',
+    photoUploading: 'Subiendo…',
+    photoError: 'No se pudo guardar la foto.',
+    photoHint: 'Se muestra arriba de la página del proyecto en la app.',
     endsOn: 'Termina el {{date}}',
     loading: 'Cargando…',
     empty: 'Todavía no hay campañas.',
@@ -2234,6 +2252,12 @@ const fr: Translations = {
     giftCountOne: '1 don',
     giftCountMany: '{{n}} dons',
     progressLabel: 'Progression de {{title}}',
+    photoAdd: 'Ajouter une photo',
+    photoChange: 'Changer la photo',
+    photoRemove: 'Retirer la photo',
+    photoUploading: 'Envoi…',
+    photoError: 'La photo n’a pas pu être enregistrée.',
+    photoHint: 'Affichée en haut de la page du projet dans l’app.',
     endsOn: 'Se termine le {{date}}',
     loading: 'Chargement…',
     empty: 'Aucune campagne pour le moment.',

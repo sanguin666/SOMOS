@@ -1,6 +1,15 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useI18n } from '../i18n/I18nContext';
-import { createCampaign, deleteCampaign, getCampaigns, updateCampaign, type CampaignInput } from '../api/donations';
+import {
+  createCampaign,
+  deleteCampaign,
+  getCampaigns,
+  removeCampaignImage,
+  updateCampaign,
+  uploadCampaignImage,
+  type CampaignInput,
+} from '../api/donations';
+import { API_BASE_URL } from '../api/client';
 import type { Campaign } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
 import { CURRENCY, endOfDayFromDateInput, formatMoney, toDateInputValue } from '../format';
@@ -77,6 +86,7 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<Draft>(EMPTY_DRAFT);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
 
   useEffect(() => {
     getCampaigns(poiId)
@@ -121,6 +131,30 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
       replace(await updateCampaign(poiId, campaign.id, { active: !campaign.active }));
     } catch {
       setError(t('campaigns.saveError'));
+    }
+  }
+
+  async function pickImage(campaign: Campaign, event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setError(null);
+    setUploadingId(campaign.id);
+    try {
+      replace(await uploadCampaignImage(poiId, campaign.id, file));
+    } catch {
+      setError(t('campaigns.photoError'));
+    } finally {
+      setUploadingId(null);
+    }
+  }
+
+  async function removeImage(campaign: Campaign) {
+    setError(null);
+    try {
+      replace(await removeCampaignImage(poiId, campaign.id));
+    } catch {
+      setError(t('campaigns.photoError'));
     }
   }
 
@@ -180,6 +214,9 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
             : null;
         return (
           <div key={campaign.id} className="card">
+            {campaign.imageUrl && (
+              <img className="campaign-photo" src={`${API_BASE_URL}${campaign.imageUrl}`} alt={campaign.title} />
+            )}
             <p className="card-title">{campaign.title}</p>
             <span className={`badge ${campaign.active ? 'badge-active' : ''}`}>
               {campaign.active ? t('campaigns.shown') : t('campaigns.hidden')}
@@ -221,6 +258,28 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
                 })}
               </p>
             )}
+            <div className="campaign-photo-actions">
+              <label className="link-button">
+                {uploadingId === campaign.id
+                  ? t('campaigns.photoUploading')
+                  : campaign.imageUrl
+                    ? t('campaigns.photoChange')
+                    : t('campaigns.photoAdd')}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="visually-hidden"
+                  disabled={uploadingId === campaign.id}
+                  onChange={(e) => pickImage(campaign, e)}
+                />
+              </label>
+              {campaign.imageUrl && (
+                <button type="button" className="link-button" onClick={() => removeImage(campaign)}>
+                  {t('campaigns.photoRemove')}
+                </button>
+              )}
+              {!campaign.imageUrl && <span className="muted">{t('campaigns.photoHint')}</span>}
+            </div>
             <div className="card-actions">
               <button
                 type="button"

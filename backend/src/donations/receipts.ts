@@ -137,6 +137,10 @@ type Wording = {
   taxIdLabel: string;
   amountLine: (amount: string, year: number) => string;
   giftsLine: (count: number) => string;
+  // A receipt for one gift rather than a year's.
+  giftTitle: string;
+  giftAmountLine: (amount: string, date: string) => string;
+  giftLine: string;
   nature: string;
   signed: (place: string, date: string) => string;
   number: string;
@@ -154,6 +158,9 @@ const WORDING: Record<Language, Wording> = {
     taxIdLabel: 'N° fiscal',
     amountLine: (amount, year) => `Somme totale reçue au titre de l’année ${year} : <strong>${amount}</strong>`,
     giftsLine: (count) => `${count} versement${count > 1 ? 's' : ''} effectué${count > 1 ? 's' : ''} en ligne, par carte bancaire.`,
+    giftTitle: 'Reçu au titre d’un don',
+    giftAmountLine: (amount, date) => `Somme reçue le ${date} : <strong>${amount}</strong>`,
+    giftLine: 'Versement effectué en ligne, par carte bancaire.',
     nature: 'Nature du don : numéraire. Forme : don manuel.',
     signed: (place, date) => `Fait ${place ? `à ${place}, ` : ''}le ${date}`,
     number: 'Reçu n°',
@@ -169,6 +176,9 @@ const WORDING: Record<Language, Wording> = {
     taxIdLabel: 'NIF',
     amountLine: (amount, year) => `Importe total recibido durante el año ${year}: <strong>${amount}</strong>`,
     giftsLine: (count) => `${count} donativo${count > 1 ? 's' : ''} realizado${count > 1 ? 's' : ''} en línea, con tarjeta.`,
+    giftTitle: 'Certificado de donativo',
+    giftAmountLine: (amount, date) => `Importe recibido el ${date}: <strong>${amount}</strong>`,
+    giftLine: 'Donativo realizado en línea, con tarjeta.',
     nature: 'Naturaleza del donativo: dinerario.',
     signed: (place, date) => `En ${place ? `${place}, a ` : ''}${date}`,
     number: 'Certificado n.º',
@@ -183,6 +193,9 @@ const WORDING: Record<Language, Wording> = {
     taxIdLabel: 'Tax number',
     amountLine: (amount, year) => `Total received in ${year}: <strong>${amount}</strong>`,
     giftsLine: (count) => `${count} gift${count > 1 ? 's' : ''} made online, by card.`,
+    giftTitle: 'Donation receipt',
+    giftAmountLine: (amount, date) => `Received on ${date}: <strong>${amount}</strong>`,
+    giftLine: 'Gift made online, by card.',
     nature: 'Nature of the gift: money.',
     signed: (place, date) => `${place ? `${place}, ` : ''}${date}`,
     number: 'Receipt no.',
@@ -191,12 +204,28 @@ const WORDING: Record<Language, Wording> = {
   },
 };
 
-/** One giver's receipt for one year, as a page to print or save as a PDF. */
-export function receiptHtml(poi: Poi, donor: ReceiptDonor, year: number, currency: string): string {
+/**
+ * One giver's receipt for one year, as a page to print or save as a PDF.
+ * With `gift`, the receipt is for that single gift instead, the one a
+ * giver downloads from their list of gifts in the app.
+ */
+export function receiptHtml(
+  poi: Poi,
+  donor: ReceiptDonor,
+  year: number,
+  currency: string,
+  gift?: { id: string; at: Date },
+): string {
   const w = WORDING[poi.language] ?? WORDING[Language.EN];
   const locale = poi.language === Language.EN ? 'en-GB' : poi.language;
   const amount = new Intl.NumberFormat(locale, { style: 'currency', currency: currency.toUpperCase() }).format(donor.total);
   const today = new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date());
+  const title = gift ? w.giftTitle : `${w.title} ${year}`;
+  const number = gift ? receiptNumber(year, `g:${gift.id}`) : receiptNumber(year, donor.key);
+  const amountLine = gift
+    ? w.giftAmountLine(escapeHtml(amount), escapeHtml(new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(gift.at)))
+    : w.amountLine(escapeHtml(amount), year);
+  const giftsLine = gift ? w.giftLine : w.giftsLine(donor.count);
   const issuerName = poi.legalName || poi.name;
   const hasIssuer = !!(poi.legalName && poi.legalAddress);
   const donorAddress = [donor.address, [donor.postalCode, donor.city].filter(Boolean).join(' ')]
@@ -209,7 +238,7 @@ export function receiptHtml(poi: Poi, donor: ReceiptDonor, year: number, currenc
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(w.title)} ${year} — ${escapeHtml(donor.name)}</title>
+    <title>${escapeHtml(title)} — ${escapeHtml(donor.name)}</title>
     <style>
       body { margin: 0; background: #FAF5EE; color: #111; font: 16px/1.5 system-ui, -apple-system, sans-serif; padding: 24px 16px; }
       main { max-width: 42rem; margin: 0 auto; background: #fff; border: 1px solid rgba(92,70,44,0.16); border-radius: 16px; padding: 32px; }
@@ -227,8 +256,8 @@ export function receiptHtml(poi: Poi, donor: ReceiptDonor, year: number, currenc
   </head>
   <body>
     <main>
-      <h1>${escapeHtml(w.title)} ${year}</h1>
-      <p class="number">${escapeHtml(w.number)} ${receiptNumber(year, donor.key)}</p>
+      <h1>${escapeHtml(title)}</h1>
+      <p class="number">${escapeHtml(w.number)} ${number}</p>
       <p class="legal">${escapeHtml(w.legalBasis)}</p>
       <section>
         <h2>${escapeHtml(w.issuer)}</h2>
@@ -243,8 +272,8 @@ export function receiptHtml(poi: Poi, donor: ReceiptDonor, year: number, currenc
         ${donorAddress}${donor.taxId ? `<br />${escapeHtml(w.taxIdLabel)} : ${escapeHtml(donor.taxId)}` : ''}</p>
       </section>
       <section>
-        <p class="amount">${w.amountLine(escapeHtml(amount), year)}</p>
-        <p>${escapeHtml(w.giftsLine(donor.count))}<br />${escapeHtml(w.nature)}</p>
+        <p class="amount">${amountLine}</p>
+        <p>${escapeHtml(giftsLine)}<br />${escapeHtml(w.nature)}</p>
       </section>
       <section class="signature">
         <p>${escapeHtml(w.signed(poi.city ?? '', today))}</p>

@@ -30,6 +30,33 @@ export type Campaign = {
   active: boolean;
   raised: number;
   giftCount: number;
+  // A picture of what the money is for: prefix it with API_BASE_URL.
+  imageUrl: string | null;
+};
+
+// Where a gift can go from the Donations tab besides the general fund:
+// the Sunday collection, or one of the projects.
+export type DonationProject = { kind: 'collection' } | { kind: 'campaign'; campaign: Campaign };
+
+// One of the giver's own gifts. `receiptUrl` is a signed link to its
+// printable tax receipt, or null when none was asked for.
+export type MyGift = {
+  id: string;
+  amount: number;
+  createdAt: string;
+  purpose: DonationPurpose | 'mass_intention';
+  campaignTitle: string | null;
+  recurring: boolean;
+  wantsReceipt: boolean;
+  receiptUrl: string | null;
+};
+
+export type ReceiptDetails = {
+  donorName: string;
+  donorAddress: string;
+  donorPostalCode: string;
+  donorCity: string;
+  donorTaxId?: string | null;
 };
 
 export type CheckoutBody = {
@@ -53,10 +80,6 @@ export type MonthlyGift = {
   campaign: { id: string; title: string } | null;
   createdAt: string;
 };
-
-// A year the giver asked for a receipt in. `url` is a signed link to the
-// printable receipt: prefix it with API_BASE_URL.
-export type ReceiptYear = { year: number; total: number; url: string };
 
 /**
  * Starts a gift. Comes back with a Stripe checkout page to open, or
@@ -90,6 +113,13 @@ export function stopMonthlyGift(poiId: string, donationId: string): Promise<void
   );
 }
 
-export function getMyReceipts(poiId: string): Promise<ReceiptYear[]> {
-  return apiGet<ReceiptYear[]>(`/pois/${encodeURIComponent(poiId)}/donations/mine/receipts`);
+export function getMyGifts(poiId: string): Promise<MyGift[]> {
+  return apiGet<MyGift[]>(`/pois/${encodeURIComponent(poiId)}/donations/mine/gifts`);
+}
+
+export function requestGiftReceipt(poiId: string, donationId: string, details: ReceiptDetails): Promise<MyGift> {
+  return apiPost<MyGift>(
+    `/pois/${encodeURIComponent(poiId)}/donations/mine/gifts/${encodeURIComponent(donationId)}/receipt`,
+    details,
+  );
 }

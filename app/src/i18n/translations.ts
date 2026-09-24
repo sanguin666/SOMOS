@@ -174,6 +174,23 @@ export type Translations = {
     myReceipts: string;
     openReceipt: string;
     receiptFor: string;
+    giveTitle: string;
+    projectsLabel: string;
+    projectButton: string;
+    otherAmount: string;
+    amountLabel: string;
+    myGifts: string;
+    myMonthlyGift: string;
+    giftGeneral: string;
+    giftMonthly: string;
+    giftIntention: string;
+    taxReceipt: string;
+    taxReceiptFor: string;
+    askReceipt: string;
+    askReceiptTitle: string;
+    getReceiptButton: string;
+    projectRaised: string;
+    projectRaisedNoGoal: string;
   };
   events: {
     title: string;
@@ -563,6 +580,23 @@ const en: Translations = {
     myReceipts: 'MY TAX RECEIPTS',
     openReceipt: 'Open',
     receiptFor: 'Receipt for {{year}}, {{amount}}',
+    giveTitle: 'Give',
+    projectsLabel: 'OUR PROJECTS',
+    projectButton: 'Give {{amount}} to the project',
+    otherAmount: 'Other',
+    amountLabel: 'Amount',
+    myGifts: 'MY GIFTS',
+    myMonthlyGift: 'MY MONTHLY GIFT',
+    giftGeneral: 'Gift',
+    giftMonthly: 'Monthly gift',
+    giftIntention: 'Mass intention',
+    taxReceipt: 'Tax receipt',
+    taxReceiptFor: 'Download the tax receipt for {{amount}} on {{date}}',
+    askReceipt: 'Get a receipt',
+    askReceiptTitle: 'Tax receipt for {{amount}} on {{date}}',
+    getReceiptButton: 'Get the receipt',
+    projectRaised: '{{raised}} raised of {{goal}}',
+    projectRaisedNoGoal: '{{raised}} raised so far',
   },
   events: {
     title: 'Events',
@@ -952,6 +986,23 @@ const es: Translations = {
     myReceipts: 'MIS CERTIFICADOS',
     openReceipt: 'Abrir',
     receiptFor: 'Certificado de {{year}}, {{amount}}',
+    giveTitle: 'Hacer un donativo',
+    projectsLabel: 'NUESTROS PROYECTOS',
+    projectButton: 'Donar {{amount}} al proyecto',
+    otherAmount: 'Otro',
+    amountLabel: 'Importe',
+    myGifts: 'MIS DONATIVOS',
+    myMonthlyGift: 'MI DONATIVO MENSUAL',
+    giftGeneral: 'Donativo',
+    giftMonthly: 'Donativo mensual',
+    giftIntention: 'Intención de misa',
+    taxReceipt: 'Certificado fiscal',
+    taxReceiptFor: 'Descargar el certificado fiscal del donativo de {{amount}} del {{date}}',
+    askReceipt: 'Pedir el certificado',
+    askReceiptTitle: 'Certificado fiscal del donativo de {{amount}} del {{date}}',
+    getReceiptButton: 'Obtener el certificado',
+    projectRaised: '{{raised}} recaudados de {{goal}}',
+    projectRaisedNoGoal: '{{raised}} recaudados hasta ahora',
   },
   events: {
     title: 'Eventos',
@@ -1341,6 +1392,23 @@ const fr: Translations = {
     myReceipts: 'MES REÇUS FISCAUX',
     openReceipt: 'Ouvrir',
     receiptFor: 'Reçu {{year}}, {{amount}}',
+    giveTitle: 'Faire un don',
+    projectsLabel: 'NOS PROJETS',
+    projectButton: 'Donner {{amount}} au projet',
+    otherAmount: 'Autre',
+    amountLabel: 'Montant',
+    myGifts: 'MES DONS',
+    myMonthlyGift: 'MON DON MENSUEL',
+    giftGeneral: 'Don',
+    giftMonthly: 'Don mensuel',
+    giftIntention: 'Intention de messe',
+    taxReceipt: 'Reçu fiscal',
+    taxReceiptFor: 'Télécharger le reçu fiscal du don de {{amount}} du {{date}}',
+    askReceipt: 'Demander le reçu',
+    askReceiptTitle: 'Reçu fiscal pour le don de {{amount}} du {{date}}',
+    getReceiptButton: 'Obtenir le reçu',
+    projectRaised: '{{raised}} collectés sur {{goal}}',
+    projectRaisedNoGoal: '{{raised}} collectés pour l’instant',
   },
   events: {
     title: 'Événements',

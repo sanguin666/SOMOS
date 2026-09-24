@@ -6,6 +6,7 @@ import { CommunityScreen } from './CommunityScreen';
 import { CommunityThreadScreen } from './CommunityThreadScreen';
 import { ComposeAnnouncementScreen } from './ComposeAnnouncementScreen';
 import { DonateScreen } from './DonateScreen';
+import type { DonationProject } from '../api/donations';
 import { EventsScreen } from './EventsScreen';
 import { CalendarScreen } from './CalendarScreen';
 import { LivestreamScreen } from './LivestreamScreen';
@@ -38,7 +39,8 @@ type Drilldown =
   | { kind: 'community-thread'; post: CommunityPost }
   | { kind: 'new-request' }
   | { kind: 'request'; id: string }
-  | { kind: 'calendar' };
+  | { kind: 'calendar' }
+  | { kind: 'project'; project: DonationProject };
 
 /**
  * Everything under one POI. The banner and the bottom menu live in
@@ -116,6 +118,7 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
       onBack={tab === 'home' && drilldown.kind === 'list' ? undefined : goBack}
       onOpenPlaces={onOpenPlaces}
       onOpenProfile={() => setProfileOpen(true)}
+      scrollKey={`${tab}:${drilldown.kind}:${drilldown.kind === 'project' ? projectKey(drilldown.project) : ''}`}
     >
       <ProfileScreen
         visible={profileOpen}
@@ -137,7 +140,14 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
       )}
 
       {tab === 'donations' && (
-        <DonateScreen poi={poi} onDone={() => selectTab('home')} onSignIn={onSignIn} />
+        <DonateScreen
+          key={drilldown.kind === 'project' ? projectKey(drilldown.project) : 'donate'}
+          poi={poi}
+          project={drilldown.kind === 'project' ? drilldown.project : null}
+          onOpenProject={(project) => setDrilldown({ kind: 'project', project })}
+          onDone={() => selectTab('home')}
+          onSignIn={onSignIn}
+        />
       )}
 
       {tab === 'requests' &&
@@ -205,4 +215,8 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
         ))}
     </PoiShell>
   );
+}
+
+function projectKey(project: DonationProject): string {
+  return project.kind === 'campaign' ? project.campaign.id : project.kind;
 }

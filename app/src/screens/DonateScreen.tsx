@@ -1,23 +1,24 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { FormCard, FormDivider, FormField } from '../components/FormCard';
-import { CheckIcon, ChevronRightIcon, HeartIcon } from '../components/icons';
+import { CheckIcon, ChevronRightIcon, DownloadIcon, HeartIcon } from '../components/icons';
 import { uploadUri } from '../api/client';
 import {
   getCampaigns,
   getDonationStatus,
   getDonationsConfig,
+  getMyGifts,
   getMyMonthlyGifts,
-  getMyReceipts,
+  requestGiftReceipt,
   startDonationCheckout,
   stopMonthlyGift,
   type Campaign,
-  type DonationPurpose,
+  type DonationProject,
   type MonthlyGift,
-  type ReceiptYear,
+  type MyGift,
 } from '../api/donations';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
@@ -27,17 +28,16 @@ import type { Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
+  // A project's own page (or the collection's), or null for the tab itself.
+  project: DonationProject | null;
+  onOpenProject: (project: DonationProject) => void;
   // Leaves the donation flow once it is confirmed — back to the hub feed.
   onDone: () => void;
   // Giving every month needs an account, so it can be stopped later.
   onSignIn: () => void;
 };
 
-// What a gift is for: the community's general needs, the Sunday
-// collection, or one of its campaigns.
-type Purpose = { kind: Exclude<DonationPurpose, 'campaign'> } | { kind: 'campaign'; campaign: Campaign };
-
-const PRESET_AMOUNTS = [10, 25, 50, 100];
+const PRESET_AMOUNTS = [5, 10, 20];
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -59,23 +59,28 @@ const POLL_INTERVAL_MS = 2000;
  * has no effect at all on the web target (react-native-web doesn't
  * implement it), so a native-only confirmation would look broken there.
  */
-export function DonateScreen({ poi, onDone, onSignIn }: Props) {
+export function DonateScreen({ poi, project, onOpenProject, onDone, onSignIn }: Props) {
   const { t, language } = useI18n();
   const { me } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [purpose, setPurpose] = useState<Purpose>({ kind: 'general' });
-  const [monthly, setMonthly] = useState(false);
+  // A project takes one-off gifts only: a monthly payment would outlive it.
+  const [monthlyChoice, setMonthly] = useState(false);
+  const monthly = monthlyChoice && !project;
   const [wantsReceipt, setWantsReceipt] = useState(false);
-  const [donorName, setDonorName] = useState([me?.firstName, me?.lastName].filter(Boolean).join(' '));
-  const [address, setAddress] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [city, setCity] = useState('');
-  const [taxId, setTaxId] = useState('');
+  const [receipt, setReceipt] = useState<Receipt>({
+    name: [me?.firstName, me?.lastName].filter(Boolean).join(' '),
+    address: '',
+    postalCode: '',
+    city: '',
+    taxId: '',
+  });
   const [monthlyGifts, setMonthlyGifts] = useState<MonthlyGift[]>([]);
-  const [receipts, setReceipts] = useState<ReceiptYear[]>([]);
+  const [gifts, setGifts] = useState<MyGift[]>([]);
+  const [askingReceipt, setAskingReceipt] = useState<string | null>(null);
+  const [askSubmitting, setAskSubmitting] = useState(false);
   const [stopping, setStopping] = useState<string | null>(null);
   const [confirmingStop, setConfirmingStop] = useState<string | null>(null);
-  const [selected, setSelected] = useState<number>(50);
+  const [selected, setSelected] = useState<number>(10);
   const [customMode, setCustomMode] = useState(false);
   const [customAmount, setCustomAmount] = useState('');
   const [donated, setDonated] = useState(false);
@@ -107,14 +112,14 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
       .catch(() => {});
   }, [poi.id]);
 
-  // The giver's own standing gifts and receipts, when signed in.
+  // The giver's own standing gifts and past gifts, when signed in.
   const loadMine = useCallback(() => {
     if (!me) return;
     getMyMonthlyGifts(poi.id)
       .then(setMonthlyGifts)
       .catch(() => {});
-    getMyReceipts(poi.id)
-      .then(setReceipts)
+    getMyGifts(poi.id)
+      .then(setGifts)
       .catch(() => {});
   }, [poi.id, me]);
 
@@ -158,17 +163,17 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
     try {
       const result = await startDonationCheckout(poi.id, {
         amount,
-        purpose: purpose.kind,
-        campaignId: purpose.kind === 'campaign' ? purpose.campaign.id : undefined,
+        purpose: project?.kind ?? 'general',
+        campaignId: project?.kind === 'campaign' ? project.campaign.id : undefined,
         recurring: monthly || undefined,
-        donorName: donorName.trim() || undefined,
+        donorName: receipt.name.trim() || undefined,
         wantsReceipt: wantsReceipt || undefined,
         ...(wantsReceipt
           ? {
-              donorAddress: address.trim(),
-              donorPostalCode: postalCode.trim(),
-              donorCity: city.trim(),
-              donorTaxId: taxId.trim() || null,
+              donorAddress: receipt.address.trim(),
+              donorPostalCode: receipt.postalCode.trim(),
+              donorCity: receipt.city.trim(),
+              donorTaxId: receipt.taxId.trim() || null,
             }
           : {}),
       });
@@ -205,11 +210,32 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
     }
   }
 
-  function openReceipt(receipt: ReceiptYear) {
-    WebBrowser.openBrowserAsync(uploadUri(receipt.url)).catch(() => setError(true));
+  function openReceipt(url: string) {
+    WebBrowser.openBrowserAsync(uploadUri(url)).catch(() => setError(true));
   }
 
-  const receiptReady = !wantsReceipt || (!!donorName.trim() && !!address.trim() && !!postalCode.trim() && !!city.trim());
+  // A receipt for a gift made without one: the details, then straight to it.
+  async function askReceipt(id: string) {
+    setAskSubmitting(true);
+    try {
+      const updated = await requestGiftReceipt(poi.id, id, {
+        donorName: receipt.name.trim(),
+        donorAddress: receipt.address.trim(),
+        donorPostalCode: receipt.postalCode.trim(),
+        donorCity: receipt.city.trim(),
+        donorTaxId: receipt.taxId.trim() || null,
+      });
+      setGifts((current) => current.map((gift) => (gift.id === id ? updated : gift)));
+      setAskingReceipt(null);
+      if (updated.receiptUrl) openReceipt(updated.receiptUrl);
+    } catch {
+      setError(true);
+    } finally {
+      setAskSubmitting(false);
+    }
+  }
+
+  const askingGift = gifts.find((gift) => gift.id === askingReceipt) ?? null;
   const blockedOnSignIn = monthly && !me;
 
   if (donated) {
@@ -282,200 +308,86 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
     );
   }
 
-  return (
+  const isProject = project !== null;
+  const campaign = project?.kind === 'campaign' ? project.campaign : null;
+
+  // "5 €, 10 €, 20 €, Other" on one line, then the receipt box: the whole
+  // gift fits on one screen, with the button under it.
+  const giveForm = (
     <>
-      <View style={styles.titleBlock}>
-        <AccessibleText variant="title" style={styles.title}>
-          {t('donate.title', { poiName: poi.name })}
-        </AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {t('donate.subtitle')}
-        </AccessibleText>
-      </View>
-
-      <AccessibleText variant="caption" style={styles.sectionLabel}>
-        {t('donate.purposeLabel')}
-      </AccessibleText>
-      <View style={styles.listCard} accessibilityRole="radiogroup">
-        <PurposeRow
-          label={t('donate.purposeGeneral')}
-          selected={purpose.kind === 'general'}
-          onPress={() => setPurpose({ kind: 'general' })}
-        />
-        <PurposeRow
-          label={t('donate.purposeCollection')}
-          detail={t('donate.purposeCollectionHint')}
-          selected={purpose.kind === 'collection'}
-          divider
-          onPress={() => setPurpose({ kind: 'collection' })}
-        />
-        {campaigns.map((campaign) => (
-          <PurposeRow
-            key={campaign.id}
-            label={campaign.title}
-            detail={campaign.description ?? undefined}
-            selected={purpose.kind === 'campaign' && purpose.campaign.id === campaign.id}
-            divider
-            onPress={() => setPurpose({ kind: 'campaign', campaign })}
-          >
-            {campaign.goalAmount ? (
-              <View style={styles.progress}>
-                <View
-                  style={styles.progressTrack}
-                  accessibilityRole="progressbar"
-                  accessibilityValue={{ min: 0, max: campaign.goalAmount, now: campaign.raised }}
-                >
-                  <View
-                    style={[
-                      styles.progressFill,
-                      { width: `${Math.min(100, (campaign.raised / campaign.goalAmount) * 100)}%` },
-                    ]}
+      <FormCard>
+        {!isProject && (
+          <>
+            <View style={styles.choiceRow} accessibilityRole="radiogroup">
+              {[false, true].map((isMonthly) => {
+                const label = isMonthly ? t('donate.monthly') : t('donate.once');
+                return (
+                  <Choice
+                    key={label}
+                    label={label}
+                    selected={monthly === isMonthly}
+                    onPress={() => setMonthly(isMonthly)}
                   />
-                </View>
-                <AccessibleText variant="caption">
-                  {t('donate.campaignProgress', {
-                    raised: formatted(campaign.raised),
-                    goal: formatted(campaign.goalAmount),
-                  })}
-                </AccessibleText>
-              </View>
-            ) : null}
-          </PurposeRow>
-        ))}
-      </View>
-
-      <AccessibleText variant="caption" style={styles.sectionLabel}>
-        {t('donate.frequencyLabel')}
-      </AccessibleText>
-      <View style={styles.grid} accessibilityRole="radiogroup">
-        {[false, true].map((isMonthly) => {
-          const isSelected = monthly === isMonthly;
-          const label = isMonthly ? t('donate.monthly') : t('donate.once');
-          return (
-            <Pressable
-              key={label}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: isSelected }}
-              accessibilityLabel={label}
-              onPress={() => setMonthly(isMonthly)}
-              style={[styles.frequencyCell, isSelected && styles.amountCellSelected]}
-            >
-              <AccessibleText
-                variant="body"
-                style={styles.amountText}
-                color={isSelected ? colors.primary : colors.text}
-              >
-                {label}
-              </AccessibleText>
-            </Pressable>
-          );
-        })}
-      </View>
-      {monthly && (
-        <AccessibleText variant="caption">{t('donate.monthlyHint')}</AccessibleText>
-      )}
-
-      <AccessibleText variant="caption" style={styles.sectionLabel}>
-        {t('donate.chooseAmount')}
-      </AccessibleText>
-
-      <View style={styles.grid}>
-        {PRESET_AMOUNTS.map((preset) => {
-          const isSelected = !customMode && preset === selected;
-          return (
-            <Pressable
+                );
+              })}
+            </View>
+            <FormDivider />
+          </>
+        )}
+        <View style={styles.choiceRow} accessibilityRole="radiogroup">
+          {PRESET_AMOUNTS.map((preset) => (
+            <Choice
               key={preset}
-              accessibilityRole="button"
-              accessibilityLabel={formatted(preset)}
+              label={formatted(preset)}
+              selected={!customMode && preset === selected}
               onPress={() => {
                 setCustomMode(false);
                 setSelected(preset);
               }}
-              style={[styles.amountCell, isSelected && styles.amountCellSelected]}
-            >
-              <AccessibleText
-                variant="bodyLarge"
-                style={styles.amountText}
-                color={isSelected ? colors.primary : colors.text}
-              >
-                {formatted(preset)}
-              </AccessibleText>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {customMode ? (
-        <View style={[styles.customInput, styles.amountCellSelected]}>
-          <AccessibleText variant="bodyLarge" color={colors.primary}>
-            {currencySymbol(currency)}
-          </AccessibleText>
-          <TextInput
-            value={customAmount}
-            onChangeText={setCustomAmount}
-            keyboardType="number-pad"
-            placeholder="0"
-            autoFocus
-            style={styles.customInputField}
-          />
+            />
+          ))}
+          <Choice label={t('donate.otherAmount')} selected={customMode} onPress={() => setCustomMode(true)} />
         </View>
-      ) : (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('donate.customAmount')}
-          onPress={() => setCustomMode(true)}
-          style={styles.customButton}
-        >
-          <AccessibleText variant="bodyLarge">{t('donate.customAmount')}</AccessibleText>
-        </Pressable>
-      )}
-
-      <FormCard>
-        <Pressable
-          accessibilityRole="switch"
-          accessibilityState={{ checked: wantsReceipt }}
-          accessibilityLabel={t('donate.receiptToggle')}
-          onPress={() => setWantsReceipt((value) => !value)}
-          style={styles.switchRow}
-        >
-          <View style={styles.flex}>
-            <AccessibleText variant="body" style={styles.bold}>
-              {t('donate.receiptToggle')}
-            </AccessibleText>
-            <AccessibleText variant="caption">{t('donate.receiptHint')}</AccessibleText>
-          </View>
-          <Switch
-            value={wantsReceipt}
-            onValueChange={setWantsReceipt}
-            trackColor={{ true: colors.primary, false: colors.cardBorder }}
-            thumbColor="#FFFFFF"
-            accessibilityElementsHidden
-            importantForAccessibility="no"
-          />
-        </Pressable>
-        {wantsReceipt && (
+        {customMode && (
           <>
             <FormDivider />
-            <FormField label={t('donate.nameLabel')} value={donorName} onChangeText={setDonorName} autoComplete="name" />
-            <FormDivider />
-            <FormField
-              label={t('donate.addressLabel')}
-              value={address}
-              onChangeText={setAddress}
-              autoComplete="street-address"
-            />
-            <FormDivider />
-            <FormField
-              label={t('donate.postalCodeLabel')}
-              value={postalCode}
-              onChangeText={setPostalCode}
-              autoComplete="postal-code"
-            />
-            <FormDivider />
-            <FormField label={t('donate.cityLabel')} value={city} onChangeText={setCity} />
-            <FormDivider />
-            <FormField label={t('donate.taxIdLabel')} value={taxId} onChangeText={setTaxId} autoCapitalize="characters" />
+            <View style={styles.customRow}>
+              <AccessibleText variant="caption" color={colors.textMuted}>
+                {t('donate.amountLabel')}
+              </AccessibleText>
+              <View style={styles.customInput}>
+                <TextInput
+                  value={customAmount}
+                  onChangeText={setCustomAmount}
+                  keyboardType="number-pad"
+                  placeholder="0"
+                  autoFocus
+                  accessibilityLabel={t('donate.amountLabel')}
+                  style={styles.customInputField}
+                />
+                <AccessibleText variant="bodyLarge" style={styles.bold}>
+                  {currencySymbol(currency)}
+                </AccessibleText>
+              </View>
+            </View>
           </>
+        )}
+        {monthly && !isProject && (
+          <AccessibleText variant="caption" style={styles.monthlyHint}>
+            {t('donate.monthlyHint')}
+          </AccessibleText>
+        )}
+        <FormDivider />
+        <CheckboxRow
+          label={t('donate.receiptToggle')}
+          checked={wantsReceipt}
+          onToggle={() => setWantsReceipt((value) => !value)}
+        />
+        {wantsReceipt && (
+          <ReceiptFields
+            value={receipt}
+            onChange={(patch) => setReceipt((current) => ({ ...current, ...patch }))}
+          />
         )}
       </FormCard>
 
@@ -486,10 +398,8 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
         </View>
       )}
 
-      <View style={styles.spacer} />
-
       {error ? (
-        <AccessibleText variant="body" color={colors.primary} style={styles.centerText}>
+        <AccessibleText variant="body" color={colors.primaryStrong} style={styles.centerText}>
           {t('donate.error')}
         </AccessibleText>
       ) : null}
@@ -498,20 +408,83 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
         label={
           submitting
             ? t('donate.processingButton')
-            : t(monthly ? 'donate.donateMonthlyButton' : 'donate.donateButton', { amount: formatted(amount) })
+            : t(
+                campaign ? 'donate.projectButton' : monthly && !isProject ? 'donate.donateMonthlyButton' : 'donate.donateButton',
+                { amount: formatted(amount) },
+              )
         }
         onPress={donate}
-        disabled={submitting || amount <= 0 || !receiptReady || blockedOnSignIn}
+        disabled={submitting || amount <= 0 || !receiptReady(wantsReceipt, receipt) || blockedOnSignIn}
       />
 
       <AccessibleText variant="caption" style={styles.footnote}>
         {t(paymentsEnabled ? 'donate.footnote' : 'donate.demoFootnote')}
       </AccessibleText>
+    </>
+  );
+
+  if (project) {
+    const title = campaign ? campaign.title : t('donate.purposeCollection');
+    const description = campaign ? campaign.description : t('donate.purposeCollectionHint');
+    return (
+      <>
+        {campaign?.imageUrl ? (
+          <Image
+            source={{ uri: uploadUri(campaign.imageUrl) }}
+            style={styles.hero}
+            resizeMode="cover"
+            accessibilityLabel={campaign.title}
+          />
+        ) : null}
+        <View style={styles.titleBlock}>
+          <AccessibleText variant="title" style={styles.title} accessibilityRole="header">
+            {title}
+          </AccessibleText>
+          {!!description && <AccessibleText variant="body">{description}</AccessibleText>}
+        </View>
+        {campaign && <Progress campaign={campaign} formatted={formatted} large />}
+        {giveForm}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <AccessibleText variant="title" style={styles.title} accessibilityRole="header">
+        {t('donate.giveTitle')}
+      </AccessibleText>
+
+      {giveForm}
+
+      <AccessibleText variant="caption" style={styles.sectionLabel}>
+        {t('donate.projectsLabel')}
+      </AccessibleText>
+      <View style={styles.listCard}>
+        {campaigns.map((item, index) => (
+          <ProjectRow
+            key={item.id}
+            title={item.title}
+            imageUrl={item.imageUrl}
+            divider={index > 0}
+            onPress={() => onOpenProject({ kind: 'campaign', campaign: item })}
+          >
+            <Progress campaign={item} formatted={formatted} />
+          </ProjectRow>
+        ))}
+        <ProjectRow
+          title={t('donate.purposeCollection')}
+          imageUrl={null}
+          divider={campaigns.length > 0}
+          onPress={() => onOpenProject({ kind: 'collection' })}
+        >
+          <AccessibleText variant="caption">{t('donate.purposeCollectionHint')}</AccessibleText>
+        </ProjectRow>
+      </View>
 
       {monthlyGifts.length > 0 && (
         <>
           <AccessibleText variant="caption" style={styles.sectionLabel}>
-            {t('donate.myMonthly')}
+            {t(monthlyGifts.length > 1 ? 'donate.myMonthly' : 'donate.myMonthlyGift')}
           </AccessibleText>
           <View style={styles.listCard}>
             {monthlyGifts.map((gift, index) => (
@@ -556,80 +529,246 @@ export function DonateScreen({ poi, onDone, onSignIn }: Props) {
         </>
       )}
 
-      {receipts.length > 0 && (
+      {gifts.length > 0 && (
         <>
           <AccessibleText variant="caption" style={styles.sectionLabel}>
-            {t('donate.myReceipts')}
+            {t('donate.myGifts')}
           </AccessibleText>
           <View style={styles.listCard}>
-            {receipts.map((receipt, index) => (
-              <Pressable
-                key={receipt.year}
-                accessibilityRole="link"
-                accessibilityLabel={t('donate.receiptFor', { year: receipt.year, amount: formatted(receipt.total) })}
-                onPress={() => openReceipt(receipt)}
-                style={[styles.receiptRow, index > 0 && styles.divider]}
-              >
-                <View style={styles.flex}>
-                  <AccessibleText variant="bodyLarge" style={styles.bold}>
-                    {String(receipt.year)}
-                  </AccessibleText>
-                  <AccessibleText variant="caption">{formatted(receipt.total)}</AccessibleText>
+            {gifts.map((gift, index) => {
+              const date = new Date(gift.createdAt).toLocaleDateString(language, {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              });
+              const amountText = formatted(gift.amount);
+              return (
+                <View key={gift.id} style={[styles.giftRow, index > 0 && styles.divider]}>
+                  <View style={styles.flex}>
+                    <AccessibleText variant="body" style={styles.bold}>
+                      {`${amountText} · ${giftLabel(gift, t)}`}
+                    </AccessibleText>
+                    <AccessibleText variant="caption">{date}</AccessibleText>
+                  </View>
+                  {gift.receiptUrl ? (
+                    <Pressable
+                      accessibilityRole="link"
+                      accessibilityLabel={t('donate.taxReceiptFor', { amount: amountText, date })}
+                      onPress={() => openReceipt(gift.receiptUrl!)}
+                      style={styles.receiptLink}
+                    >
+                      <DownloadIcon size={24} color={colors.primaryStrong} />
+                      <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.bold}>
+                        {t('donate.taxReceipt')}
+                      </AccessibleText>
+                    </Pressable>
+                  ) : (
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={() => setAskingReceipt(askingReceipt === gift.id ? null : gift.id)}
+                      style={styles.receiptLink}
+                    >
+                      <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.bold}>
+                        {t('donate.askReceipt')}
+                      </AccessibleText>
+                    </Pressable>
+                  )}
                 </View>
-                <AccessibleText variant="body" color={colors.primaryStrong} style={styles.bold}>
-                  {t('donate.openReceipt')}
-                </AccessibleText>
-                <ChevronRightIcon size={20} color={colors.primaryStrong} />
-              </Pressable>
-            ))}
+              );
+            })}
           </View>
+          {askingGift && (
+            <>
+              <AccessibleText variant="body" style={styles.bold}>
+                {t('donate.askReceiptTitle', {
+                  amount: formatted(askingGift.amount),
+                  date: new Date(askingGift.createdAt).toLocaleDateString(language, { day: 'numeric', month: 'long' }),
+                })}
+              </AccessibleText>
+              <FormCard>
+                <ReceiptFields
+                  value={receipt}
+                  onChange={(patch) => setReceipt((current) => ({ ...current, ...patch }))}
+                  first
+                />
+              </FormCard>
+              <AccessibleButton
+                label={askSubmitting ? t('donate.processingButton') : t('donate.getReceiptButton')}
+                onPress={() => askReceipt(askingGift.id)}
+                disabled={askSubmitting || !receiptReady(true, receipt)}
+              />
+              <AccessibleButton variant="secondary" label={t('donate.cancelButton')} onPress={() => setAskingReceipt(null)} />
+            </>
+          )}
         </>
       )}
     </>
   );
 }
 
-function PurposeRow({
-  label,
-  detail,
-  selected,
-  divider = false,
-  onPress,
-  children,
-}: {
-  label: string;
-  detail?: string;
-  selected: boolean;
-  divider?: boolean;
-  onPress: () => void;
-  children?: ReactNode;
-}) {
+type Receipt = { name: string; address: string; postalCode: string; city: string; taxId: string };
+
+function receiptReady(wanted: boolean, receipt: Receipt): boolean {
+  return !wanted || (!!receipt.name.trim() && !!receipt.address.trim() && !!receipt.postalCode.trim() && !!receipt.city.trim());
+}
+
+function giftLabel(gift: MyGift, t: ReturnType<typeof useI18n>['t']): string {
+  if (gift.campaignTitle) return gift.campaignTitle;
+  if (gift.purpose === 'collection') return t('donate.purposeCollection');
+  if (gift.purpose === 'mass_intention') return t('donate.giftIntention');
+  return t(gift.recurring ? 'donate.giftMonthly' : 'donate.giftGeneral');
+}
+
+/** One of a few side-by-side choices: the chosen one in the coral wash. */
+function Choice({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
-      accessibilityLabel={detail ? `${label}. ${detail}` : label}
+      accessibilityLabel={label}
       onPress={onPress}
-      style={[styles.purposeRow, divider && styles.divider, selected && styles.purposeRowSelected]}
+      style={[styles.choice, selected && styles.choiceSelected]}
     >
-      <View style={styles.purposeHeader}>
-        <View style={styles.flex}>
-          <AccessibleText
-            variant="body"
-            color={selected ? colors.primaryStrong : colors.text}
-            style={selected ? styles.bold : undefined}
-          >
-            {label}
-          </AccessibleText>
-          {!!detail && (
-            <AccessibleText variant="caption" numberOfLines={2}>
-              {detail}
-            </AccessibleText>
-          )}
-        </View>
-        {selected && <CheckIcon size={24} color={colors.primaryStrong} />}
+      <AccessibleText
+        variant="body"
+        style={styles.choiceText}
+        color={selected ? colors.primaryStrong : colors.text}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {label}
+      </AccessibleText>
+    </Pressable>
+  );
+}
+
+function CheckboxRow({ label, checked, onToggle }: { label: string; checked: boolean; onToggle: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}
+      accessibilityLabel={label}
+      onPress={onToggle}
+      style={styles.checkboxRow}
+    >
+      <View style={[styles.checkbox, checked && styles.checkboxOn]}>
+        {checked && <CheckIcon size={20} color={colors.primaryText} />}
       </View>
-      {children}
+      <AccessibleText variant="body" style={styles.flex}>
+        {label}
+      </AccessibleText>
+    </Pressable>
+  );
+}
+
+/** Who the receipt is for, as rows of the card it sits in. */
+function ReceiptFields({
+  value,
+  onChange,
+  first = false,
+}: {
+  value: Receipt;
+  onChange: (patch: Partial<Receipt>) => void;
+  first?: boolean;
+}) {
+  const { t } = useI18n();
+  return (
+    <>
+      {!first && <FormDivider />}
+      <FormField label={t('donate.nameLabel')} value={value.name} onChangeText={(name) => onChange({ name })} autoComplete="name" />
+      <FormDivider />
+      <FormField
+        label={t('donate.addressLabel')}
+        value={value.address}
+        onChangeText={(address) => onChange({ address })}
+        autoComplete="street-address"
+      />
+      <FormDivider />
+      <FormField
+        label={t('donate.postalCodeLabel')}
+        value={value.postalCode}
+        onChangeText={(postalCode) => onChange({ postalCode })}
+        autoComplete="postal-code"
+      />
+      <FormDivider />
+      <FormField label={t('donate.cityLabel')} value={value.city} onChangeText={(city) => onChange({ city })} />
+      <FormDivider />
+      <FormField
+        label={t('donate.taxIdLabel')}
+        value={value.taxId}
+        onChangeText={(taxId) => onChange({ taxId })}
+        autoCapitalize="characters"
+      />
+    </>
+  );
+}
+
+function Progress({
+  campaign,
+  formatted,
+  large = false,
+}: {
+  campaign: Campaign;
+  formatted: (value: number) => string;
+  large?: boolean;
+}) {
+  const { t } = useI18n();
+  const text = campaign.goalAmount
+    ? t('donate.projectRaised', { raised: formatted(campaign.raised), goal: formatted(campaign.goalAmount) })
+    : t('donate.projectRaisedNoGoal', { raised: formatted(campaign.raised) });
+  return (
+    <View style={styles.progress}>
+      {campaign.goalAmount ? (
+        <View
+          style={[styles.progressTrack, large && styles.progressTrackLarge]}
+          accessibilityRole="progressbar"
+          accessibilityValue={{ min: 0, max: campaign.goalAmount, now: campaign.raised }}
+        >
+          <View
+            style={[styles.progressFill, { width: `${Math.min(100, (campaign.raised / campaign.goalAmount) * 100)}%` }]}
+          />
+        </View>
+      ) : null}
+      <AccessibleText variant={large ? 'body' : 'caption'}>{text}</AccessibleText>
+    </View>
+  );
+}
+
+/** A project in the list: its picture, its name and how far it has got. */
+function ProjectRow({
+  title,
+  imageUrl,
+  divider,
+  onPress,
+  children,
+}: {
+  title: string;
+  imageUrl: string | null;
+  divider: boolean;
+  onPress: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      onPress={onPress}
+      style={[styles.projectRow, divider && styles.divider]}
+    >
+      {imageUrl ? (
+        <Image source={{ uri: uploadUri(imageUrl) }} style={styles.thumb} resizeMode="cover" />
+      ) : (
+        <View style={[styles.thumb, styles.thumbEmpty]}>
+          <HeartIcon size={28} color={colors.primaryText} />
+        </View>
+      )}
+      <View style={styles.flex}>
+        <AccessibleText variant="bodyLarge" style={styles.bold}>
+          {title}
+        </AccessibleText>
+        {children}
+      </View>
+      <ChevronRightIcon size={22} color={colors.textMuted} />
     </Pressable>
   );
 }
@@ -650,21 +789,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
   },
-  purposeRow: {
-    minHeight: minTouchTarget,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-  },
-  purposeRowSelected: {
-    backgroundColor: colors.primarySoft,
-  },
-  purposeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
   progress: {
     gap: spacing.xs,
   },
@@ -679,24 +803,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.primary,
   },
-  frequencyCell: {
-    width: '46%',
-    flexGrow: 1,
-    minHeight: minTouchTarget,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    minHeight: minTouchTarget,
-    paddingVertical: spacing.sm,
-  },
   notice: {
     ...cardSurface,
     borderRadius: radii.lg,
@@ -709,14 +815,6 @@ const styles = StyleSheet.create({
   },
   confirm: {
     gap: spacing.sm,
-  },
-  receiptRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    minHeight: minTouchTarget,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
   },
   confirmationIcon: {
     width: 64,
@@ -756,60 +854,116 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     marginTop: spacing.md,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-  amountCell: {
-    width: '46%',
-    flexGrow: 1,
-    minHeight: 72,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  amountCellSelected: {
-    borderWidth: 3,
-    borderColor: colors.primary,
-    // The beige surface, not the blue tint this screen used before the
-    // SOMOS palette landed.
-    backgroundColor: colors.primarySoft,
-  },
-  customButton: {
-    minHeight: 64,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  customInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    minHeight: 64,
-    borderRadius: radii.lg,
-    paddingHorizontal: spacing.lg,
-  },
-  customInputField: {
-    flex: 1,
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  amountText: {
-    fontWeight: '800',
-  },
   spacer: {
     flexGrow: 1,
     minHeight: spacing.lg,
   },
   footnote: {
     textAlign: 'center',
+  },
+  choiceRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  // A button inside the card, so it keeps a heavier edge of its own.
+  choice: {
+    flex: 1,
+    minHeight: minTouchTarget,
+    borderRadius: radii.md,
+    borderWidth: 2,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xs,
+  },
+  choiceSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+  },
+  choiceText: {
+    fontWeight: '800',
+  },
+  customRow: {
+    paddingVertical: spacing.sm,
+  },
+  customInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  customInputField: {
+    flex: 1,
+    minHeight: minTouchTarget,
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  monthlyHint: {
+    paddingBottom: spacing.sm,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: minTouchTarget,
+    paddingVertical: spacing.sm,
+  },
+  checkbox: {
+    width: 30,
+    height: 30,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxOn: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  hero: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    borderRadius: radii.lg,
+  },
+  progressTrackLarge: {
+    height: 12,
+    borderRadius: 6,
+  },
+  projectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: minTouchTarget,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  thumb: {
+    width: 60,
+    height: 60,
+    borderRadius: radii.md,
+  },
+  thumbEmpty: {
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  giftRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    minHeight: minTouchTarget,
+  },
+  // The receipt, said with an arrow and a word, as big a target as a button.
+  receiptLink: {
+    minWidth: minTouchTarget,
+    minHeight: minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
   },
 });

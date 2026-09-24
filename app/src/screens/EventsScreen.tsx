@@ -124,11 +124,6 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
         </AccessibleText>
       )}
 
-      {timetable.length > 0 && (
-        <AccessibleText variant="caption" style={styles.sectionLabel}>
-          {t('schedule.everyWeek')}
-        </AccessibleText>
-      )}
       {timetable.length > 0 && <CompactTimetable sections={timetable} />}
 
       {timetable.length > 0 && oneOffs.length > 0 && (

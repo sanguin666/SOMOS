@@ -133,6 +133,7 @@ export function PoiShell({
   onBack,
   onOpenPlaces,
   onOpenProfile,
+  scrollKey,
   children,
 }: Props) {
   const { t } = useI18n();
@@ -232,6 +233,7 @@ export function PoiShell({
   return (
     <Screen
       scroll
+      scrollKey={scrollKey}
       header={header}
       headerStyle={styles.headerSlot}
       footer={footer}
@@ -259,6 +261,8 @@ type Props = {
   onOpenPlaces: () => void;
   // Opens the settings menu behind the profile circle, on the same terms.
   onOpenProfile: () => void;
+  // What is showing, so the page starts at its top when it changes.
+  scrollKey?: string;
   children: ReactNode;
 };
 

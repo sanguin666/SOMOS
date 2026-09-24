@@ -15,6 +15,7 @@ import { PoisService } from '../pois/pois.service.js';
 import type { Poi } from '../pois/entities/poi.entity.js';
 import type { User } from '../users/entities/user.entity.js';
 import { Language } from '../common/enums/language.enum.js';
+import { RequestReceiptDto } from './dto/request-receipt.dto.js';
 import { CreateDonationDto } from './dto/create-donation.dto.js';
 import type { CreateCampaignDto, UpdateCampaignDto } from './dto/campaign.dto.js';
 import { StripeService } from './stripe.service.js';
@@ -43,6 +44,18 @@ export type CampaignView = {
   active: boolean;
   raised: number;
   giftCount: number;
+  imageUrl: string | null;
+};
+
+/** One of a signed-in giver's own gifts, as "My gifts" lists it. */
+export type MyGift = {
+  id: string;
+  amount: number;
+  createdAt: Date;
+  purpose: DonationPurpose;
+  campaignTitle: string | null;
+  recurring: boolean;
+  wantsReceipt: boolean;
 };
 
 /** Anything the Stripe session tells us about how a checkout ended. */
@@ -178,6 +191,12 @@ export class DonationsService {
     const poi = await this.poisService.findOne(poiId);
     const purpose = options.purpose ?? dto.purpose ?? DonationPurpose.GENERAL;
     const recurring = dto.recurring === true;
+
+    // A project is supported with a gift, not a standing order: it ends,
+    // and a monthly payment would outlive it.
+    if (recurring && purpose === DonationPurpose.CAMPAIGN) {
+      throw new BadRequestException('A project takes one-off gifts');
+    }
 
     // A monthly gift has to belong to someone who can come back and stop it.
     if (recurring && !options.donorUserId) {
@@ -404,6 +423,13 @@ export class DonationsService {
     await this.campaignsRepository.remove(campaign);
   }
 
+  async setCampaignImage(poiId: string, id: string, imageUrl: string | null): Promise<CampaignView> {
+    const campaign = await this.findCampaign(poiId, id);
+    campaign.imageUrl = imageUrl;
+    const [view] = await this.withRaised([await this.campaignsRepository.save(campaign)]);
+    return view;
+  }
+
   private async findCampaign(poiId: string, id: string): Promise<DonationCampaign> {
     const campaign = await this.campaignsRepository.findOne({ where: { id, poi: { id: poiId } } });
     if (!campaign) throw new NotFoundException('Campaign not found');
@@ -431,6 +457,7 @@ export class DonationsService {
       active: campaign.active,
       raised: round2(Number(byId.get(campaign.id)?.total ?? 0)),
       giftCount: Number(byId.get(campaign.id)?.count ?? 0),
+      imageUrl: campaign.imageUrl ?? null,
     }));
   }
 
@@ -456,6 +483,63 @@ export class DonationsService {
       return donor ? { ...donor, key, taxId: own.at(-1)?.donorTaxId ?? null } : null;
     }
     return null;
+  }
+
+  // ---- A giver's own gifts ----
+
+  /** A signed-in giver's completed gifts to a place, newest first. */
+  async listMyGifts(poiId: string, userId: string): Promise<MyGift[]> {
+    const gifts = await this.donationsRepository.find({
+      where: { poi: { id: poiId }, donor: { id: userId }, status: DonationStatus.COMPLETED },
+      relations: { campaign: true },
+      order: { createdAt: 'DESC' },
+      take: 100,
+    });
+    return gifts.map((gift) => this.myGiftView(gift));
+  }
+
+  /** One of the giver's own completed gifts, for its receipt. */
+  async findMyGift(poiId: string, donationId: string, userId: string): Promise<Donation> {
+    const gift = await this.donationsRepository.findOne({
+      where: { id: donationId, poi: { id: poiId }, donor: { id: userId }, status: DonationStatus.COMPLETED },
+      relations: { campaign: true },
+    });
+    if (!gift) throw new NotFoundException('Gift not found');
+    return gift;
+  }
+
+  /** A gift made without a receipt, given the details one needs. */
+  async requestReceipt(poiId: string, donationId: string, userId: string, dto: RequestReceiptDto): Promise<MyGift> {
+    const gift = await this.findMyGift(poiId, donationId, userId);
+    Object.assign(gift, {
+      wantsReceipt: true,
+      donorName: dto.donorName.trim(),
+      donorAddress: dto.donorAddress.trim(),
+      donorPostalCode: dto.donorPostalCode.trim(),
+      donorCity: dto.donorCity.trim(),
+      donorTaxId: dto.donorTaxId?.trim() || null,
+    });
+    return this.myGiftView(await this.donationsRepository.save(gift));
+  }
+
+  /** A gift by id, for the receipt page a signed link opens. */
+  async findReceiptGift(donationId: string): Promise<Donation | null> {
+    return this.donationsRepository.findOne({
+      where: { id: donationId, wantsReceipt: true, status: DonationStatus.COMPLETED },
+      relations: { poi: true, donor: true },
+    });
+  }
+
+  myGiftView(gift: Donation): MyGift {
+    return {
+      id: gift.id,
+      amount: gift.amount,
+      createdAt: gift.createdAt,
+      purpose: gift.purpose,
+      campaignTitle: gift.campaign?.title ?? null,
+      recurring: gift.recurring,
+      wantsReceipt: gift.wantsReceipt,
+    };
   }
 
   /** The years a signed-in giver has receipt-worthy gifts in, newest first. */

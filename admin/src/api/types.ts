@@ -202,6 +202,8 @@ export type Campaign = {
   active: boolean;
   raised: number;
   giftCount: number;
+  // The picture on the project's page in the app, a path on the API.
+  imageUrl: string | null;
 };
 
 export type ReceiptDonor = {

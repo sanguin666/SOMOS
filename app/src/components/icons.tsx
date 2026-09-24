@@ -452,6 +452,15 @@ export function DocumentIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
+// Save to the phone: an arrow down onto a line.
+export function DownloadIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 3v12M6 10l6 6 6-6M4 21h16" stroke={color} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
 export function AlertIcon({ size = 24, color = '#111111' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

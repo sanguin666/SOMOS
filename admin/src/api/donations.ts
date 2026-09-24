@@ -1,4 +1,4 @@
-import { apiDelete, apiGet, apiPatch, apiPost } from './client';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPostForm } from './client';
 import type { Campaign, Donation, DonationStats, ReceiptList } from './types';
 
 export function getDonationStats(poiId: string): Promise<DonationStats> {
@@ -35,6 +35,16 @@ export function updateCampaign(poiId: string, id: string, body: Partial<Campaign
 // The campaign's gifts are kept; they just stop counting towards a goal.
 export function deleteCampaign(poiId: string, id: string): Promise<void> {
   return apiDelete<void>(`/pois/${poiId}/campaigns/${id}`);
+}
+
+export function uploadCampaignImage(poiId: string, id: string, file: File): Promise<Campaign> {
+  const formData = new FormData();
+  formData.append('image', file);
+  return apiPostForm<Campaign>(`/pois/${poiId}/campaigns/${id}/image`, formData);
+}
+
+export function removeCampaignImage(poiId: string, id: string): Promise<Campaign> {
+  return apiDelete<Campaign>(`/pois/${poiId}/campaigns/${id}/image`);
 }
 
 // ---- Tax receipts ----

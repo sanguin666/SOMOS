@@ -14,8 +14,12 @@ import {
   Query,
   Req,
   Res,
+  UnsupportedMediaTypeException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { DonationsService } from './donations.service.js';
@@ -31,7 +35,13 @@ import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 import { StripeService } from './stripe.service.js';
 import { SignedUrlService } from '../common/signed-url/signed-url.service.js';
 import { PoisService } from '../pois/pois.service.js';
-import { decodeDonorKey, donorsCsv, encodeDonorKey, receiptHtml } from './receipts.js';
+import { decodeDonorKey, donorsCsv, encodeDonorKey, groupDonors, receiptHtml } from './receipts.js';
+import { RequestReceiptDto } from './dto/request-receipt.dto.js';
+import type { MyGift } from './donations.service.js';
+import { localDiskStorage, publicUrlFor } from '../common/upload/multer-storage.js';
+
+const CAMPAIGN_IMAGES = 'campaigns';
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
 function parseYear(value: string | undefined): number {
   const year = Number(value ?? new Date().getFullYear());
@@ -48,6 +58,10 @@ export function returnUrlBase(configService: ConfigService, request: Request): s
 
 function receiptPath(poiId: string, year: number, encodedKey: string): string {
   return `/receipts/${poiId}/${year}/${encodedKey}`;
+}
+
+function giftReceiptPath(donationId: string): string {
+  return `/receipts/gift/${donationId}`;
 }
 
 function exportPath(poiId: string, year: number): string {
@@ -105,6 +119,31 @@ export class DonationsController {
     @Req() request: AuthenticatedRequest,
   ): Promise<void> {
     await this.donationsService.stopMonthly(poiId, donationId, request.userId);
+  }
+
+  // Every gift the signed-in giver made here, each with a link to its own
+  // receipt when they asked for one.
+  @Get('mine/gifts')
+  @UseGuards(JwtAuthGuard)
+  async myGifts(@Param('poiId') poiId: string, @Req() request: AuthenticatedRequest) {
+    const gifts = await this.donationsService.listMyGifts(poiId, request.userId);
+    return gifts.map((gift) => this.withReceiptUrl(gift));
+  }
+
+  // A receipt for a gift made without one: the details it needs, then the link.
+  @Post('mine/gifts/:donationId/receipt')
+  @UseGuards(JwtAuthGuard)
+  async requestReceipt(
+    @Param('poiId') poiId: string,
+    @Param('donationId') donationId: string,
+    @Req() request: AuthenticatedRequest,
+    @Body() dto: RequestReceiptDto,
+  ) {
+    return this.withReceiptUrl(await this.donationsService.requestReceipt(poiId, donationId, request.userId, dto));
+  }
+
+  private withReceiptUrl(gift: MyGift) {
+    return { ...gift, receiptUrl: gift.wantsReceipt ? this.signedUrls.sign(giftReceiptPath(gift.id)) : null };
   }
 
   // One entry per year with receipt-worthy gifts, each with a link to
@@ -193,6 +232,33 @@ export class CampaignsController {
     return this.donationsService.updateCampaign(poiId, id, dto);
   }
 
+  // The project's picture, uploaded on its own like every other image.
+  @Post(':id/image')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: localDiskStorage(CAMPAIGN_IMAGES),
+      limits: { fileSize: MAX_IMAGE_BYTES },
+      fileFilter: (_req, file, callback) => {
+        if (!file.mimetype.startsWith('image/')) {
+          callback(new UnsupportedMediaTypeException('File must be an image'), false);
+          return;
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  uploadImage(@Param('poiId') poiId: string, @Param('id') id: string, @UploadedFile() image?: Express.Multer.File) {
+    if (!image) throw new BadRequestException('No image uploaded');
+    return this.donationsService.setCampaignImage(poiId, id, publicUrlFor(CAMPAIGN_IMAGES, image.filename));
+  }
+
+  @Delete(':id/image')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  removeImage(@Param('poiId') poiId: string, @Param('id') id: string) {
+    return this.donationsService.setCampaignImage(poiId, id, null);
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard, PoiAdminGuard)
   remove(@Param('poiId') poiId: string, @Param('id') id: string) {
@@ -214,6 +280,28 @@ export class ReceiptsController {
     private readonly stripeService: StripeService,
     private readonly signedUrls: SignedUrlService,
   ) {}
+
+  // One gift's receipt, from the giver's list of gifts in the app.
+  @Get('gift/:donationId')
+  @Header('Content-Type', 'text/html; charset=utf-8')
+  @Header('Cache-Control', 'private, no-store')
+  async giftReceipt(
+    @Param('donationId') donationId: string,
+    @Query('exp') exp: string | undefined,
+    @Query('sig') sig: string | undefined,
+  ): Promise<string> {
+    if (!this.signedUrls.verify(giftReceiptPath(donationId), exp, sig)) {
+      throw new ForbiddenException('This link has expired');
+    }
+    const gift = await this.donationsService.findReceiptGift(donationId);
+    if (!gift) throw new NotFoundException('No gift to receipt');
+    const [donor] = groupDonors([gift]);
+    const poi = await this.poisService.findOne(gift.poi.id);
+    return receiptHtml(poi, donor, gift.createdAt.getFullYear(), this.stripeService.currency, {
+      id: gift.id,
+      at: gift.createdAt,
+    });
+  }
 
   @Get(':poiId/:year/export')
   async export(
