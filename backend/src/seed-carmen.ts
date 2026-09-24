@@ -1,3 +1,5 @@
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './users/entities/user.entity.js';
@@ -32,16 +34,50 @@ import { PageBlockType } from './common/enums/page-block-type.enum.js';
 import { BadgeKind } from './common/enums/badge-kind.enum.js';
 import { EventCategory, EventRecurrence } from './events/entities/event-kinds.js';
 import { DEMO_MEMBER_PHONE } from './common/demo/demo-account.js';
+import { UPLOADS_ROOT, publicUrlFor } from './common/upload/multer-storage.js';
 
 export const CARMEN_QR_TOKEN = 'DEMO-CARMEN';
 export const CARMEN_ADMIN_EMAIL = 'admin@carmen.example';
 export const CARMEN_ADMIN_PASSWORD = 'demo1234';
 
-// Seb's photo of the church, from Wikimedia Commons. Loaded from there
-// rather than copied into uploads, so the credit on the home page matters.
-// The 1280px thumbnail, not the 3840px one: a phone does not need more.
-const CARMEN_PICTURE =
+// Seb's photo of the church, from Wikimedia Commons (credited under the
+// picture on the home page). The seed downloads it once into uploads/
+// and the app loads it from the backend like any other upload: phones
+// loading it straight from Wikimedia got nothing back (a black picture),
+// since Wikimedia turns away image requests without a descriptive
+// User-Agent. 1280px wide: a phone does not need more.
+const CARMEN_PICTURE_SOURCE =
+  'https://commons.wikimedia.org/wiki/Special:FilePath/L%27Eliana._Esgl%C3%A9sia_de_la_Mare_de_D%C3%A9u_del_Carme_2.jpg?width=1280';
+const CARMEN_PICTURE_FILE = 'carmen-church.jpg';
+// Where earlier seeds pointed the place, its home page and its news at.
+const OLD_CARMEN_PICTURE =
   'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/L%27Eliana._Esgl%C3%A9sia_de_la_Mare_de_D%C3%A9u_del_Carme_2.jpg/1280px-L%27Eliana._Esgl%C3%A9sia_de_la_Mare_de_D%C3%A9u_del_Carme_2.jpg';
+
+/**
+ * The church photo as an /uploads/ path, downloading it the first time.
+ * Without internet the seed carries on, and the demo has no photo.
+ */
+async function carmenPicture(): Promise<string | null> {
+  const dir = join(UPLOADS_ROOT, 'demo');
+  const path = publicUrlFor('demo', CARMEN_PICTURE_FILE);
+  if (existsSync(join(dir, CARMEN_PICTURE_FILE))) return path;
+  try {
+    const response = await fetch(CARMEN_PICTURE_SOURCE, {
+      headers: { 'User-Agent': 'ANSAE-demo-seed/1.0 (https://github.com/sanguin666/SOMOS)' },
+    });
+    const type = response.headers.get('content-type') ?? '';
+    if (!response.ok || !type.startsWith('image/')) {
+      throw new Error(`HTTP ${response.status} ${type}`);
+    }
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, CARMEN_PICTURE_FILE), Buffer.from(await response.arrayBuffer()));
+    console.log('Downloaded the church photo from Wikimedia Commons');
+    return path;
+  } catch (error) {
+    console.warn(`Could not download the church photo (${(error as Error).message}); the demo has no photo.`);
+    return null;
+  }
+}
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -73,6 +109,7 @@ export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
   const documents = dataSource.getRepository(ServiceRequestDocument);
   const intentions = dataSource.getRepository(MassIntention);
 
+  const picture = await carmenPicture();
   let poi = await pois.findOne({ where: { qrCodeToken: CARMEN_QR_TOKEN } });
   if (!poi) {
     poi = await pois.save(
@@ -85,7 +122,7 @@ export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
         postalCode: '46183',
         description:
           'Una comunidad viva y acogedora en el centro de L’Eliana. Familias, jóvenes y mayores celebramos juntos la fe cada semana.',
-        pictureUrl: CARMEN_PICTURE,
+        pictureUrl: picture ?? undefined,
         qrCodeToken: CARMEN_QR_TOKEN,
         massIntentionOffering: 10,
         legalName: 'Comunidad Nuestra Señora del Carmen',
@@ -288,14 +325,23 @@ export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
     ]);
   }
 
-  // Databases seeded before news posts had photos: give the bell tower
-  // post the church's picture, so the News tab opens on a photo.
-  const bellTowerNote = await announcements.findOne({
-    where: { ...where, title: 'Gracias por la campaña del campanario' },
-  });
-  if (bellTowerNote && !bellTowerNote.imageUrl) {
-    bellTowerNote.imageUrl = CARMEN_PICTURE;
-    await announcements.save(bellTowerNote);
+  // Databases seeded earlier: point the place, its home page picture and
+  // the bell tower news post at the downloaded photo instead of
+  // Wikimedia, and give that post the photo if it had none (posts had no
+  // photos before 24 Sep 2026).
+  if (picture) {
+    if (place.pictureUrl === OLD_CARMEN_PICTURE) {
+      place.pictureUrl = picture;
+      await pois.save(place);
+    }
+    await blocks.update({ poi: { id: place.id }, imageUrl: OLD_CARMEN_PICTURE }, { imageUrl: picture });
+    const bellTowerNote = await announcements.findOne({
+      where: { ...where, title: 'Gracias por la campaña del campanario' },
+    });
+    if (bellTowerNote && (!bellTowerNote.imageUrl || bellTowerNote.imageUrl === OLD_CARMEN_PICTURE)) {
+      bellTowerNote.imageUrl = picture;
+      await announcements.save(bellTowerNote);
+    }
   }
 
   if (!(await prayers.count({ where }))) {
@@ -557,7 +603,7 @@ export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
 
   if (!(await blocks.count({ where }))) {
     const rows: Partial<PoiPageBlock>[] = [
-      { type: PageBlockType.IMAGE, imageUrl: CARMEN_PICTURE, body: 'Foto: Wikimedia Commons' },
+      ...(picture ? [{ type: PageBlockType.IMAGE, imageUrl: picture, body: 'Foto: Wikimedia Commons' }] : []),
       {
         type: PageBlockType.TEXT,
         title: 'Bienvenidos',
