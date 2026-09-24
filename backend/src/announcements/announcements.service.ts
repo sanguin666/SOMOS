@@ -56,6 +56,12 @@ export class AnnouncementsService {
     return this.announcementsRepository.save(announcement);
   }
 
+  async setImage(poiId: string, id: string, imageUrl: string | null): Promise<Announcement> {
+    const announcement = await this.findOneForPoi(poiId, id);
+    announcement.imageUrl = imageUrl;
+    return this.announcementsRepository.save(announcement);
+  }
+
   async remove(poiId: string, id: string): Promise<void> {
     const announcement = await this.findOneForPoi(poiId, id);
     await this.announcementsRepository.remove(announcement);

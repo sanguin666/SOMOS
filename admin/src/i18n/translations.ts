@@ -154,6 +154,14 @@ export type Translations = {
     saveError: string;
     deleteError: string;
     loading: string;
+    styleLabel: string;
+    styleNormal: string;
+    styleImportant: string;
+    photoLabel: string;
+    photoChange: string;
+    photoRemove: string;
+    photoHint: string;
+    photoError: string;
   };
   livestreams: {
     title: string;
@@ -727,6 +735,14 @@ const en: Translations = {
     saveError: 'Could not save changes.',
     deleteError: 'Could not delete the announcement.',
     loading: 'Loading…',
+    styleLabel: 'Style',
+    styleNormal: 'Normal',
+    styleImportant: 'Important',
+    photoLabel: 'Photo (optional)',
+    photoChange: 'Replace the photo',
+    photoRemove: 'Remove the photo',
+    photoHint: 'The newest post shows its photo big at the top of the News tab; older ones show it small.',
+    photoError: 'The photo could not be saved.',
   },
   livestreams: {
     title: 'Livestreams',
@@ -1301,6 +1317,14 @@ const es: Translations = {
     saveError: 'No se pudieron guardar los cambios.',
     deleteError: 'No se pudo eliminar el anuncio.',
     loading: 'Cargando…',
+    styleLabel: 'Estilo',
+    styleNormal: 'Normal',
+    styleImportant: 'Importante',
+    photoLabel: 'Foto (opcional)',
+    photoChange: 'Cambiar la foto',
+    photoRemove: 'Quitar la foto',
+    photoHint: 'La noticia más reciente muestra su foto en grande arriba de Noticias; las anteriores, en pequeño.',
+    photoError: 'No se pudo guardar la foto.',
   },
   livestreams: {
     title: 'Transmisiones',
@@ -1875,6 +1899,14 @@ const fr: Translations = {
     saveError: 'Impossible d’enregistrer les modifications.',
     deleteError: "Impossible de supprimer l'annonce.",
     loading: 'Chargement…',
+    styleLabel: 'Style',
+    styleNormal: 'Normal',
+    styleImportant: 'Important',
+    photoLabel: 'Photo (facultative)',
+    photoChange: 'Remplacer la photo',
+    photoRemove: 'Retirer la photo',
+    photoHint: 'La dernière actu affiche sa photo en grand en haut de l’onglet Actus ; les plus anciennes en petit.',
+    photoError: 'La photo n’a pas pu être enregistrée.',
   },
   livestreams: {
     title: 'Diffusions',

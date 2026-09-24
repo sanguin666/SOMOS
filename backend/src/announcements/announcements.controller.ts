@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,11 +16,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AnnouncementsService } from './announcements.service.js';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto.js';
 import { UpdateAnnouncementDto } from './dto/update-announcement.dto.js';
-import { localDiskStorage } from '../common/upload/multer-storage.js';
+import { localDiskStorage, publicUrlFor } from '../common/upload/multer-storage.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { PoiAdminGuard } from '../auth/guards/poi-admin.guard.js';
 
 const MAX_AUDIO_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB — a few minutes of voice audio.
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const ANNOUNCEMENT_IMAGES = 'announcements';
 
 @Controller('pois/:poiId/announcements')
 export class AnnouncementsController {
@@ -67,6 +70,34 @@ export class AnnouncementsController {
     @Body() dto: UpdateAnnouncementDto,
   ) {
     return this.announcementsService.update(poiId, id, dto);
+  }
+
+  // The post's photo, uploaded on its own after the post is saved, like a
+  // donation project's.
+  @Post(':id/image')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: localDiskStorage(ANNOUNCEMENT_IMAGES),
+      limits: { fileSize: MAX_IMAGE_BYTES },
+      fileFilter: (_req, file, callback) => {
+        if (!file.mimetype.startsWith('image/')) {
+          callback(new UnsupportedMediaTypeException('File must be an image'), false);
+          return;
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  uploadImage(@Param('poiId') poiId: string, @Param('id') id: string, @UploadedFile() image?: Express.Multer.File) {
+    if (!image) throw new BadRequestException('No image uploaded');
+    return this.announcementsService.setImage(poiId, id, publicUrlFor(ANNOUNCEMENT_IMAGES, image.filename));
+  }
+
+  @Delete(':id/image')
+  @UseGuards(JwtAuthGuard, PoiAdminGuard)
+  removeImage(@Param('poiId') poiId: string, @Param('id') id: string) {
+    return this.announcementsService.setImage(poiId, id, null);
   }
 
   @Delete(':id')

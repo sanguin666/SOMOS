@@ -34,6 +34,8 @@ type Props = {
   poi: Poi;
   modules: ActiveModule[] | null;
   onSelectTab: (tab: HubTab) => void;
+  // Opens one news post on its own page; without it a post opens the tab.
+  onOpenAnnouncement?: (item: Announcement) => void;
 };
 
 // What a POI that hasn't built a page yet gets: the two things a
@@ -89,7 +91,7 @@ function formatShortDate(iso: string) {
  * built one. This is what a congregant lands on when they open the place,
  * before they pick anything from the menu.
  */
-export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
+export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }: Props) {
   const { t, language } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
 
@@ -422,7 +424,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
                 key={item.id}
                 accessibilityRole="button"
                 accessibilityLabel={item.title}
-                onPress={() => onSelectTab('announcements')}
+                onPress={() => (onOpenAnnouncement ? onOpenAnnouncement(item) : onSelectTab('announcements'))}
                 style={styles.feedCard}
               >
                 <View style={styles.feedCardHeader}>
