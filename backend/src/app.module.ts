@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { DonationsModule } from './donations/donations.module.js';
 import { PoiSettingsModule } from './poi-settings/poi-settings.module.js';
 import { PoiPageModule } from './poi-page/poi-page.module.js';
+import { PoiBadgesModule } from './poi-badges/poi-badges.module.js';
 import { ServiceRequestsModule } from './service-requests/service-requests.module.js';
 import { MassIntentionsModule } from './mass-intentions/mass-intentions.module.js';
 import { PrivateFilesModule } from './private-files/private-files.module.js';
@@ -42,6 +43,7 @@ import { PrivateFilesModule } from './private-files/private-files.module.js';
     DonationsModule,
     PoiSettingsModule,
     PoiPageModule,
+    PoiBadgesModule,
     ServiceRequestsModule,
     MassIntentionsModule,
     PrivateFilesModule,

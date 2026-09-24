@@ -178,7 +178,7 @@ export function MenuOrderCard({ poi, modules, onSaved }: Props) {
   );
 }
 
-function moduleName(type: ModuleType, t: ReturnType<typeof useI18n>['t']): string {
+export function moduleName(type: ModuleType, t: ReturnType<typeof useI18n>['t']): string {
   switch (type) {
     case 'donations':
       return t('moduleNames.donations');

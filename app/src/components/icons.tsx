@@ -451,3 +451,13 @@ export function DocumentIcon({ size = 24, color = '#111111' }: IconProps) {
     </Svg>
   );
 }
+
+export function AlertIcon({ size = 24, color = '#111111' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 3 2 21h20Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+      <Line x1={12} y1={10} x2={12} y2={14} stroke={color} strokeWidth={2} strokeLinecap="round" />
+      <Circle cx={12} cy={17.5} r={1.2} fill={color} />
+    </Svg>
+  );
+}

@@ -260,6 +260,48 @@ export type Translations = {
     blockDonate: string;
     blockCelebrationTimes: string;
     celebrationTimesNote: string;
+    sectionsTitle: string;
+  };
+  badges: {
+    title: string;
+    loading: string;
+    loadError: string;
+    saveError: string;
+    deleteError: string;
+    kindMessage: string;
+    kindAuto: string;
+    nextMassTitle: string;
+    officeHoursTitle: string;
+    nextConfessionTitle: string;
+    campaignTitle: string;
+    fromCalendar: string;
+    fromOfficeHours: string;
+    campaignNote: string;
+    campaignLabel: string;
+    latestCampaign: string;
+    styleNormal: string;
+    styleImportant: string;
+    styleImportantShort: string;
+    until: string;
+    ended: string;
+    opens: string;
+    moveUp: string;
+    moveDown: string;
+    edit: string;
+    delete: string;
+    showLabel: string;
+    orderNote: string;
+    addTitle: string;
+    editTitle: string;
+    textLabel: string;
+    textPlaceholder: string;
+    styleLabel: string;
+    linkLabel: string;
+    linkNone: string;
+    untilLabel: string;
+    add: string;
+    save: string;
+    saving: string;
   };
   qr: {
     title: string;
@@ -714,6 +756,48 @@ const en: Translations = {
     blockDonate: 'Donate button',
     blockCelebrationTimes: 'Celebration times',
     celebrationTimesNote: 'This section is built from your weekly events (Masses, confessions, office hours): set their kind and "Every week" on the Events page.',
+    sectionsTitle: 'Page sections',
+  },
+  badges: {
+    title: 'Badges at the top of the page',
+    loading: 'Loading the badges…',
+    loadError: "Couldn't load the badges.",
+    saveError: "Couldn't save that change.",
+    deleteError: "Couldn't delete that badge.",
+    kindMessage: 'Message',
+    kindAuto: 'Auto',
+    nextMassTitle: 'Next Mass',
+    officeHoursTitle: 'Office open / closed',
+    nextConfessionTitle: 'Next confessions',
+    campaignTitle: 'Donation campaign',
+    fromCalendar: 'Worked out from the calendar',
+    fromOfficeHours: 'From the office hours in the calendar',
+    campaignNote: 'Percentage raised',
+    campaignLabel: 'Campaign',
+    latestCampaign: 'The most recent',
+    styleNormal: 'Normal',
+    styleImportant: 'Important (orange)',
+    styleImportantShort: 'Important',
+    until: 'until {{date}}',
+    ended: 'ended {{date}}',
+    opens: 'opens {{module}}',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    edit: 'Edit',
+    delete: 'Delete',
+    showLabel: 'Show “{{name}}”',
+    orderNote: 'Use ↑ ↓ to change the order. At most 4 badges show at a time.',
+    addTitle: 'Add a message',
+    editTitle: 'Edit the message',
+    textLabel: 'Text ({{n}} characters at most)',
+    textPlaceholder: 'Church closed Monday 29th',
+    styleLabel: 'Style',
+    linkLabel: 'On tap, open',
+    linkNone: 'Nothing',
+    untilLabel: 'Show until (optional)',
+    add: 'Add the badge',
+    save: 'Save',
+    saving: 'Saving…',
   },
   qr: {
     title: 'My QR',
@@ -1168,6 +1252,48 @@ const es: Translations = {
     blockDonate: 'Botón de donar',
     blockCelebrationTimes: 'Horarios de celebraciones',
     celebrationTimesNote: 'Esta sección se construye con tus eventos semanales (misas, confesiones, horario de despacho): indica su tipo y «Cada semana» en la página Eventos.',
+    sectionsTitle: 'Secciones de la página',
+  },
+  badges: {
+    title: 'Insignias en la parte superior de la página',
+    loading: 'Cargando las insignias…',
+    loadError: 'No se pudieron cargar las insignias.',
+    saveError: 'No se pudo guardar ese cambio.',
+    deleteError: 'No se pudo eliminar esa insignia.',
+    kindMessage: 'Mensaje',
+    kindAuto: 'Auto',
+    nextMassTitle: 'Próxima misa',
+    officeHoursTitle: 'Despacho abierto / cerrado',
+    nextConfessionTitle: 'Próximas confesiones',
+    campaignTitle: 'Campaña de donaciones',
+    fromCalendar: 'Calculada a partir de la agenda',
+    fromOfficeHours: 'Según el horario de oficina de la agenda',
+    campaignNote: 'Porcentaje recaudado',
+    campaignLabel: 'Campaña',
+    latestCampaign: 'La más reciente',
+    styleNormal: 'Normal',
+    styleImportant: 'Importante (naranja)',
+    styleImportantShort: 'Importante',
+    until: 'hasta el {{date}}',
+    ended: 'terminó el {{date}}',
+    opens: 'abre {{module}}',
+    moveUp: 'Subir',
+    moveDown: 'Bajar',
+    edit: 'Editar',
+    delete: 'Eliminar',
+    showLabel: 'Mostrar «{{name}}»',
+    orderNote: 'Use ↑ ↓ para cambiar el orden. Como máximo se muestran 4 insignias a la vez.',
+    addTitle: 'Añadir un mensaje',
+    editTitle: 'Editar el mensaje',
+    textLabel: 'Texto ({{n}} caracteres como máximo)',
+    textPlaceholder: 'Iglesia cerrada el lunes 29',
+    styleLabel: 'Estilo',
+    linkLabel: 'Al tocar, abrir',
+    linkNone: 'Nada',
+    untilLabel: 'Mostrar hasta (opcional)',
+    add: 'Añadir la insignia',
+    save: 'Guardar',
+    saving: 'Guardando…',
   },
   qr: {
     title: 'Mi código QR',
@@ -1622,6 +1748,48 @@ const fr: Translations = {
     blockDonate: 'Bouton de don',
     blockCelebrationTimes: 'Horaires des célébrations',
     celebrationTimesNote: "Cette section est construite à partir de vos événements hebdomadaires (messes, confessions, heures d'accueil) : indiquez leur type et « Chaque semaine » dans la page Événements.",
+    sectionsTitle: 'Sections de la page',
+  },
+  badges: {
+    title: 'Badges en haut de la page',
+    loading: 'Chargement des badges…',
+    loadError: 'Impossible de charger les badges.',
+    saveError: "Impossible d'enregistrer ce changement.",
+    deleteError: 'Impossible de supprimer ce badge.',
+    kindMessage: 'Message',
+    kindAuto: 'Auto',
+    nextMassTitle: 'Prochaine messe',
+    officeHoursTitle: 'Accueil ouvert / fermé',
+    nextConfessionTitle: 'Prochaines confessions',
+    campaignTitle: 'Campagne de dons',
+    fromCalendar: "Calculée depuis l'agenda",
+    fromOfficeHours: "Depuis les heures d'accueil de l'agenda",
+    campaignNote: 'Pourcentage collecté',
+    campaignLabel: 'Campagne',
+    latestCampaign: 'La plus récente',
+    styleNormal: 'Normal',
+    styleImportant: 'Important (orange)',
+    styleImportantShort: 'Important',
+    until: "jusqu'au {{date}}",
+    ended: 'terminé le {{date}}',
+    opens: 'ouvre {{module}}',
+    moveUp: 'Monter',
+    moveDown: 'Descendre',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    showLabel: 'Afficher « {{name}} »',
+    orderNote: "Utilisez ↑ ↓ pour changer l'ordre. Au plus 4 badges affichés à la fois.",
+    addTitle: 'Ajouter un message',
+    editTitle: 'Modifier le message',
+    textLabel: 'Texte ({{n}} caractères au plus)',
+    textPlaceholder: 'Église fermée lundi 29',
+    styleLabel: 'Style',
+    linkLabel: 'Au toucher, ouvrir',
+    linkNone: 'Rien',
+    untilLabel: "Afficher jusqu'au (facultatif)",
+    add: 'Ajouter le badge',
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
   },
   qr: {
     title: 'Mon code QR',

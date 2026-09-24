@@ -7,22 +7,32 @@ import { useI18n } from '../i18n/I18nContext';
  * only opens the question. The answer is the ordinary orange button
  * ("Yes, delete") beside a white Cancel, so nothing is lost to one stray
  * click and no other red ever appears.
+ *
+ * `quiet` shows the entry as red words with no edge, for a row that
+ * already carries other text actions; the question stays the same.
  */
 export function DestructiveButton({
   label,
   onConfirm,
   disabled,
+  quiet,
 }: {
   label: string;
   onConfirm: () => void;
   disabled?: boolean;
+  quiet?: boolean;
 }) {
   const { t } = useI18n();
   const [asking, setAsking] = useState(false);
 
   if (!asking) {
     return (
-      <button type="button" className="btn btn-destructive" disabled={disabled} onClick={() => setAsking(true)}>
+      <button
+        type="button"
+        className={quiet ? 'text-action text-action-destructive' : 'btn btn-destructive'}
+        disabled={disabled}
+        onClick={() => setAsking(true)}
+      >
         {label}
       </button>
     );

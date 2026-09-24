@@ -13,6 +13,7 @@ import {
 } from '../api/poiPage';
 import type { ActiveModule, ModuleType, PageBlockType, PoiPageBlock } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
+import { BadgesSection } from './BadgesSection';
 
 // Blocks that fill themselves from a module's content. They have nothing
 // to write, only a count, and they need that module switched on.
@@ -205,6 +206,10 @@ export function PoiHomePage() {
     <div>
       <h2>{t('homePage.title')}</h2>
       <p className="muted">{t('homePage.subtitle')}</p>
+
+      <BadgesSection poiId={poiId} modules={modules} />
+
+      <h3 style={{ marginTop: 32 }}>{t('homePage.sectionsTitle')}</h3>
 
       {error && <p className="error-text">{error}</p>}
       {blocks === null && !error && <p className="muted">{t('homePage.loading')}</p>}

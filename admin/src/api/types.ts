@@ -55,6 +55,29 @@ export type PoiPageBlock = {
   itemCount: number;
 };
 
+// The small tiles at the very top of a place's home page in the app.
+// `message` is written by the staff; the other four fill themselves and
+// always exist, only switched on or off.
+export type BadgeKind = 'message' | 'next_mass' | 'office_hours' | 'next_confession' | 'campaign';
+
+export type PoiBadge = {
+  id: string;
+  kind: BadgeKind;
+  position: number;
+  enabled: boolean;
+  text: string | null;
+  // Drawn in orange rather than white.
+  important: boolean;
+  // The module a tap opens, or null for a badge that only informs.
+  linkModule: ModuleType | null;
+  // For `campaign`: the one to show, or null for the most recent.
+  campaignId: string | null;
+  // YYYY-MM-DD, the last day it shows; null for no end.
+  showUntil: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type CurrentUser = {
   id: string;
   email: string;

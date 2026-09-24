@@ -34,6 +34,24 @@ export type ActiveModule = {
   expirationDate: string | null;
 };
 
+// The small tiles at the very top of a place's home page, in the order
+// its staff chose. A message carries its own words; the other kinds are
+// worked out on the phone from the timetable and the giving.
+export type BadgeKind = 'message' | 'next_mass' | 'office_hours' | 'next_confession' | 'campaign';
+
+export type PoiBadge = {
+  id: string;
+  kind: BadgeKind;
+  position: number;
+  enabled: boolean;
+  text: string | null;
+  important: boolean;
+  linkModule: ModuleType | null;
+  campaignId: string | null;
+  // The last day a message shows, as YYYY-MM-DD.
+  showUntil: string | null;
+};
+
 // The sections a POI stacks on its home page, in the order it chose. The
 // written ones (text, image) carry their own content; the rest pull live
 // content from a module and render nothing when it isn't active.

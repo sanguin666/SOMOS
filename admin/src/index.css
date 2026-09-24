@@ -439,6 +439,34 @@ select {
   padding: 0;
 }
 
+/* An action said in words inside a row of a list (Edit, Remove), where a
+   row of framed buttons would crowd it: coral and bold like a link, red
+   for the one that undoes something. What it opens is answered with the
+   buttons above. */
+.text-action {
+  min-height: 48px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: var(--color-primary-strong);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.text-action:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.text-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.text-action-destructive {
+  color: var(--color-danger);
+}
+
 /* A link that leads somewhere (back to a list, a receipt, a file to
    download) dressed as one of the buttons above. */
 a.btn {
@@ -465,6 +493,87 @@ a.btn {
 
 .badge-active {
   color: var(--color-primary-strong);
+}
+
+/* An on/off switch, as on the phone: orange when on. A control, not a
+   box, so it may sit in a row of a white card. */
+.switch {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  margin: 0;
+  border-radius: 16px;
+  background: #9a8f82;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s;
+}
+
+.switch:checked {
+  background: var(--color-primary);
+}
+
+.switch:checked::before {
+  transform: translateX(20px);
+}
+
+.switch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* One choice among a few, inside a form row: a pill with a hairline,
+   and the chosen one in the coral wash with a coral, bold label — the
+   way the sidebar marks the page you are on. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px 0 2px;
+}
+
+.chip {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 22px;
+  background: none;
+  color: var(--color-text);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.chip-selected {
+  border-color: var(--color-primary-soft);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-weight: 700;
+}
+
+/* ---------- Home page badges ---------- */
+
+/* "Message" or "Auto", in small capitals before the badge's name. */
+.badge-kind {
+  flex-shrink: 0;
+  width: 88px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 /* ---------- Pickers (language, place) ---------- */

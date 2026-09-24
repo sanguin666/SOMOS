@@ -4,11 +4,14 @@ import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { ChevronRightIcon, PlayIcon } from '../components/icons';
 import { uploadUri } from '../api/client';
-import { getPoiPageBlocks } from '../api/poiPage';
+import { getPoiBadges, getPoiPageBlocks } from '../api/poiPage';
+import { getCampaigns, type Campaign } from '../api/donations';
 import { getAnnouncements } from '../api/announcements';
 import { getEvents } from '../api/events';
 import { getLivestreams } from '../api/livestreams';
 import { TimetableRows } from '../components/Timetable';
+import { BadgeTiles } from '../components/BadgeTiles';
+import { badgeTiles } from '../utils/badges';
 import { formatWhen, isWeekly, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
 import type {
   ActiveModule,
@@ -18,6 +21,7 @@ import type {
   ModuleType,
   PageBlockType,
   Poi,
+  PoiBadge,
   PoiPageBlock,
 } from '../api/types';
 import type { HubTab } from '../components/PoiShell';
@@ -89,6 +93,8 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
   const poiTheme = getPoiTheme(poi.type);
 
   const [blocks, setBlocks] = useState<PoiPageBlock[] | null>(null);
+  const [badges, setBadges] = useState<PoiBadge[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [events, setEvents] = useState<Event[] | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
   const [livestreams, setLivestreams] = useState<Livestream[] | null>(null);
@@ -114,15 +120,29 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
     };
   }, [poi.id]);
 
+  useEffect(() => {
+    let cancelled = false;
+    getPoiBadges(poi.id)
+      .then((result) => {
+        if (!cancelled) setBadges(result);
+      })
+      // No badges is a page that starts with its first block, which is fine.
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [poi.id]);
+
   // Each live block's content is fetched once, only if some block on the
   // page actually asks for it and its module is on.
   const visible = (blocks ?? []).filter((block) => {
     const required = BLOCK_MODULE[block.type];
     return !required || isLive(required);
   });
-  const needsEvents = visible.some(
-    (b) => b.type === 'celebration_times' || b.type === 'next_events' || b.type === 'past_events',
-  );
+  const needsEvents =
+    visible.some((b) => b.type === 'celebration_times' || b.type === 'next_events' || b.type === 'past_events') ||
+    (isLive('events') && badges.some((b) => b.kind !== 'message' && b.kind !== 'campaign'));
+  const needsCampaigns = isLive('donations') && badges.some((b) => b.kind === 'campaign');
   const needsAnnouncements = visible.some((b) => b.type === 'latest_announcements');
   const needsLivestreams = visible.some((b) => b.type === 'next_livestream');
 
@@ -138,6 +158,19 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
       cancelled = true;
     };
   }, [poi.id, needsEvents]);
+
+  useEffect(() => {
+    if (!needsCampaigns) return;
+    let cancelled = false;
+    getCampaigns(poi.id)
+      .then((result) => {
+        if (!cancelled) setCampaigns(result);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [poi.id, needsCampaigns]);
 
   useEffect(() => {
     if (!needsAnnouncements) return;
@@ -173,11 +206,18 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
     );
   }
 
+  // The badges come first, above everything the page holds.
+  const tiles = badgeTiles(badges, { events, campaigns, isLive, now: new Date(), language, t });
+  const top = <BadgeTiles tiles={tiles} onOpen={onSelectTab} />;
+
   if (visible.length === 0) {
     return (
-      <AccessibleText variant="body" color={colors.textMuted}>
-        {t('hub.noModules')}
-      </AccessibleText>
+      <>
+        {top}
+        <AccessibleText variant="body" color={colors.textMuted}>
+          {t('hub.noModules')}
+        </AccessibleText>
+      </>
     );
   }
 
@@ -200,6 +240,7 @@ export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
 
   return (
     <>
+      {top}
       {visible.map((block) => {
         switch (block.type) {
           case 'text':

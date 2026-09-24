@@ -206,3 +206,28 @@ export function formatWhen(
   }
   return `${day} · ${timeKey(date)}`;
 }
+
+/**
+ * `formatWhen` as short as it goes, for a small tile: the caller's short
+ * words for today and tomorrow, a short weekday within the week, and a
+ * short date after that: "Sun 10:00", "12 Oct 10:00". Left in the case
+ * the language writes it mid-sentence ("ouvre mar. 10:00"); a caller
+ * starting a line with it capitalises it.
+ */
+export function formatShortWhen(
+  date: Date,
+  now: Date,
+  language: string,
+  words: { today: string; tomorrow: string },
+): string {
+  const locale = DAY_LOCALES[language] ?? language;
+  let day: string;
+  if (sameDay(date, now)) day = words.today;
+  else if (sameDay(date, addDays(now, 1))) day = words.tomorrow;
+  else if (date.getTime() - now.getTime() < 6 * 86_400_000) {
+    day = weekdayName(date.getDay(), language, 'short');
+  } else {
+    day = date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+  }
+  return `${day} ${timeKey(date)}`;
+}

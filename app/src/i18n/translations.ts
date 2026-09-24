@@ -256,6 +256,18 @@ export type Translations = {
     replyButton: string;
     replyingButton: string;
   };
+  badges: {
+    today: string;
+    tomorrow: string;
+    mass: string;
+    confession: string;
+    officeOpen: string;
+    officeClosed: string;
+    until: string;
+    opens: string;
+    raised: string;
+    give: string;
+  };
   schedule: {
     everyWeek: string;
     comingUp: string;
@@ -611,6 +623,18 @@ const en: Translations = {
     namePlaceholder: 'Your name (optional)',
     replyButton: 'Reply',
     replyingButton: 'Replying…',
+  },
+  badges: {
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+    mass: 'Mass',
+    confession: 'Confessions',
+    officeOpen: 'Office open',
+    officeClosed: 'Office closed',
+    until: 'until {{time}}',
+    opens: 'opens {{when}}',
+    raised: '{{percent}}% raised',
+    give: 'Give',
   },
   schedule: {
     everyWeek: 'EVERY WEEK',
@@ -968,6 +992,18 @@ const es: Translations = {
     replyButton: 'Responder',
     replyingButton: 'Respondiendo…',
   },
+  badges: {
+    today: 'Hoy',
+    tomorrow: 'Mañana',
+    mass: 'Misa',
+    confession: 'Confesiones',
+    officeOpen: 'Despacho abierto',
+    officeClosed: 'Despacho cerrado',
+    until: 'hasta las {{time}}',
+    opens: 'abre {{when}}',
+    raised: '{{percent}} % recaudado',
+    give: 'Donar',
+  },
   schedule: {
     everyWeek: 'CADA SEMANA',
     comingUp: 'PRÓXIMAMENTE',
@@ -1323,6 +1359,18 @@ const fr: Translations = {
     namePlaceholder: 'Votre nom (facultatif)',
     replyButton: 'Répondre',
     replyingButton: 'Envoi…',
+  },
+  badges: {
+    today: 'Auj.',
+    tomorrow: 'Demain',
+    mass: 'Messe',
+    confession: 'Confessions',
+    officeOpen: 'Accueil ouvert',
+    officeClosed: 'Accueil fermé',
+    until: 'jusqu’à {{time}}',
+    opens: 'ouvre {{when}}',
+    raised: '{{percent}} % collectés',
+    give: 'Faire un don',
   },
   schedule: {
     everyWeek: 'CHAQUE SEMAINE',

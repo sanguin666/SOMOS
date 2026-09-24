@@ -22,6 +22,8 @@ import { PageBlockType } from './common/enums/page-block-type.enum.js';
 import { ENTITIES } from './config/typeorm.config.js';
 import { EventCategory, EventRecurrence } from './events/entities/event-kinds.js';
 import { DonationCampaign } from './donations/entities/donation-campaign.entity.js';
+import { PoiBadge } from './poi-badges/entities/poi-badge.entity.js';
+import { BadgeKind } from './common/enums/badge-kind.enum.js';
 import { DonationPurpose } from './donations/entities/donation.entity.js';
 import {
   ServiceRequest,
@@ -680,6 +682,36 @@ async function seedChurchModules({
       intentions.create({ poi: stMarys, intention: 'For the souls in purgatory', requesterName: 'Susan', offeringAmount: 20, status: MassIntentionStatus.CONFIRMED, fromOffice: true }),
     ]);
     console.log('Seeded demo Mass intentions');
+  }
+
+  // The tiles at the top of each home page: a message from the office,
+  // then what the timetable and the giving say on their own.
+  const badges = dataSource.getRepository(PoiBadge);
+  for (const [place, rows] of [
+    [
+      stMarys,
+      [
+        { kind: BadgeKind.MESSAGE, text: 'Harvest Mass this Sunday, all welcome', important: true, linkModule: ModuleType.EVENTS },
+        { kind: BadgeKind.NEXT_MASS },
+        { kind: BadgeKind.OFFICE_HOURS },
+        { kind: BadgeKind.CAMPAIGN },
+        { kind: BadgeKind.NEXT_CONFESSION, enabled: false },
+      ],
+    ],
+    [
+      holyTrinity,
+      [
+        { kind: BadgeKind.MESSAGE, text: 'Inscripciones de catequesis abiertas', linkModule: ModuleType.REQUESTS },
+        { kind: BadgeKind.NEXT_MASS },
+        { kind: BadgeKind.NEXT_CONFESSION },
+        { kind: BadgeKind.OFFICE_HOURS },
+        { kind: BadgeKind.CAMPAIGN, enabled: false },
+      ],
+    ],
+  ] as const) {
+    if (await badges.count({ where: { poi: { id: place.id } } })) continue;
+    await badges.save(rows.map((row, position) => badges.create({ ...row, poi: place, position })));
+    console.log(`Seeded home badges for ${place.name}`);
   }
 }
 
