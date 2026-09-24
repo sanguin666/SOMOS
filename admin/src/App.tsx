@@ -13,6 +13,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { MyQrPage } from './pages/MyQrPage';
 import { PoiHomePage } from './pages/PoiHomePage';
 import { DonationsPage } from './pages/DonationsPage';
+import { DashboardPage } from './pages/DashboardPage';
 import { RequestDetailPage, RequestsPage } from './pages/RequestsPage';
 import { MassIntentionsPage } from './pages/MassIntentionsPage';
 
@@ -56,12 +57,12 @@ function Home() {
       </div>
     );
   }
-  return <Navigate to={`/poi/${firstPoi.id}/home-page`} replace />;
+  return <Navigate to={`/poi/${firstPoi.id}/dashboard`} replace />;
 }
 
 function PoiIndexRedirect() {
   const { poiId } = useParams<{ poiId: string }>();
-  return <Navigate to={`/poi/${poiId}/home-page`} replace />;
+  return <Navigate to={`/poi/${poiId}/dashboard`} replace />;
 }
 
 function AppRoutes() {
@@ -85,6 +86,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<PoiIndexRedirect />} />
+        <Route path="dashboard" element={<DashboardPage />} />
         <Route path="donations" element={<DonationsPage />} />
         <Route path="events" element={<EventsPage />} />
         <Route path="requests" element={<RequestsPage />} />

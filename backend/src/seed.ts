@@ -673,6 +673,55 @@ async function seedChurchModules({
     console.log('Seeded a demo baptism request');
   }
 
+  // Two more requests, so the dashboard's first page has something in
+  // each list: one nobody has opened yet, one with an appointment.
+  const hour = 60 * 60 * 1000;
+  if (!(await requests.count({ where: { poi: { id: stMarys.id }, contactName: 'Peter Novak' } }))) {
+    await requests.save(
+      requests.create({
+        poi: stMarys,
+        requester: member,
+        type: ServiceRequestType.SICK_VISIT,
+        status: ServiceRequestStatus.RECEIVED,
+        contactName: 'Peter Novak',
+        details: 'My father is at home after a fall and would love a visit and communion.',
+        preferredDate: 'Any afternoon this week',
+        lastMemberActivityAt: new Date(Date.now() - 3 * hour),
+        memberSeenAt: new Date(Date.now() - 3 * hour),
+        createdAt: new Date(Date.now() - 3 * hour),
+      }),
+    );
+    console.log('Seeded a new sick visit request');
+  }
+  if (!(await requests.count({ where: { poi: { id: stMarys.id }, contactName: 'Julia & Mark' } }))) {
+    const appointmentAt = nextWeekday(2, 17);
+    await requests.save(
+      requests.create({
+        poi: stMarys,
+        requester: member,
+        type: ServiceRequestType.WEDDING,
+        status: ServiceRequestStatus.APPOINTMENT_SET,
+        contactName: 'Julia & Mark',
+        details: 'We would like to marry next June.',
+        appointmentAt,
+        appointmentPlace: 'Welcome desk',
+        lastMemberActivityAt: new Date(Date.now() - 48 * hour),
+        lastStaffActivityAt: new Date(Date.now() - 24 * hour),
+        staffSeenAt: new Date(Date.now() - 24 * hour),
+        memberSeenAt: new Date(Date.now() - 20 * hour),
+      }),
+    );
+    console.log('Seeded a wedding request with an appointment');
+  }
+  if (!(await intentions.count({ where: { poi: { id: stMarys.id }, requesterName: 'The Doyle family' } }))) {
+    const lastSunday = nextWeekday(0, 10);
+    lastSunday.setDate(lastSunday.getDate() - 7);
+    await intentions.save(
+      intentions.create({ poi: stMarys, intention: 'For Mary Doyle, on her anniversary', requesterName: 'The Doyle family', celebrationAt: lastSunday, celebrationTitle: 'Sunday Mass', offeringAmount: 20, status: MassIntentionStatus.CONFIRMED }),
+    );
+    console.log('Seeded a Mass intention still to tick off');
+  }
+
   const hasIntentions = await intentions.count({ where: { poi: { id: stMarys.id } } });
   if (!hasIntentions) {
     const sunday = nextWeekday(0, 10);

@@ -18,10 +18,10 @@ import type {
   ServiceRequestDetail,
   ServiceRequestStatus,
   ServiceRequestSummary,
-  ServiceRequestType,
 } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
 import { fromLocalInputValue, toLocalInputValue } from '../format';
+import { typeName } from '../requestTypes';
 
 type T = ReturnType<typeof useI18n>['t'];
 
@@ -494,27 +494,3 @@ function statusName(status: ServiceRequestStatus, t: T): string {
   }
 }
 
-function typeName(type: ServiceRequestType, t: T): string {
-  switch (type) {
-    case 'baptism':
-      return t('requests.typeBaptism');
-    case 'wedding':
-      return t('requests.typeWedding');
-    case 'funeral':
-      return t('requests.typeFuneral');
-    case 'first_communion':
-      return t('requests.typeFirstCommunion');
-    case 'confirmation':
-      return t('requests.typeConfirmation');
-    case 'certificate':
-      return t('requests.typeCertificate');
-    case 'meeting':
-      return t('requests.typeMeeting');
-    case 'blessing':
-      return t('requests.typeBlessing');
-    case 'sick_visit':
-      return t('requests.typeSickVisit');
-    case 'other':
-      return t('requests.typeOther');
-  }
-}

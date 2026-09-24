@@ -318,3 +318,18 @@ export type MassIntention = {
   fromOffice: boolean;
   createdAt: string;
 };
+
+export type DashboardRequest = { id: string; type: ServiceRequestType; contactName: string; at: string };
+
+export type DashboardSummary = {
+  newRequests: DashboardRequest[];
+  awaitingReply: DashboardRequest[];
+  documentsToCheck: { requestId: string; type: ServiceRequestType; contactName: string; label: string; receivedAt: string }[];
+  appointments: (DashboardRequest & { place: string | null })[];
+  // Intentions counted by the Mass they are read at.
+  intentionsToMark: { at: string | null; title: string | null; count: number }[];
+  upcomingIntentions: { at: string | null; title: string | null; count: number }[];
+  expiredMessages: { id: string; text: string; showUntil: string }[];
+  members: { total: number; newThisWeek: number };
+  prayerRequestsThisWeek: number;
+};

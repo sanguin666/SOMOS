@@ -44,6 +44,7 @@ export function DashboardLayout() {
   // Requests and Mass intentions are pages of work for the office, so they
   // only show while the community runs that module.
   const navItems = [
+    { to: 'dashboard', label: t('layout.navDashboard') },
     { to: 'home-page', label: t('layout.navHomePage') },
     ...(isLive('requests') ? [{ to: 'requests', label: t('layout.navRequests') }] : []),
     { to: 'donations', label: t('layout.navDonations') },
@@ -58,7 +59,7 @@ export function DashboardLayout() {
   ];
 
   function handlePoiChange(nextPoiId: string) {
-    navigate(`/poi/${nextPoiId}/home-page`);
+    navigate(`/poi/${nextPoiId}/dashboard`);
   }
 
   return (

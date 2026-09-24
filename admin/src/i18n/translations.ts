@@ -32,6 +32,7 @@ export type Translations = {
     navCommunity: string;
     navMyQr: string;
     navHomePage: string;
+    navDashboard: string;
     navSettings: string;
     noAdminPois: string;
     navRequests: string;
@@ -261,6 +262,41 @@ export type Translations = {
     blockCelebrationTimes: string;
     celebrationTimesNote: string;
     sectionsTitle: string;
+  };
+  dashboard: {
+    title: string;
+    greeting: string;
+    loading: string;
+    loadError: string;
+    todoTitle: string;
+    todoTitleCount: string;
+    allDone: string;
+    newRequests: string;
+    awaitingReply: string;
+    documentsToCheck: string;
+    intentionsToMark: string;
+    expiredMessages: string;
+    actionOpen: string;
+    actionReply: string;
+    actionCheck: string;
+    actionMark: string;
+    actionEdit: string;
+    andMore: string;
+    mass: string;
+    figuresTitle: string;
+    donationsThisMonth: string;
+    vsLastMonth: string;
+    noComparison: string;
+    members: string;
+    newThisWeek: string;
+    prayerRequests: string;
+    thisWeek: string;
+    weekTitle: string;
+    weekEmpty: string;
+    weekMore: string;
+    intentionToRead: string;
+    intentionsToRead: string;
+    appointment: string;
   };
   preview: {
     title: string;
@@ -534,6 +570,7 @@ const en: Translations = {
     navCommunity: 'Community',
     navMyQr: 'My QR',
     navHomePage: 'Home page',
+    navDashboard: 'Dashboard',
     navSettings: 'Settings',
     noAdminPois: "Your account isn't an admin of any community yet.",
     navRequests: 'Requests',
@@ -764,6 +801,41 @@ const en: Translations = {
     blockCelebrationTimes: 'Celebration times',
     celebrationTimesNote: 'This section is built from your weekly events (Masses, confessions, office hours): set their kind and "Every week" on the Events page.',
     sectionsTitle: 'Page sections',
+  },
+  dashboard: {
+    title: 'Dashboard',
+    greeting: 'Hello {{name}}',
+    loading: 'Loading…',
+    loadError: 'The dashboard could not be loaded. Try again in a moment.',
+    todoTitle: 'To do',
+    todoTitleCount: 'To do ({{n}})',
+    allDone: 'All up to date. Nothing is waiting on the team.',
+    newRequests: 'New requests to open',
+    awaitingReply: 'Members waiting for an answer',
+    documentsToCheck: 'Documents received to check',
+    intentionsToMark: 'Mass intentions to tick off as said',
+    expiredMessages: 'Home page messages past their last day',
+    actionOpen: 'Open',
+    actionReply: 'Reply',
+    actionCheck: 'Check',
+    actionMark: 'Tick off',
+    actionEdit: 'Edit',
+    andMore: 'and {{n}} more',
+    mass: 'Mass',
+    figuresTitle: 'Key figures',
+    donationsThisMonth: 'Donations this month',
+    vsLastMonth: '{{pct}}% on last month, same date',
+    noComparison: 'Nothing to compare with last month',
+    members: 'Members',
+    newThisWeek: '+{{n}} this week',
+    prayerRequests: 'Prayer requests',
+    thisWeek: 'this week',
+    weekTitle: 'This week',
+    weekEmpty: 'Nothing planned in the next seven days.',
+    weekMore: '{{n}} more in Events',
+    intentionToRead: '1 intention to read',
+    intentionsToRead: '{{n}} intentions to read',
+    appointment: 'Appointment: {{what}}',
   },
   preview: {
     title: 'Live preview',
@@ -1037,6 +1109,7 @@ const es: Translations = {
     navCommunity: 'Comunidad',
     navMyQr: 'Mi código QR',
     navHomePage: 'Página de inicio',
+    navDashboard: 'Panel',
     navSettings: 'Configuración',
     noAdminPois: 'Tu cuenta todavía no es administradora de ninguna comunidad.',
     navRequests: 'Solicitudes',
@@ -1267,6 +1340,41 @@ const es: Translations = {
     blockCelebrationTimes: 'Horarios de celebraciones',
     celebrationTimesNote: 'Esta sección se construye con tus eventos semanales (misas, confesiones, horario de despacho): indica su tipo y «Cada semana» en la página Eventos.',
     sectionsTitle: 'Secciones de la página',
+  },
+  dashboard: {
+    title: 'Panel',
+    greeting: 'Hola, {{name}}',
+    loading: 'Cargando…',
+    loadError: 'No se ha podido cargar el panel. Inténtalo de nuevo en un momento.',
+    todoTitle: 'Por hacer',
+    todoTitleCount: 'Por hacer ({{n}})',
+    allDone: 'Todo al día. No hay nada pendiente para el equipo.',
+    newRequests: 'Solicitudes nuevas por abrir',
+    awaitingReply: 'Miembros esperando una respuesta',
+    documentsToCheck: 'Documentos recibidos por revisar',
+    intentionsToMark: 'Intenciones de misa por marcar como celebradas',
+    expiredMessages: 'Mensajes de inicio caducados',
+    actionOpen: 'Abrir',
+    actionReply: 'Responder',
+    actionCheck: 'Revisar',
+    actionMark: 'Marcar',
+    actionEdit: 'Editar',
+    andMore: 'y {{n}} más',
+    mass: 'Misa',
+    figuresTitle: 'Cifras clave',
+    donationsThisMonth: 'Donativos este mes',
+    vsLastMonth: '{{pct}} % respecto al mes pasado, misma fecha',
+    noComparison: 'Sin comparación con el mes pasado',
+    members: 'Miembros',
+    newThisWeek: '+{{n}} esta semana',
+    prayerRequests: 'Peticiones de oración',
+    thisWeek: 'esta semana',
+    weekTitle: 'Esta semana',
+    weekEmpty: 'Nada previsto en los próximos siete días.',
+    weekMore: '{{n}} más en Eventos',
+    intentionToRead: '1 intención por leer',
+    intentionsToRead: '{{n}} intenciones por leer',
+    appointment: 'Cita: {{what}}',
   },
   preview: {
     title: 'Vista previa en directo',
@@ -1540,6 +1648,7 @@ const fr: Translations = {
     navCommunity: 'Communauté',
     navMyQr: 'Mon code QR',
     navHomePage: "Page d'accueil",
+    navDashboard: 'Tableau de bord',
     navSettings: 'Paramètres',
     noAdminPois: "Votre compte n'est encore administrateur d'aucune communauté.",
     navRequests: 'Demandes',
@@ -1770,6 +1879,41 @@ const fr: Translations = {
     blockCelebrationTimes: 'Horaires des célébrations',
     celebrationTimesNote: "Cette section est construite à partir de vos événements hebdomadaires (messes, confessions, heures d'accueil) : indiquez leur type et « Chaque semaine » dans la page Événements.",
     sectionsTitle: 'Sections de la page',
+  },
+  dashboard: {
+    title: 'Tableau de bord',
+    greeting: 'Bonjour {{name}}',
+    loading: 'Chargement…',
+    loadError: 'Impossible de charger le tableau de bord. Réessayez dans un instant.',
+    todoTitle: 'À faire',
+    todoTitleCount: 'À faire ({{n}})',
+    allDone: 'Tout est à jour. Rien n’attend l’équipe.',
+    newRequests: 'Nouvelles demandes à ouvrir',
+    awaitingReply: 'Membres en attente d’une réponse',
+    documentsToCheck: 'Documents reçus à vérifier',
+    intentionsToMark: 'Intentions de messe à cocher comme célébrées',
+    expiredMessages: 'Messages d’accueil expirés',
+    actionOpen: 'Ouvrir',
+    actionReply: 'Répondre',
+    actionCheck: 'Vérifier',
+    actionMark: 'Cocher',
+    actionEdit: 'Modifier',
+    andMore: 'et {{n}} de plus',
+    mass: 'Messe',
+    figuresTitle: 'Chiffres clés',
+    donationsThisMonth: 'Dons ce mois-ci',
+    vsLastMonth: '{{pct}} % sur le mois dernier à date',
+    noComparison: 'Rien à comparer au mois dernier',
+    members: 'Membres',
+    newThisWeek: '+{{n}} cette semaine',
+    prayerRequests: 'Intentions de prière',
+    thisWeek: 'cette semaine',
+    weekTitle: 'Cette semaine',
+    weekEmpty: 'Rien de prévu dans les sept prochains jours.',
+    weekMore: '{{n}} de plus dans Événements',
+    intentionToRead: '1 intention à lire',
+    intentionsToRead: '{{n}} intentions à lire',
+    appointment: 'Rendez-vous : {{what}}',
   },
   preview: {
     title: 'Aperçu en direct',
