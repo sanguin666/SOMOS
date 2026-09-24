@@ -53,6 +53,12 @@ pushd backend
 if not exist .env copy .env.example .env >nul
 call npm install
 call npm run seed
+if errorlevel 1 (
+    echo.
+    echo [ERROR] The demo data could not be loaded - see the messages above.
+    echo         Copy them to Claude. Press a key to start anyway.
+    pause >nul
+)
 popd
 echo.
 
