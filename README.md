@@ -122,15 +122,19 @@ That covers development. For a demo away from your own network, build an APK ins
 
 ### Environments
 
-There are three places the whole stack runs, from least to most careful:
+The whole stack runs in three places, and every change goes through them in order:
 
-| | Where | Code | Database |
+| | Where | Branch | Database |
 |---|---|---|---|
-| **Development** | this PC, via `start.bat` | whatever is checked out | local PostgreSQL |
-| **Staging** | Railway, "staging" environment | the `staging` branch | its own, demo data |
-| **Production** | Railway, "production" environment | the `production` branch | its own, demo data for now |
+| **Development** | this PC, via `start.bat` | `dev` | local PostgreSQL |
+| **Staging** | Railway, "staging" environment | `staging` | its own, demo data |
+| **Production** | Railway, "production" environment | `production` | its own, demo data for now |
 
-Finished work is merged into `staging`, which Railway deploys to `ansae-api-staging`, `ansae-admin-staging` and `ansae-app-staging` (`.up.railway.app`). Once it has been tested there, promoting it is a fast-forward of `production` to `staging`, which Railway deploys to `ansae-api`, `ansae-admin` and `ansae-app`. The demo APK always points at production. CI runs on pushes to both branches and on pull requests.
+1. Finished work is merged into `dev` (the default branch). Check out `dev` and run `start.bat` to try it on this PC.
+2. Once it works in development, `staging` is fast-forwarded to `dev`. Railway deploys it to `ansae-api-staging`, `ansae-admin-staging` and `ansae-app-staging` (`.up.railway.app`).
+3. After sign-off on staging, `production` is fast-forwarded to `staging`. Railway deploys it to `ansae-api`, `ansae-admin` and `ansae-app`, which is what the demo APK uses.
+
+Nothing skips a step: `staging` only ever receives what is on `dev`, and `production` only what is on `staging`. CI runs on pushes to all three branches and on pull requests.
 
 ### 6. Demo APK (Android, no laptop needed)
 
