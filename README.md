@@ -124,11 +124,11 @@ That covers development. For a demo away from your own network, build an APK ins
 
 For showing the app to someone off your network, a standalone build beats Expo Go: the JavaScript ships inside the APK, so there's no Metro dev server, no QR code and no Expo Go login involved. The only thing that still has to be reachable is the backend.
 
-1. The APK talks to the backend hosted on [Railway](https://railway.com) (EU West), at `https://somos-production-ba44.up.railway.app`. That URL is in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. Railway redeploys the backend on every push to `main`, so this PC doesn't need to be on.
+1. The APK talks to the backend hosted on [Railway](https://railway.com) (EU West), at `https://ansae-api.up.railway.app`. That URL is in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. Railway redeploys the backend on every push to `main`, so this PC doesn't need to be on.
 
    The Railway service builds from the `backend/` folder (Root Directory `/backend`), with build command `npm run build`, pre-deploy command `npx typeorm migration:run -d dist/data-source.js && node dist/seed.js`, start command `npm run start:prod`, a PostgreSQL database in the same project, and a volume mounted at `/data` for uploads. Its variables are `NODE_ENV=production`, `DEMO_LOGIN=on`, `JWT_SECRET`, `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`/`DB_NAME` taken from the database's `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`, `UPLOADS_DIR=/data/uploads` and `PRIVATE_UPLOADS_DIR=/data/private`.
 
-   The admin dashboard is a second Railway service in the same project, at `https://dependable-serenity-production-1e29.up.railway.app`: Root Directory `/admin`, no build or start command (Railway serves the Vite build itself), and the variables `VITE_API_URL=https://somos-production-ba44.up.railway.app` and `VITE_DONATION_CURRENCY=EUR`, which are read at build time. The backend's `CORS_ORIGINS` lists the admin's address and `http://localhost:5173`.
+   The admin dashboard is a second Railway service in the same project, at `https://ansae-admin.up.railway.app`: Root Directory `/admin`, no build or start command (Railway serves the Vite build itself), and the variables `VITE_API_URL=https://ansae-api.up.railway.app` and `VITE_DONATION_CURRENCY=EUR`, which are read at build time. The backend's `CORS_ORIGINS` lists the admin's address and `http://localhost:5173`.
 
 2. To demo against this PC instead, `start-demo.bat` still exposes the local backend through ngrok. Put its `NGROK_DOMAIN` URL back in `app/eas.json` and rebuild.
 3. Build and install:
