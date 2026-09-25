@@ -120,11 +120,23 @@ The app needs to reach the backend's API. On the same Wi-Fi network, edit `app/.
 
 That covers development. For a demo away from your own network, build an APK instead — see below.
 
+### Environments
+
+There are three places the whole stack runs, from least to most careful:
+
+| | Where | Code | Database |
+|---|---|---|---|
+| **Development** | this PC, via `start.bat` | whatever is checked out | local PostgreSQL |
+| **Staging** | Railway, "staging" environment | the `staging` branch | its own, demo data |
+| **Production** | Railway, "production" environment | the `production` branch | its own, demo data for now |
+
+Finished work is merged into `staging`, which Railway deploys to `ansae-api-staging`, `ansae-admin-staging` and `ansae-app-staging` (`.up.railway.app`). Once it has been tested there, promoting it is a fast-forward of `production` to `staging`, which Railway deploys to `ansae-api`, `ansae-admin` and `ansae-app`. The demo APK always points at production. CI runs on pushes to both branches and on pull requests.
+
 ### 6. Demo APK (Android, no laptop needed)
 
 For showing the app to someone off your network, a standalone build beats Expo Go: the JavaScript ships inside the APK, so there's no Metro dev server, no QR code and no Expo Go login involved. The only thing that still has to be reachable is the backend.
 
-1. The APK talks to the backend hosted on [Railway](https://railway.com) (EU West), at `https://ansae-api.up.railway.app`. That URL is in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. Railway redeploys the backend on every push to `main`, so this PC doesn't need to be on.
+1. The APK talks to the backend hosted on [Railway](https://railway.com) (EU West), at `https://ansae-api.up.railway.app`. That URL is in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. Railway redeploys it on every push to `production`, so this PC doesn't need to be on. See "Environments" below.
 
    The Railway service builds from the `backend/` folder (Root Directory `/backend`), with build command `npm run build`, pre-deploy command `npx typeorm migration:run -d dist/data-source.js && node dist/seed.js`, start command `npm run start:prod`, a PostgreSQL database in the same project, and a volume mounted at `/data` for uploads. Its variables are `NODE_ENV=production`, `DEMO_LOGIN=on`, `JWT_SECRET`, `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`/`DB_NAME` taken from the database's `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`, `UPLOADS_DIR=/data/uploads` and `PRIVATE_UPLOADS_DIR=/data/private`.
 
