@@ -128,6 +128,8 @@ For showing the app to someone off your network, a standalone build beats Expo G
 
    The Railway service builds from the `backend/` folder (Root Directory `/backend`), with build command `npm run build`, pre-deploy command `npx typeorm migration:run -d dist/data-source.js && node dist/seed.js`, start command `npm run start:prod`, a PostgreSQL database in the same project, and a volume mounted at `/data` for uploads. Its variables are `NODE_ENV=production`, `JWT_SECRET`, `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`/`DB_NAME` taken from the database's `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`, `UPLOADS_DIR=/data/uploads` and `PRIVATE_UPLOADS_DIR=/data/private`.
 
+   The admin dashboard is a second Railway service in the same project, at `https://dependable-serenity-production-1e29.up.railway.app`: Root Directory `/admin`, no build or start command (Railway serves the Vite build itself), and the variables `VITE_API_URL=https://somos-production-ba44.up.railway.app` and `VITE_DONATION_CURRENCY=EUR`, which are read at build time. The backend's `CORS_ORIGINS` lists the admin's address and `http://localhost:5173`.
+
 2. To demo against this PC instead, `start-demo.bat` still exposes the local backend through ngrok. Put its `NGROK_DOMAIN` URL back in `app/eas.json` and rebuild.
 3. Build and install:
 
