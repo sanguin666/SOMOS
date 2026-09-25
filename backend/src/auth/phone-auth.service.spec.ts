@@ -1,4 +1,4 @@
-import { normalizePhone } from './phone-auth.service.js';
+import { PhoneAuthService, normalizePhone } from './phone-auth.service.js';
 
 /**
  * Normalization decides whether two spellings of a number reach the same
@@ -24,5 +24,37 @@ describe('normalizePhone', () => {
     // Known limitation, documented on the function: resolving one to the
     // other needs a country, and there's no country picker yet.
     expect(normalizePhone('600112233')).not.toBe(normalizePhone('+34600112233'));
+  });
+});
+
+/**
+ * The one-tap demo sign-in: on by default in development, off in
+ * production, and DEMO_LOGIN overrides either way so the hosted demo server
+ * can keep it.
+ */
+describe('PhoneAuthService.demoLoginEnabled', () => {
+  function service(env: Record<string, string>, delivers = false) {
+    const config = { get: (key: string, fallback?: string) => env[key] ?? fallback };
+    return new PhoneAuthService(
+      null as never,
+      null as never,
+      null as never,
+      { delivers } as never,
+      config as never,
+    );
+  }
+
+  it('is on in development and off in production', () => {
+    expect(service({}).demoLoginEnabled()).toBe(true);
+    expect(service({ NODE_ENV: 'production' }).demoLoginEnabled()).toBe(false);
+  });
+
+  it('stays on in production with DEMO_LOGIN=on', () => {
+    expect(service({ NODE_ENV: 'production', DEMO_LOGIN: 'on' }).demoLoginEnabled()).toBe(true);
+  });
+
+  it('is off with DEMO_LOGIN=off, or once real texts are sent', () => {
+    expect(service({ DEMO_LOGIN: 'off' }).demoLoginEnabled()).toBe(false);
+    expect(service({ NODE_ENV: 'production', DEMO_LOGIN: 'on' }, true).demoLoginEnabled()).toBe(false);
   });
 });

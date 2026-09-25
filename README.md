@@ -75,7 +75,7 @@ email:    admin@carmen.example
 password: demo1234
 ```
 
-In the app, "sign in" goes straight into the demo member (María García, +34600000001) with no code, as long as the backend has no SMS sender and is not in production. Set `DEMO_LOGIN=off` to get the normal phone login back.
+In the app, "sign in" goes straight into the demo member (María García, +34600000001) with no code, as long as the backend has no SMS sender and is not in production. Set `DEMO_LOGIN=off` to get the normal phone login back, or `DEMO_LOGIN=on` to keep the demo sign-in on a production server with no SMS sender, like the Railway demo.
 
 The older demo places are still there ("St. Mary's Community" and "Holy Trinity Chapel"), managed by `admin@stmarys.example` / `demo1234`.
 
@@ -126,7 +126,7 @@ For showing the app to someone off your network, a standalone build beats Expo G
 
 1. The APK talks to the backend hosted on [Railway](https://railway.com) (EU West), at `https://somos-production-ba44.up.railway.app`. That URL is in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. Railway redeploys the backend on every push to `main`, so this PC doesn't need to be on.
 
-   The Railway service builds from the `backend/` folder (Root Directory `/backend`), with build command `npm run build`, pre-deploy command `npx typeorm migration:run -d dist/data-source.js && node dist/seed.js`, start command `npm run start:prod`, a PostgreSQL database in the same project, and a volume mounted at `/data` for uploads. Its variables are `NODE_ENV=production`, `JWT_SECRET`, `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`/`DB_NAME` taken from the database's `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`, `UPLOADS_DIR=/data/uploads` and `PRIVATE_UPLOADS_DIR=/data/private`.
+   The Railway service builds from the `backend/` folder (Root Directory `/backend`), with build command `npm run build`, pre-deploy command `npx typeorm migration:run -d dist/data-source.js && node dist/seed.js`, start command `npm run start:prod`, a PostgreSQL database in the same project, and a volume mounted at `/data` for uploads. Its variables are `NODE_ENV=production`, `DEMO_LOGIN=on`, `JWT_SECRET`, `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`/`DB_NAME` taken from the database's `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`, `UPLOADS_DIR=/data/uploads` and `PRIVATE_UPLOADS_DIR=/data/private`.
 
    The admin dashboard is a second Railway service in the same project, at `https://dependable-serenity-production-1e29.up.railway.app`: Root Directory `/admin`, no build or start command (Railway serves the Vite build itself), and the variables `VITE_API_URL=https://somos-production-ba44.up.railway.app` and `VITE_DONATION_CURRENCY=EUR`, which are read at build time. The backend's `CORS_ORIGINS` lists the admin's address and `http://localhost:5173`.
 

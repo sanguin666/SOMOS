@@ -183,11 +183,13 @@ export class PhoneAuthService {
 
   // Never in production, even if someone deploys without configuring a real
   // sender: handing the code back in the response would make the whole
-  // login pointless.
+  // login pointless. The one exception is a demo server that asks for it
+  // with DEMO_LOGIN=on, where nobody could sign in otherwise.
   private shouldRevealCode(): boolean {
     return (
       !this.smsSender.delivers &&
-      this.configService.get<string>('NODE_ENV', 'development') !== 'production'
+      (this.configService.get<string>('NODE_ENV', 'development') !== 'production' ||
+        this.configService.get<string>('DEMO_LOGIN') === 'on')
     );
   }
 }
