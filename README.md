@@ -130,6 +130,8 @@ For showing the app to someone off your network, a standalone build beats Expo G
 
    The admin dashboard is a second Railway service in the same project, at `https://ansae-admin.up.railway.app`: Root Directory `/admin`, no build or start command (Railway serves the Vite build itself), and the variables `VITE_API_URL=https://ansae-api.up.railway.app` and `VITE_DONATION_CURRENCY=EUR`, which are read at build time. The backend's `CORS_ORIGINS` lists the admin's address and `http://localhost:5173`.
 
+   The app's web version, which the admin's phone preview shows, is a third Railway service at `https://ansae-app.up.railway.app`: Root Directory `/app`, no build or start command (`npm run build` runs `expo export --platform web`, and Railway serves the result), and `EXPO_PUBLIC_API_URL=https://ansae-api.up.railway.app`. The admin's `VITE_APP_PREVIEW_URL` points at it, and the backend's `CORS_ORIGINS` lists it too.
+
 2. To demo against this PC instead, `start-demo.bat` still exposes the local backend through ngrok. Put its `NGROK_DOMAIN` URL back in `app/eas.json` and rebuild.
 3. Build and install:
 
