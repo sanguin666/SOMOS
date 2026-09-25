@@ -124,15 +124,11 @@ That covers development. For a demo away from your own network, build an APK ins
 
 For showing the app to someone off your network, a standalone build beats Expo Go: the JavaScript ships inside the APK, so there's no Metro dev server, no QR code and no Expo Go login involved. The only thing that still has to be reachable is the backend.
 
-1. Expose the backend on a stable public URL. On [ngrok](https://ngrok.com/)'s free plan you get one assigned domain, so pin it:
+1. The APK talks to the backend hosted on [Railway](https://railway.com) (EU West), at `https://somos-production-ba44.up.railway.app`. That URL is in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. Railway redeploys the backend on every push to `main`, so this PC doesn't need to be on.
 
-   ```bash
-   ngrok http 3000 --url https://<your-domain>.ngrok-free.dev
-   ```
+   The Railway service builds from the `backend/` folder (Root Directory `/backend`), with build command `npm run build`, pre-deploy command `npx typeorm migration:run -d dist/data-source.js && node dist/seed.js`, start command `npm run start:prod`, a PostgreSQL database in the same project, and a volume mounted at `/data` for uploads. Its variables are `NODE_ENV=production`, `JWT_SECRET`, `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`/`DB_NAME` taken from the database's `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`, `UPLOADS_DIR=/data/uploads` and `PRIVATE_UPLOADS_DIR=/data/private`.
 
-   `start-demo.bat` does this for you along with the database and backend — set `NGROK_DOMAIN` at the top of that file.
-
-2. Put that same URL in the `preview` profile's `env` block in `app/eas.json`, which is what gets baked into the build. It has to match the domain in `start-demo.bat`.
+2. To demo against this PC instead, `start-demo.bat` still exposes the local backend through ngrok. Put its `NGROK_DOMAIN` URL back in `app/eas.json` and rebuild.
 3. Build and install:
 
    ```bash
@@ -154,9 +150,9 @@ For showing the app to someone off your network, a standalone build beats Expo G
 
    EAS only uses git to read the branch name and commit hash for build metadata. With `EAS_NO_VCS=1` it still respects `.gitignore`, so `node_modules` stays out of the upload and the resulting APK is the same.
 
-On the day, run `start-demo.bat` and open the app on the phone. Nothing to scan, nothing to type.
+On the day, just open the app on the phone. Nothing to start, scan or type.
 
-Re-run the build only when the app code changes. Backend changes need nothing rebuilt, as long as the ngrok domain stays the same.
+Re-run the build only when the app code changes. Backend changes need nothing rebuilt, as long as the backend URL stays the same.
 
 > **iOS:** the same flow needs a paid Apple Developer account to install on a physical device, so this route is Android-only for now.
 

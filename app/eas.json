@@ -9,7 +9,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://bloomers-amusable-dork.ngrok-free.dev"
+        "EXPO_PUBLIC_API_URL": "https://somos-production-ba44.up.railway.app"
       }
     },
     "production": {
