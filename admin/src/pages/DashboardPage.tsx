@@ -43,13 +43,21 @@ function occurrencesThisWeek(events: Event[], now: Date): { event: Event; at: Da
   return occurrencesBetween(happenings, now, new Date(now.getTime() + WEEK_MS));
 }
 
-function todoRows(summary: DashboardSummary, t: T, formatWhen: (iso: string) => string): TodoRow[] {
+// Only work for the modules the place runs: a switched-off module leaves
+// nothing to do, even if old requests or intentions are still on file.
+function todoRows(
+  summary: DashboardSummary,
+  t: T,
+  formatWhen: (iso: string) => string,
+  isLive: (type: ModuleType) => boolean,
+): TodoRow[] {
   const rows: TodoRow[] = [];
   const who = (r: { type: Parameters<typeof typeName>[0]; contactName: string }) =>
     `${typeName(r.type, t)}, ${r.contactName}`;
   const requestLink = (ids: string[]) => (ids.length === 1 ? `../requests/${ids[0]}` : '../requests');
 
-  if (summary.newRequests.length) {
+  const requestsLive = isLive('requests');
+  if (requestsLive && summary.newRequests.length) {
     rows.push({
       key: 'new',
       count: summary.newRequests.length,
@@ -59,7 +67,7 @@ function todoRows(summary: DashboardSummary, t: T, formatWhen: (iso: string) => 
       to: requestLink(summary.newRequests.map((r) => r.id)),
     });
   }
-  if (summary.awaitingReply.length) {
+  if (requestsLive && summary.awaitingReply.length) {
     rows.push({
       key: 'reply',
       count: summary.awaitingReply.length,
@@ -69,7 +77,7 @@ function todoRows(summary: DashboardSummary, t: T, formatWhen: (iso: string) => 
       to: requestLink(summary.awaitingReply.map((r) => r.id)),
     });
   }
-  if (summary.documentsToCheck.length) {
+  if (requestsLive && summary.documentsToCheck.length) {
     rows.push({
       key: 'documents',
       count: summary.documentsToCheck.length,
@@ -80,7 +88,7 @@ function todoRows(summary: DashboardSummary, t: T, formatWhen: (iso: string) => 
     });
   }
   const toMark = summary.intentionsToMark.reduce((n, c) => n + c.count, 0);
-  if (toMark) {
+  if (isLive('mass_intentions') && toMark) {
     rows.push({
       key: 'intentions',
       count: toMark,
@@ -147,14 +155,16 @@ export function DashboardPage() {
   if (error) return <div><h2>{t('dashboard.title')}</h2><p className="error-text">{error}</p></div>;
   if (!summary) return <div><h2>{t('dashboard.title')}</h2><p className="muted">{t('dashboard.loading')}</p></div>;
 
-  const todos = todoRows(summary, t, formatWhen);
+  const todos = todoRows(summary, t, formatWhen, isLive);
 
   const now = new Date();
   const week: WeekRow[] = [];
-  const intentionsAt = new Map(summary.upcomingIntentions.filter((c) => c.at).map((c) => [new Date(c.at!).getTime(), c]));
+  const eventsLive = isLive('events');
+  const requestsLive = isLive('requests');
+  const intentionsAt = new Map((isLive('mass_intentions') ? summary.upcomingIntentions : []).filter((c) => c.at).map((c) => [new Date(c.at!).getTime(), c]));
   const intentionsWord = (n: number) =>
     n === 1 ? t('dashboard.intentionToRead') : t('dashboard.intentionsToRead', { n });
-  for (const { event, at } of occurrencesThisWeek(events, now)) {
+  for (const { event, at } of occurrencesThisWeek(eventsLive ? events : [], now)) {
     const intentions = intentionsAt.get(at.getTime());
     intentionsAt.delete(at.getTime());
     week.push({
@@ -168,7 +178,7 @@ export function DashboardPage() {
   for (const c of intentionsAt.values()) {
     week.push({ key: `intentions|${c.at}`, at: new Date(c.at!), what: c.title ?? t('dashboard.mass'), meta: intentionsWord(c.count) });
   }
-  for (const a of summary.appointments) {
+  for (const a of requestsLive ? summary.appointments : []) {
     week.push({
       key: `appointment|${a.id}`,
       at: new Date(a.at),
@@ -272,7 +282,7 @@ export function DashboardPage() {
                 </span>
               </div>
             ))}
-            {week.length > WEEK_ROWS && (
+            {eventsLive && week.length > WEEK_ROWS && (
               <Link className="week-more" to="../events">
                 {t('dashboard.weekMore', { n: week.length - WEEK_ROWS })}
               </Link>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, NavLink, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { LogoMark } from '../components/LogoMark';
@@ -7,14 +7,34 @@ import { LanguagePicker } from '../components/LanguagePicker';
 import { PickerRow, PickerSheet, PinIcon } from '../components/PickerSheet';
 import { getActiveModules } from '../api/activeModules';
 import type { ActiveModule, ModuleType } from '../api/types';
+import type { Translations } from '../i18n/translations';
 import type { DashboardContext } from './usePoiId';
 
 const LIVE_STATUSES = new Set(['trial', 'active']);
+
+// The sidebar in its order. A page tied to a module only shows while the
+// place runs that module; the others (dashboard, home page, QR code,
+// settings) are always there.
+const NAV: { to: string; label: `layout.${keyof Translations['layout']}`; module?: ModuleType }[] = [
+  { to: 'dashboard', label: 'layout.navDashboard' },
+  { to: 'home-page', label: 'layout.navHomePage' },
+  { to: 'requests', label: 'layout.navRequests', module: 'requests' },
+  { to: 'donations', label: 'layout.navDonations', module: 'donations' },
+  { to: 'events', label: 'layout.navEvents', module: 'events' },
+  { to: 'mass-intentions', label: 'layout.navMassIntentions', module: 'mass_intentions' },
+  { to: 'announcements', label: 'layout.navAnnouncements', module: 'announcements' },
+  { to: 'livestreams', label: 'layout.navLivestreams', module: 'livestreams' },
+  { to: 'prayer-requests', label: 'layout.navPrayerRequests', module: 'prayer_requests' },
+  { to: 'community', label: 'layout.navCommunity', module: 'community' },
+  { to: 'my-qr', label: 'layout.navMyQr' },
+  { to: 'settings', label: 'layout.navSettings' },
+];
 
 export function DashboardLayout() {
   const { user, logout } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
   const { poiId } = useParams<{ poiId: string }>();
   const [poiPickerOpen, setPoiPickerOpen] = useState(false);
   // Kept with the place they belong to, so switching places never shows
@@ -41,22 +61,15 @@ export function DashboardLayout() {
     return !!modules?.some((m) => m.moduleType === type && LIVE_STATUSES.has(m.status));
   }
 
-  // Requests and Mass intentions are pages of work for the office, so they
-  // only show while the community runs that module.
-  const navItems = [
-    { to: 'dashboard', label: t('layout.navDashboard') },
-    { to: 'home-page', label: t('layout.navHomePage') },
-    ...(isLive('requests') ? [{ to: 'requests', label: t('layout.navRequests') }] : []),
-    { to: 'donations', label: t('layout.navDonations') },
-    { to: 'events', label: t('layout.navEvents') },
-    ...(isLive('mass_intentions') ? [{ to: 'mass-intentions', label: t('layout.navMassIntentions') }] : []),
-    { to: 'announcements', label: t('layout.navAnnouncements') },
-    { to: 'livestreams', label: t('layout.navLivestreams') },
-    { to: 'prayer-requests', label: t('layout.navPrayerRequests') },
-    { to: 'community', label: t('layout.navCommunity') },
-    { to: 'my-qr', label: t('layout.navMyQr') },
-    { to: 'settings', label: t('layout.navSettings') },
-  ];
+  const navItems = NAV.filter((item) => !item.module || isLive(item.module));
+
+  // A module switched off (here in Settings, or elsewhere) takes its page
+  // with it: whoever is still on it goes back to the dashboard.
+  const section = location.pathname.split('/')[3];
+  const closedPage = NAV.find((item) => item.to === section && item.module);
+  if (modules && closedPage && !isLive(closedPage.module!)) {
+    return <Navigate to={`/poi/${poiId}/dashboard`} replace />;
+  }
 
   function handlePoiChange(nextPoiId: string) {
     navigate(`/poi/${nextPoiId}/dashboard`);
@@ -103,7 +116,7 @@ export function DashboardLayout() {
         <nav>
           {navItems.map((item) => (
             <NavLink key={item.to} to={item.to}>
-              {item.label}
+              {t(item.label)}
             </NavLink>
           ))}
         </nav>
