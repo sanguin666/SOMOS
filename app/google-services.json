@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "65779941006",
+    "project_id": "ansae-c3b65",
+    "storage_bucket": "ansae-c3b65.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65779941006:android:777f860241e3a5524e93df",
+        "android_client_info": {
+          "package_name": "com.ansae.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuOJ7xCgjT8ByO8IW4A3RGV51LtRShsoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
