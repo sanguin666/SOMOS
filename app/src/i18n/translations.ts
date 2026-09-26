@@ -387,6 +387,26 @@ export type Translations = {
     cancelKeep: string;
     permissionDenied: string;
   };
+  notifications: {
+    title: string;
+    from: string;
+    on: string;
+    off: string;
+    news: string;
+    newsHint: string;
+    requests: string;
+    requestsHint: string;
+    events: string;
+    eventsHint: string;
+    live: string;
+    liveHint: string;
+    phoneOff: string;
+    turnOn: string;
+    openSettings: string;
+    loadError: string;
+    saveError: string;
+    signInFirst: string;
+  };
   intentions: {
     title: string;
     subtitle: string;
@@ -797,6 +817,26 @@ const en: Translations = {
     cancelConfirm: 'Yes, cancel it',
     cancelKeep: 'No, keep it',
     permissionDenied: 'ANSAE needs access to your photos or camera for this. You can allow it in your phone’s settings.',
+  },
+  notifications: {
+    title: 'Notifications',
+    from: 'From {{poiName}}',
+    on: 'On',
+    off: 'Off',
+    news: 'News',
+    newsHint: 'When the office sends news to everyone',
+    requests: 'My requests',
+    requestsHint: 'A reply or an appointment from the office',
+    events: 'Event reminders',
+    eventsHint: 'One hour before events you rang the bell for',
+    live: 'Live',
+    liveHint: 'When a celebration starts live',
+    phoneOff: 'Notifications are turned off for ANSAE on this phone.',
+    turnOn: 'Turn on notifications',
+    openSettings: 'Open the phone’s settings',
+    loadError: 'Couldn\'t load your choices. Pull up the app again to retry.',
+    saveError: 'Couldn\'t save that change. Please try again.',
+    signInFirst: 'Sign in to choose your notifications.',
   },
   intentions: {
     title: 'Mass intentions',
@@ -1209,6 +1249,26 @@ const es: Translations = {
     cancelKeep: 'No, mantenerla',
     permissionDenied: 'ANSAE necesita acceso a tus fotos o a la cámara. Puedes permitirlo en los ajustes del teléfono.',
   },
+  notifications: {
+    title: 'Notificaciones',
+    from: 'De {{poiName}}',
+    on: 'Activadas',
+    off: 'Desactivadas',
+    news: 'Noticias',
+    newsHint: 'Cuando la oficina envía una noticia a todos',
+    requests: 'Mis solicitudes',
+    requestsHint: 'Una respuesta o una cita de la oficina',
+    events: 'Recordatorios de eventos',
+    eventsHint: 'Una hora antes de los eventos con la campana activada',
+    live: 'En directo',
+    liveHint: 'Cuando una celebración empieza en directo',
+    phoneOff: 'Las notificaciones de ANSAE están desactivadas en este teléfono.',
+    turnOn: 'Activar las notificaciones',
+    openSettings: 'Abrir los ajustes del teléfono',
+    loadError: 'No se han podido cargar tus opciones. Vuelve a abrir la app para reintentar.',
+    saveError: 'No se ha podido guardar el cambio. Inténtalo de nuevo.',
+    signInFirst: 'Inicia sesión para elegir tus notificaciones.',
+  },
   intentions: {
     title: 'Intenciones de misa',
     subtitle: 'Pide que se ofrezca una misa por alguien: un ser querido fallecido, un enfermo, una acción de gracias.',
@@ -1619,6 +1679,26 @@ const fr: Translations = {
     cancelConfirm: 'Oui, l’annuler',
     cancelKeep: 'Non, la garder',
     permissionDenied: 'ANSAE a besoin d’accéder à vos photos ou à l’appareil photo. Vous pouvez l’autoriser dans les réglages du téléphone.',
+  },
+  notifications: {
+    title: 'Notifications',
+    from: 'De {{poiName}}',
+    on: 'Activées',
+    off: 'Désactivées',
+    news: 'Actualités',
+    newsHint: 'Quand l’accueil envoie une actualité à tous',
+    requests: 'Mes demandes',
+    requestsHint: 'Une réponse ou un rendez-vous de l’accueil',
+    events: 'Rappels d’événements',
+    eventsHint: 'Une heure avant les événements dont vous avez activé la cloche',
+    live: 'En direct',
+    liveHint: 'Quand une célébration commence en direct',
+    phoneOff: 'Les notifications d’ANSAE sont désactivées sur ce téléphone.',
+    turnOn: 'Activer les notifications',
+    openSettings: 'Ouvrir les réglages du téléphone',
+    loadError: 'Impossible de charger vos choix. Rouvrez l’app pour réessayer.',
+    saveError: 'Impossible d’enregistrer ce changement. Veuillez réessayer.',
+    signInFirst: 'Connectez-vous pour choisir vos notifications.',
   },
   intentions: {
     title: 'Intentions de messe',

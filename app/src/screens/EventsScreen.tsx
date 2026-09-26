@@ -4,6 +4,9 @@ import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { CompactTimetable } from '../components/Timetable';
 import { getEvents } from '../api/events';
+import { getEventReminders, setEventReminder } from '../api/notifications';
+import { enablePush } from '../notifications/push';
+import { useAuth } from '../auth/AuthContext';
 import { repeats, occurrencesOf, weeklyTimetable } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
 import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
@@ -27,11 +30,12 @@ function formatDetails(event: Event): string {
 }
 
 export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const { me } = useAuth();
   const [events, setEvents] = useState<Event[] | null>(null);
   const [error, setError] = useState(false);
-  // Which events the reader wants a reminder for — device-local only,
-  // since there's no congregant account yet to attach a subscription to.
+  // Which events the reader rang the bell for: a push an hour before
+  // each, sent by the backend.
   const [notifying, setNotifying] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -40,13 +44,38 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
       .catch(() => setError(true));
   }, [poi.id]);
 
-  function toggleNotify(id: string) {
-    setNotifying((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  useEffect(() => {
+    if (!me) return;
+    let cancelled = false;
+    getEventReminders(poi.id)
+      .then((ids) => {
+        if (!cancelled) setNotifying(new Set(ids));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [poi.id, me?.id]);
+
+  function flip(current: Set<string>, id: string): Set<string> {
+    const next = new Set(current);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    return next;
+  }
+
+  async function toggleNotify(id: string) {
+    const on = !notifying.has(id);
+    // Shown at once; put back if the backend says no.
+    setNotifying((current) => flip(current, id));
+    try {
+      await setEventReminder(id, on);
+      // A bell is a request for a notification: the moment to ask the
+      // phone, if it never has been.
+      if (on) await enablePush(language);
+    } catch {
+      setNotifying((current) => flip(current, id));
+    }
   }
 
   // The weekly timetable first, since it is what most people come for;
@@ -159,7 +188,7 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
                   ? t('events.notifyOn', { title: event.title })
                   : t('events.notifyOff', { title: event.title })
               }
-              onPress={() => toggleNotify(event.id)}
+              onPress={() => void toggleNotify(event.id)}
               style={[styles.bellButton, isNotifying && styles.bellButtonActive]}
             >
               <BellIcon size={18} color={isNotifying ? '#FFFFFF' : colors.textMuted} filled={isNotifying} />

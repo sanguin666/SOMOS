@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PoisModule } from '../pois/pois.module.js';
 import { AuthModule } from '../auth/auth.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 import { ServiceRequest } from './entities/service-request.entity.js';
 import { ServiceRequestMessage } from './entities/service-request-message.entity.js';
 import { ServiceRequestDocument } from './entities/service-request-document.entity.js';
@@ -13,6 +14,7 @@ import { ServiceRequestsController } from './service-requests.controller.js';
     TypeOrmModule.forFeature([ServiceRequest, ServiceRequestMessage, ServiceRequestDocument]),
     PoisModule,
     AuthModule,
+    NotificationsModule,
   ],
   controllers: [ServiceRequestsController],
   providers: [ServiceRequestsService],

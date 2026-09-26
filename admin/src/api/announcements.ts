@@ -3,11 +3,15 @@ import type { Announcement } from './types';
 
 export type AnnouncementInput = { title: string; body?: string; important: boolean };
 
+// Creating only: whether members' phones get a notification. Left out, the
+// backend follows `important`.
+export type NewAnnouncementInput = AnnouncementInput & { notify?: boolean };
+
 export function getAnnouncements(poiId: string): Promise<Announcement[]> {
   return apiGet<Announcement[]>(`/pois/${poiId}/announcements`);
 }
 
-export function createAnnouncement(poiId: string, body: AnnouncementInput): Promise<Announcement> {
+export function createAnnouncement(poiId: string, body: NewAnnouncementInput): Promise<Announcement> {
   return apiPost<Announcement>(`/pois/${poiId}/announcements`, body);
 }
 

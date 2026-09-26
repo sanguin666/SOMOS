@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
@@ -11,6 +11,7 @@ import {
   ChevronRightIcon,
   ClipboardIcon,
   ExitIcon,
+  BellIcon,
   GlobeIcon,
   HeartIcon,
   MegaphoneIcon,
@@ -24,6 +25,9 @@ import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/th
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
+import { getNotificationPreferences } from '../api/notifications';
+import { getPermissionState } from '../notifications/push';
+import { useAuth } from '../auth/AuthContext';
 
 /**
  * Each language written in itself, never translated. Somebody who opened
@@ -42,6 +46,7 @@ type Props = {
   onSelectTab: (tab: HubTab) => void;
   onOpenPlaces: () => void;
   onAddPlace: () => void;
+  onOpenNotifications: () => void;
   // Resolves once the membership is gone and the app has moved on, so
   // this screen knows when to stop showing its spinner.
   onLeavePlace: () => Promise<void>;
@@ -61,6 +66,7 @@ export function MoreScreen({
   onOpenPlaces,
   onAddPlace,
   onLeavePlace,
+  onOpenNotifications,
 }: Props) {
   const { t, language, setLanguage } = useI18n();
   const poiTheme = getPoiTheme(poi.type);
@@ -68,6 +74,25 @@ export function MoreScreen({
   const [confirmingLeave, setConfirmingLeave] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [leaveFailed, setLeaveFailed] = useState(false);
+  const { me } = useAuth();
+  // "On" when this phone may show notifications and at least one kind is
+  // on for this place; null until known, so the row never says the wrong
+  // thing first.
+  const [notificationsOn, setNotificationsOn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!me) return;
+    let cancelled = false;
+    Promise.all([getPermissionState(), getNotificationPreferences(poi.id)])
+      .then(([permission, preferences]) => {
+        if (cancelled) return;
+        setNotificationsOn(permission === 'granted' && Object.values(preferences).some(Boolean));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [poi.id, me?.id]);
 
   async function leave() {
     setLeaving(true);
@@ -204,6 +229,28 @@ export function MoreScreen({
           )}
         </View>
       </Modal>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          notificationsOn === null
+            ? t('notifications.title')
+            : `${t('notifications.title')}: ${notificationsOn ? t('notifications.on') : t('notifications.off')}`
+        }
+        onPress={onOpenNotifications}
+        style={styles.row}
+      >
+        <BellIcon size={26} color={colors.textMuted} />
+        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+          {t('notifications.title')}
+        </AccessibleText>
+        {notificationsOn !== null && (
+          <AccessibleText variant="body" color={colors.textMuted}>
+            {notificationsOn ? t('notifications.on') : t('notifications.off')}
+          </AccessibleText>
+        )}
+        <ChevronRightIcon size={22} color={colors.textMuted} />
+      </Pressable>
 
       {/* One row carrying the language it is currently set to, rather
           than three abbreviations side by side. The list itself only

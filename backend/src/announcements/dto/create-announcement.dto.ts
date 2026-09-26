@@ -19,4 +19,11 @@ export class CreateAnnouncementDto {
   @Transform(({ value }) => (value === undefined ? undefined : value === true || value === 'true'))
   @IsBoolean()
   important?: boolean;
+
+  // Push it to members' phones on publishing. Only read on create: an
+  // edit never notifies again. Left out, it follows `important`.
+  @IsOptional()
+  @Transform(({ value }) => (value === undefined ? undefined : value === true || value === 'true'))
+  @IsBoolean()
+  notify?: boolean;
 }
