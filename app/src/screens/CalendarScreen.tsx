@@ -10,7 +10,7 @@ import type { Event, EventCategory, Poi } from '../api/types';
 
 type Props = { poi: Poi };
 
-const DAY_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', fr: 'fr-FR' };
+const DAY_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', va: 'ca-ES', fr: 'fr-FR' };
 
 // A Mass has no end time; it counts as this many minutes long when
 // working out whether it is still under way.

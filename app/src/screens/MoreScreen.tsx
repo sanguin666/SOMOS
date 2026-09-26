@@ -37,6 +37,7 @@ import { useAuth } from '../auth/AuthContext';
 const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   en: 'English',
   es: 'Español',
+  va: 'Valencià',
   fr: 'Français',
 };
 

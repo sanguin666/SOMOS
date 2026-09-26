@@ -1,6 +1,6 @@
 const SYMBOLS: Record<string, string> = { eur: '€', usd: '$', gbp: '£' };
 
-const LOCALES: Record<string, string> = { en: 'en-IE', es: 'es-ES', fr: 'fr-FR' };
+const LOCALES: Record<string, string> = { en: 'en-IE', es: 'es-ES', va: 'ca-ES', fr: 'fr-FR' };
 
 export function currencySymbol(currency: string): string {
   return SYMBOLS[currency.toLowerCase()] ?? currency.toUpperCase();

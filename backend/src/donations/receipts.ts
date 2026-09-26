@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Donation } from './entities/donation.entity.js';
 import type { Poi } from '../pois/entities/poi.entity.js';
-import { Language } from '../common/enums/language.enum.js';
+import { intlLocale, Language } from '../common/enums/language.enum.js';
 
 /**
  * Yearly tax receipts. A community owes each giver who asked for one a
@@ -185,6 +185,24 @@ const WORDING: Record<Language, Wording> = {
     missingIssuer: 'Los datos legales de la comunidad aún no se han completado en el panel de administración.',
     print: 'Imprimir o guardar en PDF',
   },
+  [Language.VA]: {
+    title: 'Certificat de donatius',
+    legalBasis:
+      'Als efectes del que preveu la Llei 49/2002, de 23 de desembre, de règim fiscal de les entitats sense finalitats lucratives i dels incentius fiscals al mecenatge. El donatiu té caràcter irrevocable.',
+    issuer: 'Entitat perceptora',
+    donor: 'Donant',
+    taxIdLabel: 'NIF',
+    amountLine: (amount, year) => `Import total rebut durant l’any ${year}: <strong>${amount}</strong>`,
+    giftsLine: (count) => `${count} donatiu${count > 1 ? 's' : ''} fet${count > 1 ? 's' : ''} en línia, amb targeta.`,
+    giftTitle: 'Certificat de donatiu',
+    giftAmountLine: (amount, date) => `Import rebut el ${date}: <strong>${amount}</strong>`,
+    giftLine: 'Donatiu fet en línia, amb targeta.',
+    nature: 'Naturalesa del donatiu: dinerari.',
+    signed: (place, date) => `${place ? `${place}, ` : ''}${date}`,
+    number: 'Certificat núm.',
+    missingIssuer: 'Les dades legals de la comunitat encara no s’han completat en el panell d’administració.',
+    print: 'Imprimir o guardar en PDF',
+  },
   [Language.EN]: {
     title: 'Donation receipt',
     legalBasis: 'Receipt for gifts received, for the donor’s tax records.',
@@ -217,7 +235,7 @@ export function receiptHtml(
   gift?: { id: string; at: Date },
 ): string {
   const w = WORDING[poi.language] ?? WORDING[Language.EN];
-  const locale = poi.language === Language.EN ? 'en-GB' : poi.language;
+  const locale = poi.language === Language.EN ? 'en-GB' : intlLocale(poi.language);
   const amount = new Intl.NumberFormat(locale, { style: 'currency', currency: currency.toUpperCase() }).format(donor.total);
   const today = new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date());
   const title = gift ? w.giftTitle : `${w.title} ${year}`;
