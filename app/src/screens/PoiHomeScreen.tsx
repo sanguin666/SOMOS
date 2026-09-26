@@ -7,6 +7,7 @@ import { uploadUri } from '../api/client';
 import { getPoiBadges, getPoiPageBlocks } from '../api/poiPage';
 import { getCampaigns, type Campaign } from '../api/donations';
 import { getAnnouncements } from '../api/announcements';
+import { PostList } from './AnnouncementsScreen';
 import { getEvents } from '../api/events';
 import { getLivestreams } from '../api/livestreams';
 import { TimetableRows } from '../components/Timetable';
@@ -419,27 +420,10 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
               onSeeAll={() => onSelectTab('announcements')}
               seeAllLabel={t('hub.seeAll')}
             />
-            {shown.map((item) => (
-              <Pressable
-                key={item.id}
-                accessibilityRole="button"
-                accessibilityLabel={item.title}
-                onPress={() => (onOpenAnnouncement ? onOpenAnnouncement(item) : onSelectTab('announcements'))}
-                style={styles.feedCard}
-              >
-                <View style={styles.feedCardHeader}>
-                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                    {item.title}
-                  </AccessibleText>
-                  <AccessibleText variant="caption">{formatShortDate(item.createdAt)}</AccessibleText>
-                </View>
-                {!!item.body && (
-                  <AccessibleText variant="body" color={colors.textMuted} numberOfLines={2}>
-                    {item.body}
-                  </AccessibleText>
-                )}
-              </Pressable>
-            ))}
+            <PostList
+              items={shown}
+              onOpen={(item) => (onOpenAnnouncement ? onOpenAnnouncement(item) : onSelectTab('announcements'))}
+            />
           </View>
         );
       }
@@ -626,12 +610,6 @@ const styles = StyleSheet.create({
     ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  feedCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     gap: spacing.sm,
   },
 });

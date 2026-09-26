@@ -90,11 +90,7 @@ export function AnnouncementsScreen({ poi, onCompose, onOpen, canCompose }: Prop
           <AccessibleText variant="caption" style={styles.sectionLabel}>
             {t('announcements.earlier')}
           </AccessibleText>
-          <View style={styles.listCard}>
-            {earlier.map((item, index) => (
-              <PostRow key={item.id} item={item} divider={index > 0} onPress={() => onOpen(item)} />
-            ))}
-          </View>
+          <PostList items={earlier} onOpen={onOpen} />
         </>
       )}
     </>
@@ -141,6 +137,20 @@ function LatestPost({ item, onPress }: { item: Announcement; onPress: () => void
         </AccessibleText>
       </View>
     </Pressable>
+  );
+}
+
+/**
+ * Posts as rows in one white box: on the News tab under the newest post,
+ * and as the home page's latest news.
+ */
+export function PostList({ items, onOpen }: { items: Announcement[]; onOpen: (item: Announcement) => void }) {
+  return (
+    <View style={styles.listCard}>
+      {items.map((item, index) => (
+        <PostRow key={item.id} item={item} divider={index > 0} onPress={() => onOpen(item)} />
+      ))}
+    </View>
   );
 }
 
