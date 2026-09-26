@@ -7,6 +7,7 @@ import { ChevronRightIcon } from '../components/icons';
 import { getMyRequests, type RequestStatus, type RequestSummary } from '../api/requests';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import type { Poi } from '../api/types';
 import { cardSurface, colors, radii, spacing } from '../theme/theme';
 
@@ -85,7 +86,7 @@ export function RequestsScreen({ poi, onNew, onOpen, onSignIn }: Props) {
             const type = t(`requests.type_${request.type}`);
             const status = t(`requests.status_${request.status}`);
             const sent = t('requests.sentOn', {
-              date: new Date(request.createdAt).toLocaleDateString(language, { day: 'numeric', month: 'long' }),
+              date: new Date(request.createdAt).toLocaleDateString(intlLocale(language), { day: 'numeric', month: 'long' }),
             });
             const notes = [
               request.unread ? t('requests.unread') : null,

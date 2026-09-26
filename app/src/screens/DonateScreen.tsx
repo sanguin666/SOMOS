@@ -22,6 +22,7 @@ import {
 } from '../api/donations';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
 import { currencySymbol, formatAmount } from '../utils/currency';
 import type { Poi } from '../api/types';
@@ -497,7 +498,7 @@ export function DonateScreen({ poi, project, onOpenProject, onDone, onSignIn }: 
                     t(gift.purpose === 'collection' ? 'donate.purposeCollection' : 'donate.purposeGeneral')}
                   {' · '}
                   {t('donate.since', {
-                    date: new Date(gift.createdAt).toLocaleDateString(language, { month: 'long', year: 'numeric' }),
+                    date: new Date(gift.createdAt).toLocaleDateString(intlLocale(language), { month: 'long', year: 'numeric' }),
                   })}
                 </AccessibleText>
                 {confirmingStop === gift.id ? (
@@ -536,7 +537,7 @@ export function DonateScreen({ poi, project, onOpenProject, onDone, onSignIn }: 
           </AccessibleText>
           <View style={styles.listCard}>
             {gifts.map((gift, index) => {
-              const date = new Date(gift.createdAt).toLocaleDateString(language, {
+              const date = new Date(gift.createdAt).toLocaleDateString(intlLocale(language), {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
@@ -582,7 +583,7 @@ export function DonateScreen({ poi, project, onOpenProject, onDone, onSignIn }: 
               <AccessibleText variant="body" style={styles.bold}>
                 {t('donate.askReceiptTitle', {
                   amount: formatted(askingGift.amount),
-                  date: new Date(askingGift.createdAt).toLocaleDateString(language, { day: 'numeric', month: 'long' }),
+                  date: new Date(askingGift.createdAt).toLocaleDateString(intlLocale(language), { day: 'numeric', month: 'long' }),
                 })}
               </AccessibleText>
               <FormCard>

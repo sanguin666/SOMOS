@@ -1,4 +1,4 @@
-import { Language } from '../common/enums/language.enum.js';
+import { intlLocale, Language } from '../common/enums/language.enum.js';
 import { ServiceRequestStatus, ServiceRequestType } from '../service-requests/entities/service-request.entity.js';
 
 /**
@@ -38,6 +38,16 @@ const TEXTS = {
     statusNow: 'Votre demande est maintenant : {status}',
     documentAsked: 'L’accueil vous demande un document : {label}',
   },
+  va: {
+    live: 'En directe: {title}',
+    inOneHour: 'D’ací a 1 hora: {title}',
+    requestTitle: 'La teua sol·licitud: {type}',
+    officeReplied: 'El despatx ha respost: «{body}»',
+    officeSentFile: 'El despatx t’ha enviat un fitxer.',
+    appointment: 'Cita: {when}',
+    statusNow: 'La teua sol·licitud ara està: {status}',
+    documentAsked: 'El despatx et demana un document: {label}',
+  },
 } satisfies Record<Language, Record<string, string>>;
 
 const REQUEST_TYPES: Record<Language, Record<ServiceRequestType, string>> = {
@@ -56,12 +66,18 @@ const REQUEST_TYPES: Record<Language, Record<ServiceRequestType, string>> = {
     confirmation: 'Confirmation', certificate: 'Certificat', meeting: 'Rendez-vous', blessing: 'Bénédiction',
     sick_visit: 'Visite à un malade', other: 'Autre demande',
   },
+  va: {
+    baptism: 'Bateig', wedding: 'Boda', funeral: 'Funeral', first_communion: 'Primera Comunió',
+    confirmation: 'Confirmació', certificate: 'Certificat', meeting: 'Cita', blessing: 'Benedicció',
+    sick_visit: 'Visita a un malalt', other: 'Una altra sol·licitud',
+  },
 };
 
 const REQUEST_STATUSES: Record<Language, Record<ServiceRequestStatus, string>> = {
   en: { received: 'received', in_progress: 'in progress', appointment_set: 'appointment set', completed: 'done', cancelled: 'cancelled' },
   es: { received: 'recibida', in_progress: 'en curso', appointment_set: 'cita fijada', completed: 'terminada', cancelled: 'cancelada' },
   fr: { received: 'reçue', in_progress: 'en cours', appointment_set: 'rendez-vous fixé', completed: 'terminée', cancelled: 'annulée' },
+  va: { received: 'rebuda', in_progress: 'en curs', appointment_set: 'cita fixada', completed: 'acabada', cancelled: 'cancel·lada' },
 };
 
 export function text(
@@ -87,18 +103,18 @@ export function formatWhen(date: Date, language: Language, timeZone?: string | n
     weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
   };
   try {
-    return date.toLocaleString(language, { ...options, timeZone: timeZone ?? undefined });
+    return date.toLocaleString(intlLocale(language), { ...options, timeZone: timeZone ?? undefined });
   } catch {
     // An unknown time zone name: fall back to the server's clock rather than fail.
-    return date.toLocaleString(language, options);
+    return date.toLocaleString(intlLocale(language), options);
   }
 }
 
 /** "12:00" in the reader's language and time zone. */
 export function formatTime(date: Date, language: Language, timeZone?: string | null): string {
   try {
-    return date.toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit', timeZone: timeZone ?? undefined });
+    return date.toLocaleTimeString(intlLocale(language), { hour: '2-digit', minute: '2-digit', timeZone: timeZone ?? undefined });
   } catch {
-    return date.toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(intlLocale(language), { hour: '2-digit', minute: '2-digit' });
   }
 }

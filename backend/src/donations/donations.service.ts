@@ -94,6 +94,12 @@ const PRODUCT_NAMES: Record<Language, Record<'gift' | 'monthly' | 'collection' |
     collection: 'Colecta — {name}',
     intention: 'Intención de misa — {name}',
   },
+  [Language.VA]: {
+    gift: 'Donatiu a {name}',
+    monthly: 'Donatiu mensual a {name}',
+    collection: 'Col·lecta — {name}',
+    intention: 'Intenció de missa — {name}',
+  },
 };
 
 function productName(poi: Poi, purpose: DonationPurpose, recurring: boolean): string {

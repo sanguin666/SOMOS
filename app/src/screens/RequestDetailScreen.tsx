@@ -18,6 +18,7 @@ import {
   type RequestFile,
 } from '../api/requests';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import type { Poi } from '../api/types';
 import { formatWhen } from '../utils/schedule';
 import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
@@ -257,7 +258,7 @@ export function RequestDetailScreen({ poi, requestId }: Props) {
         )}
         <AccessibleText variant="caption">
           {t('requests.sentOn', {
-            date: new Date(request.createdAt).toLocaleDateString(language, { day: 'numeric', month: 'long' }),
+            date: new Date(request.createdAt).toLocaleDateString(intlLocale(language), { day: 'numeric', month: 'long' }),
           })}
         </AccessibleText>
       </View>
