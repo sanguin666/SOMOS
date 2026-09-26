@@ -22,6 +22,7 @@ import { DashboardModule } from './dashboard/dashboard.module.js';
 import { ServiceRequestsModule } from './service-requests/service-requests.module.js';
 import { MassIntentionsModule } from './mass-intentions/mass-intentions.module.js';
 import { PrivateFilesModule } from './private-files/private-files.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { PrivateFilesModule } from './private-files/private-files.module.js';
     ServiceRequestsModule,
     MassIntentionsModule,
     PrivateFilesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

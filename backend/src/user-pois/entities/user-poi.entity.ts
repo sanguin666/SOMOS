@@ -37,6 +37,21 @@ export class UserPoi {
   })
   role!: MemberRole;
 
+  // Which push notifications this person wants from this place. All on by
+  // default: someone who allowed notifications on their phone expects to
+  // get them, and each kind can be turned off in the app's settings.
+  @Column({ name: 'notify_news', default: true })
+  notifyNews!: boolean;
+
+  @Column({ name: 'notify_requests', default: true })
+  notifyRequests!: boolean;
+
+  @Column({ name: 'notify_events', default: true })
+  notifyEvents!: boolean;
+
+  @Column({ name: 'notify_live', default: true })
+  notifyLive!: boolean;
+
   @CreateDateColumn({ name: 'joined_at' })
   joinedAt!: Date;
 }
