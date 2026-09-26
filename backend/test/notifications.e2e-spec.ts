@@ -45,6 +45,9 @@ describe('Notifications (e2e)', () => {
     await client(app).post('/auth/me/push-tokens').set(as(luis.token)).send({ token: luisPhone }).expect(204);
   });
 
+  // Triggers send without holding up the request that caused them.
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 300));
+
   afterAll(async () => {
     await app.close();
   });
@@ -98,5 +101,110 @@ describe('Notifications (e2e)', () => {
 
     const left = await app.get(DataSource).query('SELECT token FROM push_tokens ORDER BY token');
     expect(left.map((row: { token: string }) => row.token)).toEqual([anaPhone]);
+  });
+
+  it('pushes news the office chose to send, and important news by default', async () => {
+    const post = (body: object) =>
+      client(app).post(`/pois/${place.id}/announcements`).set(as(adminToken)).send(body).expect(201);
+
+    await post({ title: 'Quiet news', body: 'x' });
+    await post({ title: 'Important but kept quiet', body: 'x', important: true, notify: false });
+    await settle();
+    expect(sent).toEqual([]);
+
+    const important = await post({ title: 'Mass moved to 12:00', body: 'x', important: true });
+    await post({ title: 'Normal but sent', body: 'x', notify: true });
+    await settle();
+    expect(sent.filter((m) => m.to === anaPhone).map((m) => [m.title, m.body])).toEqual([
+      ['San Roque', 'Mass moved to 12:00'],
+      ['San Roque', 'Normal but sent'],
+    ]);
+    expect(sent[0].data).toEqual({ screen: 'announcement', id: important.body.id, poiId: place.id });
+
+    // Editing never notifies again.
+    sent = [];
+    await client(app).patch(`/pois/${place.id}/announcements/${important.body.id}`).set(as(adminToken)).send({ title: 'Edited' }).expect(200);
+    await settle();
+    expect(sent).toEqual([]);
+  });
+
+  it('tells a member about the office’s reply, in the language of their phone', async () => {
+    await client(app).post('/auth/me/push-tokens').set(as(ana.token)).send({ token: anaPhone, language: 'es', timeZone: 'Europe/Madrid' }).expect(204);
+    const created = await client(app)
+      .post(`/pois/${place.id}/requests`)
+      .set(as(ana.token))
+      .send({ type: 'baptism', contactName: 'Ana', details: 'For our son' })
+      .expect(201);
+    const id = created.body.id as string;
+
+    // The member's own message tells nobody.
+    await client(app).post(`/pois/${place.id}/requests/mine/${id}/messages`).set(as(ana.token)).field('body', 'Hello').expect(201);
+    await client(app).post(`/pois/${place.id}/requests/${id}/messages`).set(as(adminToken)).field('body', 'We can meet Tuesday').expect(201);
+    await client(app)
+      .patch(`/pois/${place.id}/requests/${id}`)
+      .set(as(adminToken))
+      .send({ appointmentAt: '2026-10-06T16:00:00.000Z', appointmentPlace: 'Despacho' })
+      .expect(200);
+    await settle();
+
+    expect(sent.map((m) => [m.to, m.title, m.body])).toEqual([
+      [anaPhone, 'Tu solicitud: Bautizo', 'La oficina ha respondido: «We can meet Tuesday»'],
+      [anaPhone, 'Tu solicitud: Bautizo', expect.stringMatching(/^Cita: .*18:00, Despacho$/)],
+    ]);
+    expect(sent[0].data).toEqual({ screen: 'request', id, poiId: place.id });
+  });
+
+  it('reminds people who rang the bell an hour before, once', async () => {
+    const startsAt = new Date(Date.now() + 30 * 60 * 1000);
+    const event = await client(app)
+      .post(`/pois/${place.id}/events`)
+      .set(as(adminToken))
+      .send({ title: 'Rosary', startsAt: startsAt.toISOString(), location: 'Chapel' })
+      .expect(201);
+    const eventId = event.body.id as string;
+
+    await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).expect(204);
+    await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).expect(204);
+    const belled = await client(app).get(`/auth/me/pois/${place.id}/event-reminders`).set(as(ana.token)).expect(200);
+    expect(belled.body).toEqual([eventId]);
+
+    // Someone from elsewhere can't ring the bell on this place's events.
+    const { token: outsider } = await signInWithId(app, '+34600400008', 'Eva');
+    await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(outsider)).expect(404);
+
+    const notifications = app.get(NotificationsService);
+    // Two hours early: not yet.
+    await notifications.sendDueEventReminders(new Date(startsAt.getTime() - 2 * 60 * 60 * 1000));
+    expect(sent).toEqual([]);
+
+    await notifications.sendDueEventReminders();
+    await notifications.sendDueEventReminders();
+    expect(sent.map((m) => [m.to, m.title])).toEqual([[anaPhone, 'In 1 hour: Rosary']]);
+    expect(sent[0].body).toMatch(/Chapel$/);
+    expect(sent[0].data).toEqual({ screen: 'event', id: eventId, poiId: place.id });
+
+    await client(app).delete(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).expect(204);
+    const after = await client(app).get(`/auth/me/pois/${place.id}/event-reminders`).set(as(ana.token)).expect(200);
+    expect(after.body).toEqual([]);
+  });
+
+  it('tells members once when a livestream goes live', async () => {
+    const stream = await client(app)
+      .post(`/pois/${place.id}/livestreams`)
+      .set(as(adminToken))
+      .send({ title: 'Sunday Mass', url: 'https://example.com/live', scheduledAt: new Date().toISOString() })
+      .expect(201);
+    await settle();
+    expect(sent).toEqual([]);
+
+    const patch = (body: object) =>
+      client(app).patch(`/pois/${place.id}/livestreams/${stream.body.id}`).set(as(adminToken)).send(body).expect(200);
+    await patch({ status: 'live' });
+    await patch({ title: 'Sunday Mass (renamed)' });
+    await settle();
+    expect(sent.map((m) => [m.to, m.body]).sort()).toEqual([
+      [anaPhone, 'Live now: Sunday Mass'],
+      [luisPhone, 'Live now: Sunday Mass'],
+    ]);
   });
 });

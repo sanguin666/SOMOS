@@ -43,6 +43,12 @@
           "photosPermission": "Allow ANSAE to use your photos so you can choose a profile picture.",
           "cameraPermission": "Allow ANSAE to use the camera so you can take a profile picture."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#E1663F"
+        }
       ]
     ]
   }

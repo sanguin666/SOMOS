@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, BackHandler, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -9,7 +10,8 @@ import { PoiHubScreen } from './src/screens/PoiHubScreen';
 import { PhoneLoginScreen } from './src/screens/PhoneLoginScreen';
 import { PlaceSwitcher } from './src/components/PlaceSwitcher';
 import { PreviewApp, previewPoiId } from './src/preview/PreviewApp';
-import { I18nProvider } from './src/i18n/I18nContext';
+import { I18nProvider, useI18n } from './src/i18n/I18nContext';
+import { enablePush, onNotificationTapped, refreshPush, type PushTarget } from './src/notifications/push';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
 import { demoSignIn, joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
 import { getPoi } from './src/api/pois';
@@ -17,6 +19,10 @@ import { forgetPlace, getSavedPlaces, rememberPlace, type SavedPlace } from './s
 import { landingPoi } from './src/landing';
 import { colors } from './src/theme/theme';
 import type { Poi } from './src/api/types';
+
+// Set once this phone has been asked about notifications, so the question
+// comes up the first time someone is signed in and never again uninvited.
+const PUSH_ASKED_KEY = 'ansae.push.asked.v1';
 
 type Route =
   | { name: 'addPlace' }
@@ -41,6 +47,29 @@ function AppRoutes() {
   // stack alone can't say: "empty" is also what signing out leaves.
   const [landed, setLanded] = useState(false);
   const current = stack[stack.length - 1];
+  const { language } = useI18n();
+  // What a tapped notification asked to open, handed to the place's hub.
+  // `nonce` makes tapping the same notification twice open it twice.
+  const [pushTarget, setPushTarget] = useState<(PushTarget & { nonce: number }) | null>(null);
+  const currentPoiId = current?.name === 'hub' ? current.poi.id : null;
+  const currentPoiRef = useRef<string | null>(null);
+  currentPoiRef.current = currentPoiId;
+
+  // Notifications follow the signed-in person: ask the first time, and
+  // register again on every launch and language change so the backend
+  // writes to this phone in the language it is set to.
+  useEffect(() => {
+    if (!me) return;
+    (async () => {
+      const asked = await AsyncStorage.getItem(PUSH_ASKED_KEY).catch(() => null);
+      if (asked) {
+        await refreshPush(language);
+      } else {
+        await AsyncStorage.setItem(PUSH_ASKED_KEY, '1').catch(() => undefined);
+        await enablePush(language);
+      }
+    })().catch(() => undefined);
+  }, [me?.id, language]);
 
   // The places this device has visited, merged under the ones the account
   // carries, so the switcher shows both.
@@ -147,6 +176,25 @@ function AppRoutes() {
     setLanded(false);
   }
 
+  // A tapped notification opens its place first, when it isn't the one
+  // on screen, then the news item, request or event inside it.
+  useEffect(() => {
+    if (!me) return;
+    return onNotificationTapped((target) => {
+      const open = () => setPushTarget({ ...target, nonce: Date.now() });
+      if (currentPoiRef.current === target.poiId) {
+        open();
+        return;
+      }
+      getPoi(target.poiId)
+        .then((poi) => {
+          openPoi(poi);
+          open();
+        })
+        .catch(() => undefined);
+    });
+  }, [me?.id]);
+
   // Android's back button for everything outside a place: the switcher
   // closes first, then the stack pops. Returning false at the bottom of
   // the stack leaves the press to Android, which closes the app. The hub
@@ -238,6 +286,7 @@ function AppRoutes() {
           onAddPlace={() => push({ name: 'scan' })}
           onLeavePlace={() => leaveCurrentPoi(current.poi)}
           onSignIn={startSignIn}
+          pushTarget={pushTarget?.poiId === current.poi.id ? pushTarget : null}
         />
       )}
 

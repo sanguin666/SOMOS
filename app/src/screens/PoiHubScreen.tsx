@@ -13,6 +13,7 @@ import { CalendarScreen } from './CalendarScreen';
 import { LivestreamScreen } from './LivestreamScreen';
 import { MassIntentionsScreen } from './MassIntentionsScreen';
 import { MoreScreen } from './MoreScreen';
+import { NotificationsScreen } from './NotificationsScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
 import { NewRequestScreen } from './NewRequestScreen';
 import { PrayerRequestsScreen } from './PrayerRequestsScreen';
@@ -21,6 +22,8 @@ import { RequestDetailScreen } from './RequestDetailScreen';
 import { RequestsScreen } from './RequestsScreen';
 import { useAuth } from '../auth/AuthContext';
 import { getActiveModules } from '../api/pois';
+import { getAnnouncements } from '../api/announcements';
+import type { PushTarget } from '../notifications/push';
 import type { ActiveModule, Announcement, CommunityPost, Poi } from '../api/types';
 
 type Props = {
@@ -29,6 +32,8 @@ type Props = {
   onAddPlace: () => void;
   onLeavePlace: () => Promise<void>;
   onSignIn: () => void;
+  // A tapped notification for this place, to open once it arrives.
+  pushTarget?: (PushTarget & { nonce: number }) | null;
 };
 
 // A drill-down opened from within a tab. It replaces the tab's own content
@@ -42,6 +47,7 @@ type Drilldown =
   | { kind: 'new-request' }
   | { kind: 'request'; id: string }
   | { kind: 'calendar' }
+  | { kind: 'notifications' }
   | { kind: 'project'; project: DonationProject };
 
 /**
@@ -50,7 +56,7 @@ type Drilldown =
  * only what sits between them, so the chrome never moves and the selected
  * button is the one thing that changes.
  */
-export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSignIn }: Props) {
+export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSignIn, pushTarget }: Props) {
   const { isAdminOf, me } = useAuth();
   const isStaff = isAdminOf(poi.id);
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
@@ -73,6 +79,38 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
       cancelled = true;
     };
   }, [poi.id]);
+
+  useEffect(() => {
+    if (!pushTarget) return;
+    let cancelled = false;
+    setProfileOpen(false);
+    switch (pushTarget.screen) {
+      case 'request':
+        setTab('requests');
+        setDrilldown({ kind: 'request', id: pushTarget.id });
+        break;
+      case 'event':
+        selectTab('events');
+        break;
+      case 'livestream':
+        selectTab('livestreams');
+        break;
+      case 'announcement':
+        // The news list first, so there is something on screen at once;
+        // the item itself once it has loaded.
+        selectTab('announcements');
+        getAnnouncements(poi.id)
+          .then((items) => {
+            const item = items.find((candidate) => candidate.id === pushTarget.id);
+            if (item && !cancelled) setDrilldown({ kind: 'announcement', item });
+          })
+          .catch(() => undefined);
+        break;
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [pushTarget?.nonce]);
 
   function selectTab(next: HubTab) {
     setTab(next);
@@ -140,7 +178,9 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
         />
       )}
 
-      {tab === 'more' && (
+      {tab === 'more' && drilldown.kind === 'notifications' && <NotificationsScreen poi={poi} />}
+
+      {tab === 'more' && drilldown.kind !== 'notifications' && (
         <MoreScreen
           poi={poi}
           modules={modules}
@@ -148,6 +188,7 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
           onOpenPlaces={onOpenPlaces}
           onAddPlace={onAddPlace}
           onLeavePlace={onLeavePlace}
+          onOpenNotifications={() => setDrilldown({ kind: 'notifications' })}
         />
       )}
 

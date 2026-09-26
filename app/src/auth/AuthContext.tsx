@@ -10,6 +10,7 @@ import {
 import { setAuthToken, setUnauthorizedHandler } from '../api/client';
 import { getMe, type Me } from '../api/auth';
 import { clearStoredToken, getStoredToken, storeToken } from '../storage/session';
+import { disablePushForSignOut } from '../notifications/push';
 
 type AuthState = {
   // False until the stored token has been read back and checked. Screens
@@ -50,6 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [me, setMe] = useState<Me | null>(null);
 
   const signOut = useCallback(async () => {
+    // While the session still works: this phone stops receiving the
+    // person's notifications once they have signed out of it.
+    await disablePushForSignOut();
     setAuthToken(null);
     setMe(null);
     await clearStoredToken();

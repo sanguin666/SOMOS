@@ -20,6 +20,8 @@ import type {
   CreateServiceRequestDto,
   UpdateServiceRequestDto,
 } from './dto/service-request.dto.js';
+import { NotificationsService, type Reader } from '../notifications/notifications.service.js';
+import { formatWhen, requestStatusLabel, requestTypeLabel, text } from '../notifications/texts.js';
 
 /** The folder under PRIVATE_UPLOADS_ROOT every request file goes in. */
 export const REQUEST_FILES_FOLDER = 'requests';
@@ -89,6 +91,7 @@ export class ServiceRequestsService {
     private readonly documents: Repository<ServiceRequestDocument>,
     private readonly poisService: PoisService,
     private readonly signedUrls: SignedUrlService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async create(poiId: string, userId: string, dto: CreateServiceRequestDto): Promise<RequestDetail> {
@@ -143,6 +146,7 @@ export class ServiceRequestsService {
 
   async updateByStaff(poiId: string, id: string, dto: UpdateServiceRequestDto): Promise<RequestDetail> {
     const request = await this.findFor(poiId, id, 'staff');
+    const before = { status: request.status, appointmentAt: request.appointmentAt?.getTime() ?? null };
     if (dto.status !== undefined) request.status = dto.status;
     if (dto.appointmentAt !== undefined) {
       request.appointmentAt = dto.appointmentAt ? new Date(dto.appointmentAt) : null;
@@ -156,6 +160,22 @@ export class ServiceRequestsService {
     request.lastStaffActivityAt = new Date();
     request.staffSeenAt = new Date();
     await this.requests.save(request);
+    // One notification for the change that matters most: a new date says
+    // more than the status that comes with it.
+    const appointmentAt = request.appointmentAt;
+    if (appointmentAt && appointmentAt.getTime() !== before.appointmentAt) {
+      this.notifyRequester(poiId, request, (reader) =>
+        text(reader.language, 'appointment', {
+          when: [formatWhen(appointmentAt, reader.language, reader.timeZone), request.appointmentPlace]
+            .filter(Boolean)
+            .join(', '),
+        }),
+      );
+    } else if (request.status !== before.status) {
+      this.notifyRequester(poiId, request, (reader) =>
+        text(reader.language, 'statusNow', { status: requestStatusLabel(reader.language, request.status) }),
+      );
+    }
     return this.detail(request.id, 'staff');
   }
 
@@ -193,6 +213,13 @@ export class ServiceRequestsService {
       }),
     );
     await this.touch(request, side);
+    if (side === 'staff') {
+      this.notifyRequester(poiId, request, (reader) =>
+        body
+          ? text(reader.language, 'officeReplied', { body: shorten(body) })
+          : text(reader.language, 'officeSentFile'),
+      );
+    }
     return this.detail(request.id, side);
   }
 
@@ -200,6 +227,7 @@ export class ServiceRequestsService {
     const request = await this.findFor(poiId, id, 'staff');
     await this.documents.save(this.documents.create({ ...dto, request }));
     await this.touch(request, 'staff');
+    this.notifyRequester(poiId, request, (reader) => text(reader.language, 'documentAsked', { label: dto.label }));
     return this.detail(request.id, 'staff');
   }
 
@@ -236,6 +264,17 @@ export class ServiceRequestsService {
     await this.documents.remove(document);
     await this.deleteStoredFile(document.filePath);
     return this.detail(request.id, 'staff');
+  }
+
+  /** Tells the member who asked that the office did something on their request. */
+  private notifyRequester(poiId: string, request: ServiceRequest, body: (reader: Reader) => string): void {
+    this.notifications.fireAndForget(() =>
+      this.notifications.notifyUsers([request.requester.id], poiId, 'requests', (reader) => ({
+        title: text(reader.language, 'requestTitle', { type: requestTypeLabel(reader.language, request.type) }),
+        body: body(reader),
+        data: { screen: 'request', id: request.id },
+      })),
+    );
   }
 
   /**
@@ -353,4 +392,10 @@ export class ServiceRequestsService {
       })),
     };
   }
+}
+
+// A lock screen shows two or three lines: the rest is in the app.
+function shorten(body: string): string {
+  const flat = body.replace(/\s+/g, ' ').trim();
+  return flat.length > 120 ? `${flat.slice(0, 117)}…` : flat;
 }

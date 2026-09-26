@@ -6,6 +6,7 @@ import { PoisService } from '../pois/pois.service.js';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto.js';
 import { UpdateAnnouncementDto } from './dto/update-announcement.dto.js';
 import { publicUrlFor } from '../common/upload/multer-storage.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 const ANNOUNCEMENTS_UPLOAD_SUBFOLDER = 'announcements';
 
@@ -15,6 +16,7 @@ export class AnnouncementsService {
     @InjectRepository(Announcement)
     private readonly announcementsRepository: Repository<Announcement>,
     private readonly poisService: PoisService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async create(
@@ -28,15 +30,26 @@ export class AnnouncementsService {
       );
     }
 
+    const { notify, ...fields } = dto;
     const poi = await this.poisService.findOne(poiId);
     const announcement = this.announcementsRepository.create({
-      ...dto,
+      ...fields,
       poi,
       audioUrl: audioFile
         ? publicUrlFor(ANNOUNCEMENTS_UPLOAD_SUBFOLDER, audioFile.filename)
         : undefined,
     });
-    return this.announcementsRepository.save(announcement);
+    const saved = await this.announcementsRepository.save(announcement);
+    if (notify ?? saved.important) {
+      this.notifications.fireAndForget(() =>
+        this.notifications.notifyPoiMembers(poiId, 'news', {
+          title: poi.name,
+          body: saved.title,
+          data: { screen: 'announcement', id: saved.id },
+        }),
+      );
+    }
+    return saved;
   }
 
   findForPoi(poiId: string): Promise<Announcement[]> {

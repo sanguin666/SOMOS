@@ -13,9 +13,10 @@ import { API_BASE_URL } from '../api/client';
 import type { Announcement } from '../api/types';
 import { DestructiveButton } from '../components/DestructiveButton';
 
-type Draft = { title: string; body: string; important: boolean; photo: File | null };
+// `notify` is null until somebody picks: it then follows `important`.
+type Draft = { title: string; body: string; important: boolean; notify: boolean | null; photo: File | null };
 
-const EMPTY_DRAFT: Draft = { title: '', body: '', important: false, photo: null };
+const EMPTY_DRAFT: Draft = { title: '', body: '', important: false, notify: null, photo: null };
 
 function imageSrc(url: string) {
   return /^https?:\/\//.test(url) ? url : `${API_BASE_URL}${url}`;
@@ -26,7 +27,9 @@ function PostFields({
   onChange,
   currentPhoto,
   onRemovePhoto,
+  showNotify = false,
 }: {
+  showNotify?: boolean;
   draft: Draft;
   onChange: (patch: Partial<Draft>) => void;
   currentPhoto?: string | null;
@@ -60,6 +63,29 @@ function PostFields({
           ))}
         </div>
       </div>
+      {showNotify && (
+        <div className="form-row">
+          <span>{t('announcements.notifyLabel')}</span>
+          <div className="chips" role="radiogroup" aria-label={t('announcements.notifyLabel')}>
+            {[false, true].map((notify) => {
+              const selected = (draft.notify ?? draft.important) === notify;
+              return (
+                <button
+                  key={String(notify)}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  className={`chip ${selected ? 'chip-selected' : ''}`}
+                  onClick={() => onChange({ notify })}
+                >
+                  {notify ? t('announcements.notifyYes') : t('announcements.notifyNo')}
+                </button>
+              );
+            })}
+          </div>
+          <span className="field-hint">{t('announcements.notifyHint')}</span>
+        </div>
+      )}
       <label>
         {currentPhoto ? t('announcements.photoChange') : t('announcements.photoLabel')}
         <input type="file" accept="image/*" onChange={(e) => onChange({ photo: e.target.files?.[0] ?? null })} />
@@ -118,6 +144,7 @@ export function AnnouncementsPage() {
         title: draft.title.trim(),
         body: draft.body.trim() || undefined,
         important: draft.important,
+        notify: draft.notify ?? draft.important,
       });
       if (draft.photo) {
         created = await uploadAnnouncementImage(poiId, created.id, draft.photo).catch(() => {
@@ -137,7 +164,7 @@ export function AnnouncementsPage() {
 
   function startEdit(item: Announcement) {
     setEditingId(item.id);
-    setEditDraft({ title: item.title, body: item.body ?? '', important: item.important, photo: null });
+    setEditDraft({ title: item.title, body: item.body ?? '', important: item.important, notify: null, photo: null });
   }
 
   async function saveEdit(id: string) {
@@ -180,7 +207,7 @@ export function AnnouncementsPage() {
       <p className="muted">{t('announcements.subtitle')}</p>
 
       <form key={formKey} className="form card" onSubmit={handleCreate}>
-        <PostFields draft={draft} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} />
+        <PostFields showNotify draft={draft} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} />
         <button type="submit" className="btn btn-primary" disabled={submitting || !draft.title.trim()}>
           {submitting ? t('announcements.publishing') : t('announcements.publish')}
         </button>

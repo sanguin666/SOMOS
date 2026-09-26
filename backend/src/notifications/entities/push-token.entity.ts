@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
+import { Language } from '../../common/enums/language.enum.js';
 
 /**
  * One phone that can receive push notifications for a person: the Expo push
@@ -30,6 +31,16 @@ export class PushToken {
 
   @Column({ unique: true })
   token!: string;
+
+  // The app's language and the phone's time zone when it last registered,
+  // so a notification is written in the words and the clock its reader
+  // sees in the app. Per phone rather than per person: the app keeps its
+  // language on the device.
+  @Column({ type: 'enum', enum: Language, default: Language.EN })
+  language!: Language;
+
+  @Column('varchar', { name: 'time_zone', nullable: true })
+  timeZone?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

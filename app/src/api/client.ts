@@ -120,6 +120,10 @@ export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   });
 }
 
+export async function apiPut(path: string): Promise<void> {
+  await request<void>(path, { method: 'PUT' });
+}
+
 export async function apiDelete(path: string): Promise<void> {
   await request<void>(path, { method: 'DELETE' });
 }

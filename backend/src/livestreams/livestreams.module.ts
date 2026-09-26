@@ -5,9 +5,10 @@ import { LivestreamsService } from './livestreams.service.js';
 import { LivestreamsController } from './livestreams.controller.js';
 import { PoisModule } from '../pois/pois.module.js';
 import { AuthModule } from '../auth/auth.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Livestream]), PoisModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Livestream]), PoisModule, AuthModule, NotificationsModule],
   controllers: [LivestreamsController],
   providers: [LivestreamsService],
   exports: [LivestreamsService],

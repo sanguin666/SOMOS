@@ -155,6 +155,10 @@ export type Translations = {
     deleteError: string;
     loading: string;
     styleLabel: string;
+    notifyLabel: string;
+    notifyNo: string;
+    notifyYes: string;
+    notifyHint: string;
     styleNormal: string;
     styleImportant: string;
     photoLabel: string;
@@ -736,6 +740,10 @@ const en: Translations = {
     deleteError: 'Could not delete the announcement.',
     loading: 'Loading…',
     styleLabel: 'Style',
+    notifyLabel: 'Notify members on their phones',
+    notifyNo: 'No',
+    notifyYes: 'Yes',
+    notifyHint: 'Yes by default when the news is important. Sent once, on publishing.',
     styleNormal: 'Normal',
     styleImportant: 'Important',
     photoLabel: 'Photo (optional)',
@@ -1318,6 +1326,10 @@ const es: Translations = {
     deleteError: 'No se pudo eliminar el anuncio.',
     loading: 'Cargando…',
     styleLabel: 'Estilo',
+    notifyLabel: 'Avisar a los miembros en su teléfono',
+    notifyNo: 'No',
+    notifyYes: 'Sí',
+    notifyHint: '«Sí» por defecto cuando la noticia es importante. Se envía una sola vez, al publicar.',
     styleNormal: 'Normal',
     styleImportant: 'Importante',
     photoLabel: 'Foto (opcional)',
@@ -1900,6 +1912,10 @@ const fr: Translations = {
     deleteError: "Impossible de supprimer l'annonce.",
     loading: 'Chargement…',
     styleLabel: 'Style',
+    notifyLabel: 'Prévenir les membres sur leur téléphone',
+    notifyNo: 'Non',
+    notifyYes: 'Oui',
+    notifyHint: '« Oui » d\'office quand l\'actualité est importante. Envoyé une seule fois, à la publication.',
     styleNormal: 'Normal',
     styleImportant: 'Important',
     photoLabel: 'Photo (facultative)',
