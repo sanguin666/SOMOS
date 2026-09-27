@@ -5,8 +5,10 @@ import {
   formatWhen,
   occurrencesOf,
   occurrencesOnDay,
+  rowHasEvent,
   startOfWeek,
   upcomingOccurrences,
+  timetableTime,
   weeklyTimetable,
 } from './schedule';
 
@@ -267,5 +269,26 @@ describe('repeat rules', () => {
       { days: [], times: ['19:00'], monthly: { week: 1, weekday: 5, day: null } },
     ]);
     expect(masses.notes).toEqual([{ startsAt: at(2026, 9, 16, 8, 30), reason: 'No Mass: retreat' }]);
+  });
+});
+
+describe('rowHasEvent', () => {
+  // Which timetable line a time belongs to, for the small bell on it.
+  it('matches a weekly event to the lines holding its days and a monthly one to its rule', () => {
+    const weekdays = event({ title: 'weekday', startsAt: at(2026, 9, 7, 19, 30).toISOString(), repeatDays: [1, 2, 3, 4, 5, 6] });
+    const sunday = event({ title: 'sunday', startsAt: at(2026, 9, 6, 12).toISOString() });
+    const firstFriday = event({
+      title: 'first friday',
+      startsAt: at(2026, 9, 4, 19).toISOString(),
+      recurrence: 'monthly',
+      monthlyWeek: 1,
+      monthlyWeekday: 5,
+    });
+    const [masses] = weeklyTimetable([weekdays, sunday, firstFriday], MONDAY);
+    const [monSat, sun, monthly] = masses.rows;
+    expect([rowHasEvent(monSat, weekdays), rowHasEvent(monSat, sunday), rowHasEvent(monSat, firstFriday)]).toEqual([true, false, false]);
+    expect([rowHasEvent(sun, weekdays), rowHasEvent(sun, sunday)]).toEqual([false, true]);
+    expect([rowHasEvent(monthly, firstFriday), rowHasEvent(monthly, weekdays)]).toEqual([true, false]);
+    expect(timetableTime(sunday)).toBe('12:00');
   });
 });

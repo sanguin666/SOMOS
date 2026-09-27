@@ -179,6 +179,34 @@ export type TimetableSection = { category: EventCategory; rows: TimetableRow[]; 
 // How far ahead a timetable warns about a day off.
 const NOTE_DAYS = 45;
 
+/** The repeating events that haven't stopped by `now`: the timetable's. */
+export function regularEvents(events: Event[], now: Date): Event[] {
+  return events.filter(
+    (event) => repeats(event) && (!event.repeatUntil || endOfDay(new Date(event.repeatUntil)) >= now),
+  );
+}
+
+/**
+ * How a repeating event's time reads in the timetable. A Mass is a
+ * moment; an open office or an hour of adoration is a stretch of time
+ * someone can drop in on, so it shows when it ends.
+ */
+export function timetableTime(event: Event): string {
+  const start = new Date(event.startsAt);
+  const end = event.category !== 'mass' && event.endsAt ? new Date(event.endsAt) : null;
+  return end ? `${timeKey(start)}–${timeKey(end)}` : timeKey(start);
+}
+
+/** Whether a timetable row lists this event (its days, or its monthly rule). */
+export function rowHasEvent(row: TimetableRow, event: Event): boolean {
+  if (row.monthly) {
+    if (event.recurrence !== 'monthly') return false;
+    if (event.monthlyDay) return row.monthly.day === event.monthlyDay;
+    return row.monthly.week === (event.monthlyWeek ?? null) && row.monthly.weekday === (event.monthlyWeekday ?? null);
+  }
+  return event.recurrence === 'weekly' && weekdaysOf(event).some((day) => row.days.includes(day));
+}
+
 /**
  * The regular timetable, one section per kind of celebration, each line a
  * run of consecutive days with the same times: "Mon–Fri 08:30",
@@ -188,9 +216,7 @@ const NOTE_DAYS = 45;
  * coming up in the next weeks.
  */
 export function weeklyTimetable(events: Event[], now: Date, firstDay = 1): TimetableSection[] {
-  const regular = events.filter(
-    (event) => repeats(event) && (!event.repeatUntil || endOfDay(new Date(event.repeatUntil)) >= now),
-  );
+  const regular = regularEvents(events, now);
   const weekOrder = Array.from({ length: 7 }, (_, i) => (firstDay + i) % 7);
   const today = startOfDay(now);
 
@@ -199,13 +225,7 @@ export function weeklyTimetable(events: Event[], now: Date, firstDay = 1): Timet
     const inCategory = regular.filter((event) => event.category === category);
     if (inCategory.length === 0) continue;
 
-    // A Mass is a moment; an open office or an hour of adoration is a
-    // stretch of time someone can drop in on, so it shows when it ends.
-    const timeOf = (event: Event) => {
-      const start = new Date(event.startsAt);
-      const end = category !== 'mass' && event.endsAt ? new Date(event.endsAt) : null;
-      return end ? `${timeKey(start)}–${timeKey(end)}` : timeKey(start);
-    };
+    const timeOf = timetableTime;
 
     const timesByDay = new Map<number, Set<string>>();
     const monthlyRows = new Map<string, TimetableRow>();

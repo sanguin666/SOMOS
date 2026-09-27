@@ -28,12 +28,21 @@ export function updateNotificationPreferences(
   return apiPatch<NotificationPreferences>(`/auth/me/pois/${encodeURIComponent(poiId)}/notifications`, change);
 }
 
+/**
+ * A bell someone rang: an hour before the event, and for a repeating one
+ * before every time it happens, unless `onlyDate` (YYYY-MM-DD) limits it
+ * to that one day.
+ */
+export type EventReminder = { eventId: string; onlyDate: string | null };
+
 /** The events in a place whose bell is on. */
-export function getEventReminders(poiId: string): Promise<string[]> {
-  return apiGet<string[]>(`/auth/me/pois/${encodeURIComponent(poiId)}/event-reminders`);
+export function getEventReminders(poiId: string): Promise<EventReminder[]> {
+  return apiGet<EventReminder[]>(`/auth/me/pois/${encodeURIComponent(poiId)}/event-reminders`);
 }
 
-export function setEventReminder(eventId: string, on: boolean): Promise<void> {
+/** Rings the bell (every time, or on `onlyDate` alone), or with `null` stops it. */
+export function setEventReminder(eventId: string, reminder: { onlyDate: string | null } | null): Promise<void> {
   const path = `/auth/me/event-reminders/${encodeURIComponent(eventId)}`;
-  return on ? apiPut(path) : apiDelete(path);
+  if (!reminder) return apiDelete(path);
+  return apiPut(path, reminder.onlyDate ? { onlyDate: reminder.onlyDate } : {});
 }
