@@ -312,6 +312,19 @@ export type Translations = {
     itemsOnDay: string;
     now: string;
   };
+  reminders: {
+    sectionBell: string;
+    timesTitle: string;
+    timesHint: string;
+    done: string;
+    askTitle: string;
+    askHint: string;
+    everyWeekday: string;
+    everyTime: string;
+    onlyDay: string;
+    cancel: string;
+    rowOn: string;
+  };
   schedule: {
     everyWeek: string;
     comingUp: string;
@@ -742,6 +755,19 @@ const en: Translations = {
     nothing: 'Nothing planned that day.',
     itemsOnDay: '{{n}} planned',
     now: 'Now',
+  },
+  reminders: {
+    sectionBell: 'Reminders for {{title}}',
+    timesTitle: 'Reminders: {{title}}',
+    timesHint: 'An hour before, each time.',
+    done: 'Done',
+    askTitle: 'Remind me about {{title}} at {{time}}',
+    askHint: "You'll get a notification an hour before.",
+    everyWeekday: 'Every {{day}}',
+    everyTime: 'Every time',
+    onlyDay: 'Only {{date}}',
+    cancel: 'Cancel',
+    rowOn: 'Reminder 1 h before',
   },
   schedule: {
     everyWeek: 'EVERY WEEK',
@@ -1174,6 +1200,19 @@ const es: Translations = {
     itemsOnDay: '{{n}} previsto(s)',
     now: 'Ahora',
   },
+  reminders: {
+    sectionBell: 'Recordatorios de {{title}}',
+    timesTitle: 'Recordatorios: {{title}}',
+    timesHint: 'Una hora antes, cada vez.',
+    done: 'Listo',
+    askTitle: 'Recordarme {{title}} a las {{time}}',
+    askHint: 'Recibirás una notificación una hora antes.',
+    everyWeekday: 'Cada {{day}}',
+    everyTime: 'Cada vez',
+    onlyDay: 'Solo el {{date}}',
+    cancel: 'Cancelar',
+    rowOn: 'Aviso 1 h antes',
+  },
   schedule: {
     everyWeek: 'CADA SEMANA',
     comingUp: 'PRÓXIMAMENTE',
@@ -1604,6 +1643,19 @@ const fr: Translations = {
     nothing: 'Rien de prévu ce jour-là.',
     itemsOnDay: '{{n}} prévu(s)',
     now: 'Maintenant',
+  },
+  reminders: {
+    sectionBell: 'Rappels pour {{title}}',
+    timesTitle: 'Rappels : {{title}}',
+    timesHint: 'Une heure avant, à chaque fois.',
+    done: 'Terminé',
+    askTitle: 'Me rappeler {{title}} à {{time}}',
+    askHint: 'Vous recevrez une notification une heure avant.',
+    everyWeekday: 'Chaque {{day}}',
+    everyTime: 'À chaque fois',
+    onlyDay: 'Seulement le {{date}}',
+    cancel: 'Annuler',
+    rowOn: 'Rappel 1 h avant',
   },
   schedule: {
     everyWeek: 'CHAQUE SEMAINE',
@@ -2036,6 +2088,19 @@ const va: Translations = {
     itemsOnDay: '{{n}} previst(s)',
     now: 'Ara',
   },
+  reminders: {
+    sectionBell: 'Recordatoris de {{title}}',
+    timesTitle: 'Recordatoris: {{title}}',
+    timesHint: 'Una hora abans, cada vegada.',
+    done: 'Fet',
+    askTitle: "Recorda'm {{title}} a les {{time}}",
+    askHint: 'Rebràs una notificació una hora abans.',
+    everyWeekday: 'Cada {{day}}',
+    everyTime: 'Cada vegada',
+    onlyDay: 'Només el {{date}}',
+    cancel: 'Cancel·la',
+    rowOn: 'Avís 1 h abans',
+  },
   schedule: {
     everyWeek: 'CADA SETMANA',
     comingUp: 'PRÒXIMAMENT',
@@ -2466,6 +2531,19 @@ const gl: Translations = {
     nothing: 'Nada previsto ese día.',
     itemsOnDay: '{{n}} previsto(s)',
     now: 'Agora',
+  },
+  reminders: {
+    sectionBell: 'Lembranzas de {{title}}',
+    timesTitle: 'Lembranzas: {{title}}',
+    timesHint: 'Unha hora antes, cada vez.',
+    done: 'Feito',
+    askTitle: 'Lémbrame {{title}} ás {{time}}',
+    askHint: 'Recibirás unha notificación unha hora antes.',
+    everyWeekday: 'Cada {{day}}',
+    everyTime: 'Cada vez',
+    onlyDay: 'Só o {{date}}',
+    cancel: 'Cancelar',
+    rowOn: 'Aviso 1 h antes',
   },
   schedule: {
     everyWeek: 'CADA SEMANA',
@@ -2898,6 +2976,19 @@ const pt: Translations = {
     nothing: 'Nada previsto nesse dia.',
     itemsOnDay: '{{n}} previsto(s)',
     now: 'Agora',
+  },
+  reminders: {
+    sectionBell: 'Lembretes de {{title}}',
+    timesTitle: 'Lembretes: {{title}}',
+    timesHint: 'Uma hora antes, de cada vez.',
+    done: 'Concluído',
+    askTitle: 'Lembrar-me de {{title}} às {{time}}',
+    askHint: 'Vai receber uma notificação uma hora antes.',
+    everyWeekday: 'Todas as semanas, {{day}}',
+    everyTime: 'Todas as vezes',
+    onlyDay: 'Só {{date}}',
+    cancel: 'Cancelar',
+    rowOn: 'Lembrete 1 h antes',
   },
   schedule: {
     everyWeek: 'TODAS AS SEMANAS',

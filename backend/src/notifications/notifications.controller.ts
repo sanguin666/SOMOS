@@ -3,6 +3,7 @@ import { JwtAuthGuard, type AuthenticatedRequest } from '../auth/guards/jwt-auth
 import { NotificationsService } from './notifications.service.js';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto.js';
 import { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto.js';
+import { SetEventReminderDto } from './dto/set-event-reminder.dto.js';
 
 /**
  * The signed-in person's own phones and notification choices, next to the
@@ -41,7 +42,8 @@ export class NotificationsController {
     return this.notificationsService.updatePreferences(request.userId, poiId, dto);
   }
 
-  // The events in this place whose bell is on.
+  // The events in this place whose bell is on, each with the one day it
+  // is limited to, if any.
   @Get('pois/:poiId/event-reminders')
   eventReminders(@Req() request: AuthenticatedRequest, @Param('poiId', ParseUUIDPipe) poiId: string) {
     return this.notificationsService.listEventReminders(request.userId, poiId);
@@ -49,8 +51,12 @@ export class NotificationsController {
 
   @Put('event-reminders/:eventId')
   @HttpCode(204)
-  addEventReminder(@Req() request: AuthenticatedRequest, @Param('eventId', ParseUUIDPipe) eventId: string) {
-    return this.notificationsService.addEventReminder(request.userId, eventId);
+  addEventReminder(
+    @Req() request: AuthenticatedRequest,
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Body() dto: SetEventReminderDto,
+  ) {
+    return this.notificationsService.addEventReminder(request.userId, eventId, dto.onlyDate);
   }
 
   @Delete('event-reminders/:eventId')

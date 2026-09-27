@@ -2,15 +2,22 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
-import { CompactTimetable } from '../components/Timetable';
+import { CompactTimetable, type TimetableBells } from '../components/Timetable';
+import { TimesReminderSheet } from '../components/ReminderSheets';
 import { getEvents } from '../api/events';
-import { getEventReminders, setEventReminder } from '../api/notifications';
-import { enablePush } from '../notifications/push';
+import { useEventReminders } from '../notifications/useEventReminders';
 import { useAuth } from '../auth/AuthContext';
-import { repeats, occurrencesOf, weeklyTimetable } from '../utils/schedule';
+import {
+  regularEvents,
+  repeats,
+  occurrencesOf,
+  rowHasEvent,
+  timetableTime,
+  weeklyTimetable,
+} from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
 import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
-import type { Event, Poi } from '../api/types';
+import type { Event, EventCategory, Poi } from '../api/types';
 
 type Props = {
   poi: Poi;
@@ -30,13 +37,14 @@ function formatDetails(event: Event): string {
 }
 
 export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
-  const { t, language } = useI18n();
+  const { t } = useI18n();
   const { me } = useAuth();
   const [events, setEvents] = useState<Event[] | null>(null);
   const [error, setError] = useState(false);
-  // Which events the reader rang the bell for: a push an hour before
-  // each, sent by the backend.
-  const [notifying, setNotifying] = useState<Set<string>>(new Set());
+  // The bells the reader rang: a push an hour before, sent by the backend.
+  const reminders = useEventReminders(poi.id);
+  // The kind whose times are open in the reminders sheet.
+  const [bellCategory, setBellCategory] = useState<EventCategory | null>(null);
 
   useEffect(() => {
     getEvents(poi.id)
@@ -44,45 +52,25 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
       .catch(() => setError(true));
   }, [poi.id]);
 
-  useEffect(() => {
-    if (!me) return;
-    let cancelled = false;
-    getEventReminders(poi.id)
-      .then((ids) => {
-        if (!cancelled) setNotifying(new Set(ids));
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [poi.id, me?.id]);
-
-  function flip(current: Set<string>, id: string): Set<string> {
-    const next = new Set(current);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    return next;
-  }
-
-  async function toggleNotify(id: string) {
-    const on = !notifying.has(id);
-    // Shown at once; put back if the backend says no.
-    setNotifying((current) => flip(current, id));
-    try {
-      await setEventReminder(id, on);
-      // A bell is a request for a notification: the moment to ask the
-      // phone, if it never has been.
-      if (on) await enablePush(language);
-    } catch {
-      setNotifying((current) => flip(current, id));
-    }
-  }
-
   // The weekly timetable first, since it is what most people come for;
   // then the one-off events still to come, soonest first.
   const now = new Date();
   const timetable = weeklyTimetable(events ?? [], now);
   const oneOffs = (events ?? []).filter((event) => !repeats(event) && occurrencesOf(event, now, 1).length > 0);
+  const regular = regularEvents(events ?? [], now);
+  const ofCategory = (category: EventCategory) => regular.filter((event) => event.category === category);
+
+  // Signed-in readers only: a bell needs someone to remind.
+  const bells: TimetableBells | undefined = me
+    ? {
+        isSectionOn: (category) => ofCategory(category).some((event) => reminders.isEveryTime(event.id)),
+        onSectionBell: setBellCategory,
+        isTimeOn: (category, row, time) =>
+          ofCategory(category).some(
+            (event) => reminders.isEveryTime(event.id) && timetableTime(event) === time && rowHasEvent(row, event),
+          ),
+      }
+    : undefined;
 
   return (
     <>
@@ -153,7 +141,15 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
         </AccessibleText>
       )}
 
-      {timetable.length > 0 && <CompactTimetable sections={timetable} />}
+      {timetable.length > 0 && <CompactTimetable sections={timetable} bells={bells} />}
+
+      <TimesReminderSheet
+        title={bellCategory ? t(`schedule.category_${bellCategory}`) : null}
+        events={bellCategory ? ofCategory(bellCategory) : []}
+        isOn={reminders.isEveryTime}
+        onToggle={(eventId, on) => void reminders.set(eventId, on ? null : undefined)}
+        onClose={() => setBellCategory(null)}
+      />
 
       {timetable.length > 0 && oneOffs.length > 0 && (
         <AccessibleText variant="caption" style={styles.sectionLabel}>
@@ -162,7 +158,7 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
       )}
       {oneOffs.map((event) => {
         const startsAt = new Date(event.startsAt);
-        const isNotifying = notifying.has(event.id);
+        const isNotifying = reminders.isOn(event.id);
         return (
           <View key={event.id} style={styles.eventRow}>
             <View style={styles.dateChip}>
@@ -188,7 +184,7 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
                   ? t('events.notifyOn', { title: event.title })
                   : t('events.notifyOff', { title: event.title })
               }
-              onPress={() => void toggleNotify(event.id)}
+              onPress={() => void reminders.set(event.id, isNotifying ? undefined : null)}
               style={[styles.bellButton, isNotifying && styles.bellButtonActive]}
             >
               <BellIcon size={18} color={isNotifying ? '#FFFFFF' : colors.textMuted} filled={isNotifying} />

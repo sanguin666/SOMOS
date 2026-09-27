@@ -10,6 +10,7 @@ import { EventRecurrence } from '../events/entities/event-kinds.js';
 import { Language } from '../common/enums/language.enum.js';
 import { ExpoPushClient, type PushMessage } from './expo-push.client.js';
 import { formatTime, text } from './texts.js';
+import { dayKey, isTimeZone, localTime, repeats, startsBetween } from '../events/occurrences.js';
 import type { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto.js';
 import type { RegisterPushTokenDto } from './dto/register-push-token.dto.js';
 
@@ -28,6 +29,12 @@ export interface Notification {
   // Read by the app when the notification is tapped: `screen` and `id`
   // say what to open. `poiId` is added here, for every notification.
   data?: Record<string, string>;
+}
+
+/** A bell as the app sees it: which event, and whether for one day only. */
+export interface EventReminderView {
+  eventId: string;
+  onlyDate: string | null;
 }
 
 /** Who a notification is for, so it can be written in their words. */
@@ -117,20 +124,25 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** The events in a place this person rang the bell for. */
-  async listEventReminders(userId: string, poiId: string): Promise<string[]> {
+  async listEventReminders(userId: string, poiId: string): Promise<EventReminderView[]> {
     await this.findMembership(userId, poiId);
     const reminders = await this.reminderRepository.find({
       where: { user: { id: userId }, event: { poi: { id: poiId } } },
       relations: { event: true },
     });
-    return reminders.map((r) => r.event.id);
+    return reminders.map((r) => ({ eventId: r.event.id, onlyDate: r.onlyDate ?? null }));
   }
 
-  async addEventReminder(userId: string, eventId: string): Promise<void> {
+  async addEventReminder(userId: string, eventId: string, onlyDate?: string): Promise<void> {
     const event = await this.eventRepository.findOne({ where: { id: eventId }, relations: { poi: true } });
     if (!event) throw new NotFoundException('Event not found');
     await this.findMembership(userId, event.poi.id);
-    await this.reminderRepository.upsert({ user: { id: userId }, event: { id: eventId } }, ['user', 'event']);
+    // A one-off event has one day anyway.
+    const only = repeats(event) ? (onlyDate ?? null) : null;
+    await this.reminderRepository.upsert({ user: { id: userId }, event: { id: eventId }, onlyDate: only }, [
+      'user',
+      'event',
+    ]);
   }
 
   async removeEventReminder(userId: string, eventId: string): Promise<void> {
@@ -138,32 +150,72 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Sends the reminder for every belled one-off event starting within the
-   * next hour, once. Runs every minute; `now` is there for tests.
+   * Sends a reminder for every belled event starting within the next
+   * hour: a one-off event once, a repeating one once for each time it
+   * happens (days off skipped), a one-day bell once and then dropped.
+   * Repeating times are read in the person's own time zone, from their
+   * phone. Runs every minute; `now` is there for tests.
    */
   async sendDueEventReminders(now = new Date()): Promise<void> {
-    const due = await this.reminderRepository.find({
-      where: {
-        remindedAt: IsNull(),
-        event: {
-          recurrence: EventRecurrence.NONE,
-          startsAt: And(MoreThan(now), LessThanOrEqual(new Date(now.getTime() + REMINDER_LEAD_MS))),
-        },
-      },
+    const until = new Date(now.getTime() + REMINDER_LEAD_MS);
+    const reminders = await this.reminderRepository.find({
+      where: [
+        { remindedAt: IsNull(), event: { recurrence: EventRecurrence.NONE, startsAt: And(MoreThan(now), LessThanOrEqual(until)) } },
+        { event: { recurrence: In([EventRecurrence.WEEKLY, EventRecurrence.MONTHLY]) } },
+      ],
       relations: { user: true, event: { poi: true } },
     });
-    for (const reminder of due) {
-      reminder.remindedAt = now;
-      await this.reminderRepository.save(reminder);
+    if (reminders.length === 0) return;
+
+    const zones = await this.timeZonesOf(reminders.map((r) => r.user.id));
+    for (const reminder of reminders) {
       const { event } = reminder;
+      const timeZone = zones.get(reminder.user.id) ?? this.defaultTimeZone;
+      const today = dayKey(localTime(now, timeZone));
+      if (reminder.onlyDate && reminder.onlyDate < today) {
+        // A one-day bell for a day gone by (a day off, say): nothing left to ring.
+        await this.reminderRepository.delete({ id: reminder.id });
+        continue;
+      }
+      const start = startsBetween(event, now, until, timeZone).find(
+        (s) => !reminder.onlyDate || dayKey(localTime(s, timeZone)) === reminder.onlyDate,
+      );
+      if (!start || reminder.remindedFor?.getTime() === start.getTime()) continue;
+
+      if (reminder.onlyDate) {
+        await this.reminderRepository.delete({ id: reminder.id });
+      } else {
+        reminder.remindedAt = now;
+        reminder.remindedFor = start;
+        await this.reminderRepository.save(reminder);
+      }
       await this.notifyUsers([reminder.user.id], event.poi.id, 'events', (reader) => ({
         title: text(reader.language, 'inOneHour', { title: event.title }),
-        body: [formatTime(event.startsAt, reader.language, reader.timeZone), event.location]
+        body: [formatTime(start, reader.language, reader.timeZone ?? timeZone), event.location]
           .filter(Boolean)
           .join(', '),
         data: { screen: 'event', id: event.id },
       }));
     }
+  }
+
+  // Each person's time zone, from the phone that last told us one.
+  private async timeZonesOf(userIds: string[]): Promise<Map<string, string>> {
+    const tokens = await this.tokenRepository.find({
+      where: { user: { id: In([...new Set(userIds)]) } },
+      relations: { user: true },
+      order: { updatedAt: 'ASC' },
+    });
+    const zones = new Map<string, string>();
+    for (const token of tokens) {
+      if (isTimeZone(token.timeZone)) zones.set(token.user.id, token.timeZone);
+    }
+    return zones;
+  }
+
+  private get defaultTimeZone(): string {
+    const configured = this.configService.get<string>('DEFAULT_TIME_ZONE');
+    return isTimeZone(configured) ? configured : 'Europe/Madrid';
   }
 
   /** Everyone in a place who kept this kind on, e.g. important news. */

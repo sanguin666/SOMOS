@@ -166,7 +166,7 @@ describe('Notifications (e2e)', () => {
     await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).expect(204);
     await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).expect(204);
     const belled = await client(app).get(`/auth/me/pois/${place.id}/event-reminders`).set(as(ana.token)).expect(200);
-    expect(belled.body).toEqual([eventId]);
+    expect(belled.body).toEqual([{ eventId, onlyDate: null }]);
 
     // Someone from elsewhere can't ring the bell on this place's events.
     const { token: outsider } = await signInWithId(app, '+34600400008', 'Eva');
@@ -186,6 +186,69 @@ describe('Notifications (e2e)', () => {
     await client(app).delete(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).expect(204);
     const after = await client(app).get(`/auth/me/pois/${place.id}/event-reminders`).set(as(ana.token)).expect(200);
     expect(after.body).toEqual([]);
+  });
+
+  it('reminds before every time a repeating event happens, in the phone time zone', async () => {
+    // Sunday Mass at 10:00 in Madrid, from 6 September, off on 4 October.
+    const event = await client(app)
+      .post(`/pois/${place.id}/events`)
+      .set(as(adminToken))
+      .send({
+        title: 'Mass',
+        startsAt: '2026-09-06T08:00:00.000Z',
+        location: 'Church',
+        category: 'mass',
+        recurrence: 'weekly',
+        repeatDays: [0],
+        exceptions: [{ date: '2026-10-04', reason: 'Pilgrimage' }],
+      })
+      .expect(201);
+    const eventId = event.body.id as string;
+    await client(app)
+      .post('/auth/me/push-tokens')
+      .set(as(ana.token))
+      .send({ token: anaPhone, timeZone: 'Europe/Madrid' })
+      .expect(204);
+
+    await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(ana.token)).send({}).expect(204);
+    await client(app)
+      .put(`/auth/me/event-reminders/${eventId}`)
+      .set(as(luis.token))
+      .send({ onlyDate: '2026-10-11' })
+      .expect(204);
+    await client(app).put(`/auth/me/event-reminders/${eventId}`).set(as(luis.token)).send({ onlyDate: 'soon' }).expect(400);
+    const luisBells = await client(app).get(`/auth/me/pois/${place.id}/event-reminders`).set(as(luis.token)).expect(200);
+    expect(luisBells.body).toEqual([{ eventId, onlyDate: '2026-10-11' }]);
+
+    const notifications = app.get(NotificationsService);
+    const at = (iso: string) => notifications.sendDueEventReminders(new Date(iso));
+    const tenAM = expect.stringMatching(/^10:00( AM)?, Church$/);
+    const got = () => sent.splice(0).map((m) => [m.to, m.title, m.body]);
+
+    // Sunday 27 September, 09:30 in Madrid: Mass at 10:00, once.
+    await at('2026-09-27T07:30:00.000Z');
+    await at('2026-09-27T07:45:00.000Z');
+    expect(got()).toEqual([[anaPhone, 'In 1 hour: Mass', tenAM]]);
+
+    // Not on a weekday, nor on the day off.
+    await at('2026-09-29T07:30:00.000Z');
+    await at('2026-10-04T07:30:00.000Z');
+    expect(got()).toEqual([]);
+
+    // 11 October: Ana as every week, Luis for his one day.
+    await at('2026-10-11T07:30:00.000Z');
+    expect(got().sort()).toEqual([
+      [anaPhone, 'In 1 hour: Mass', tenAM],
+      [luisPhone, 'In 1 hour: Mass', tenAM],
+    ]);
+    const after = await client(app).get(`/auth/me/pois/${place.id}/event-reminders`).set(as(luis.token)).expect(200);
+    expect(after.body).toEqual([]);
+
+    // After the clock change 10:00 in Madrid is 09:00 UTC; still 10:00.
+    await at('2026-11-01T07:30:00.000Z');
+    expect(got()).toEqual([]);
+    await at('2026-11-01T08:30:00.000Z');
+    expect(got()).toEqual([[anaPhone, 'In 1 hour: Mass', tenAM]]);
   });
 
   it('tells members once when a livestream goes live', async () => {
