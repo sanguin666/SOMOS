@@ -299,6 +299,21 @@ export function weekdayName(day: number, language: string, style: 'long' | 'shor
 }
 
 /**
+ * A date as the three lines of a small calendar page: "MIÉ", "30",
+ * "SEPT". Short names without their trailing dot, upper-cased by the
+ * caller's style.
+ */
+export function calendarPage(date: Date, language: string): { weekday: string; day: string; month: string } {
+  const locale = DAY_LOCALES[language] ?? language;
+  const clean = (text: string) => text.replace(/\.$/, '');
+  return {
+    weekday: clean(date.toLocaleDateString(locale, { weekday: 'short' })),
+    day: String(date.getDate()),
+    month: clean(date.toLocaleDateString(locale, { month: 'short' })),
+  };
+}
+
+/**
  * A timetable row's days: "Sunday", "Saturday, Sunday", or for three or
  * more in a row "Mon–Fri".
  */
@@ -309,6 +324,15 @@ export function formatDays(days: number[], language: string): string {
     return capitalise(`${first}–${last}`);
   }
   return capitalise(days.map((day) => weekdayName(day, language)).join(', '));
+}
+
+/**
+ * `formatDays` kept short enough for the narrow date column of a summary
+ * row: "Lun–sáb", "Sáb, dom", "Dom".
+ */
+export function shortDays(days: number[], language: string): string {
+  if (days.length >= 3) return formatDays(days, language);
+  return capitalise(days.map((day) => weekdayName(day, language, 'short').replace(/\.$/, '')).join(', '));
 }
 
 function sameDay(a: Date, b: Date): boolean {

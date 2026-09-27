@@ -346,6 +346,7 @@ export type Translations = {
     monthlyDay: string;
     dayOff: string;
     dayOffReason: string;
+    notAt: string;
   };
   requests: {
     title: string;
@@ -791,6 +792,7 @@ const en: Translations = {
     monthlyDay: 'Day {{day}} of each month',
     dayOff: 'Not on {{date}} at {{time}}.',
     dayOffReason: 'Not on {{date}} at {{time}}: {{reason}}',
+    notAt: 'Not at {{time}}',
   },
   requests: {
     title: 'Requests',
@@ -1236,6 +1238,7 @@ const es: Translations = {
     monthlyDay: 'El día {{day}} de cada mes',
     dayOff: 'No el {{date}} a las {{time}}.',
     dayOffReason: 'No el {{date}} a las {{time}}: {{reason}}',
+    notAt: 'No a las {{time}}',
   },
   requests: {
     title: 'Solicitudes',
@@ -1681,6 +1684,7 @@ const fr: Translations = {
     monthlyDay: 'Le {{day}} de chaque mois',
     dayOff: 'Pas le {{date}} à {{time}}.',
     dayOffReason: 'Pas le {{date}} à {{time}} : {{reason}}',
+    notAt: 'Pas à {{time}}',
   },
   requests: {
     title: 'Demandes',
@@ -2126,6 +2130,7 @@ const va: Translations = {
     monthlyDay: 'El dia {{day}} de cada mes',
     dayOff: 'No el {{date}} a les {{time}}.',
     dayOffReason: 'No el {{date}} a les {{time}}: {{reason}}',
+    notAt: 'No a les {{time}}',
   },
   requests: {
     title: 'Sol·licituds',
@@ -2571,6 +2576,7 @@ const gl: Translations = {
     monthlyDay: 'O día {{day}} de cada mes',
     dayOff: 'Non o {{date}} ás {{time}}.',
     dayOffReason: 'Non o {{date}} ás {{time}}: {{reason}}',
+    notAt: 'Non ás {{time}}',
   },
   requests: {
     title: 'Solicitudes',
@@ -3017,6 +3023,7 @@ const pt: Translations = {
     monthlyDay: 'No dia {{day}} de cada mês',
     dayOff: 'Não a {{date}} às {{time}}.',
     dayOffReason: 'Não a {{date}} às {{time}}: {{reason}}',
+    notAt: 'Não às {{time}}',
   },
   requests: {
     title: 'Pedidos',

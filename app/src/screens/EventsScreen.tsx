@@ -4,6 +4,7 @@ import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { CompactTimetable, type TimetableBells } from '../components/Timetable';
 import { TimesReminderSheet } from '../components/ReminderSheets';
+import { SummaryList, SummaryRow } from '../components/SummaryList';
 import { getEvents } from '../api/events';
 import { useEventReminders } from '../notifications/useEventReminders';
 import { useAuth } from '../auth/AuthContext';
@@ -12,6 +13,7 @@ import {
   repeats,
   occurrencesOf,
   rowHasEvent,
+  timeKey,
   timetableTime,
   weeklyTimetable,
 } from '../utils/schedule';
@@ -29,10 +31,7 @@ type Props = {
 };
 
 function formatDetails(event: Event): string {
-  const time = new Date(event.startsAt).toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const time = timeKey(new Date(event.startsAt));
   return event.location ? `${time} · ${event.location}` : time;
 }
 
@@ -156,42 +155,39 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
           {t('schedule.comingUp')}
         </AccessibleText>
       )}
-      {oneOffs.map((event) => {
-        const startsAt = new Date(event.startsAt);
-        const isNotifying = reminders.isOn(event.id);
-        return (
-          <View key={event.id} style={styles.eventRow}>
-            <View style={styles.dateChip}>
-              <AccessibleText variant="caption" color="#FFFFFF" style={styles.dateMonth}>
-                {startsAt.toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
-              </AccessibleText>
-              <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.dateDay}>
-                {startsAt.getDate()}
-              </AccessibleText>
-            </View>
-
-            <View style={styles.eventText}>
-              <AccessibleText variant="bodyLarge" style={styles.eventTitle}>
-                {event.title}
-              </AccessibleText>
-              <AccessibleText variant="caption">{formatDetails(event)}</AccessibleText>
-            </View>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={
-                isNotifying
-                  ? t('events.notifyOn', { title: event.title })
-                  : t('events.notifyOff', { title: event.title })
-              }
-              onPress={() => void reminders.set(event.id, isNotifying ? undefined : null)}
-              style={[styles.bellButton, isNotifying && styles.bellButtonActive]}
-            >
-              <BellIcon size={18} color={isNotifying ? '#FFFFFF' : colors.textMuted} filled={isNotifying} />
-            </Pressable>
-          </View>
-        );
-      })}
+      {oneOffs.length > 0 && (
+        <SummaryList>
+          {oneOffs.map((event, index) => {
+            const startsAt = new Date(event.startsAt);
+            const isNotifying = reminders.isOn(event.id);
+            return (
+              <SummaryRow
+                key={event.id}
+                date={startsAt}
+                title={event.title}
+                detail={formatDetails(event)}
+                accessibilityLabel={`${event.title}, ${formatDetails(event)}`}
+                divider={index > 0}
+                accessory={
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={
+                      isNotifying
+                        ? t('events.notifyOn', { title: event.title })
+                        : t('events.notifyOff', { title: event.title })
+                    }
+                    onPress={() => void reminders.set(event.id, isNotifying ? undefined : null)}
+                    hitSlop={8}
+                    style={[styles.bellButton, isNotifying && styles.bellButtonActive]}
+                  >
+                    <BellIcon size={18} color={isNotifying ? '#FFFFFF' : colors.textMuted} filled={isNotifying} />
+                  </Pressable>
+                }
+              />
+            );
+          })}
+        </SummaryList>
+      )}
     </>
   );
 }
@@ -252,36 +248,6 @@ const styles = StyleSheet.create({
   },
   liveTitle: {
     fontWeight: '800',
-  },
-  eventRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-  },
-  dateChip: {
-    width: 56,
-    height: 56,
-    borderRadius: radii.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dateMonth: {
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
-  },
-  dateDay: {
-    fontWeight: '800',
-  },
-  eventText: {
-    flex: 1,
-    gap: 2,
-  },
-  eventTitle: {
-    fontWeight: '700',
   },
   bellButton: {
     width: 40,
