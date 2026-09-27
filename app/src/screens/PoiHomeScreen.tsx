@@ -2,19 +2,19 @@ import { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
-import { ChevronRightIcon, PlayIcon } from '../components/icons';
+import { ChevronRightIcon } from '../components/icons';
 import { uploadUri } from '../api/client';
 import { getPoiBadges, getPoiPageBlocks } from '../api/poiPage';
 import { getCampaigns, type Campaign } from '../api/donations';
 import { getAnnouncements } from '../api/announcements';
-import { PostList } from './AnnouncementsScreen';
 import { getEvents } from '../api/events';
 import { getLivestreams } from '../api/livestreams';
-import { TimetableRows } from '../components/Timetable';
+import { monthlyRuleLabel } from '../components/Timetable';
+import { SummaryList, SummaryRow } from '../components/SummaryList';
 import { BadgeTiles } from '../components/BadgeTiles';
 import { badgeTiles } from '../utils/badges';
 import { usePreview } from '../preview/PreviewContext';
-import { formatWhen, repeats, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
+import { formatWhen, repeats, shortDays, timeKey, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
 import type {
   ActiveModule,
   Announcement,
@@ -81,10 +81,6 @@ const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
   next_livestream: 'livestreams',
   donate: 'donations',
 };
-
-function formatShortDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
 
 /**
  * A POI's home page: the blocks its admins arranged in the dashboard, in
@@ -318,39 +314,48 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
               onSeeAll={() => onSelectTab('events')}
               seeAllLabel={t('hub.seeAll')}
             />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={
-                nextMass
-                  ? `${t('hub.nextMass')}: ${formatWhen(nextMass.startsAt, today, language, {
-                      today: t('schedule.today'),
-                      tomorrow: t('schedule.tomorrow'),
-                    })}`
-                  : t('hub.celebrationTimes')
-              }
-              onPress={() => onSelectTab('events')}
-              style={styles.timesCard}
-            >
+            <SummaryList>
               {nextMass && (
-                <View style={styles.nextMass}>
-                  <AccessibleText variant="caption" color={poiTheme.accentStrong} style={styles.nextMassLabel}>
-                    {t('hub.nextMass')}
-                  </AccessibleText>
-                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                    {formatWhen(nextMass.startsAt, today, language, {
-                      today: t('schedule.today'),
-                      tomorrow: t('schedule.tomorrow'),
-                    })}
-                  </AccessibleText>
-                  {!!(nextMass.event.location || nextMass.event.title) && (
-                    <AccessibleText variant="caption" color={colors.textMuted}>
-                      {[nextMass.event.title, nextMass.event.location].filter(Boolean).join(' · ')}
-                    </AccessibleText>
-                  )}
-                </View>
+                <SummaryRow
+                  date={nextMass.startsAt}
+                  title={`${t('hub.nextMass')} ${timeKey(nextMass.startsAt)}`}
+                  detail={[nextMass.event.title, nextMass.event.location].filter(Boolean).join(' · ')}
+                  accessibilityLabel={`${t('hub.nextMass')}: ${formatWhen(nextMass.startsAt, today, language, {
+                    today: t('schedule.today'),
+                    tomorrow: t('schedule.tomorrow'),
+                  })}`}
+                  divider={false}
+                  onPress={() => onSelectTab('events')}
+                />
               )}
-              {massTimes && <TimetableRows rows={massTimes.rows} notes={massTimes.notes} />}
-            </Pressable>
+              {massTimes?.rows.map((row, index) => {
+                const days = row.monthly ? monthlyRuleLabel(row.monthly, t, language) : shortDays(row.days, language);
+                const times = row.times.join(' · ');
+                return (
+                  <SummaryRow
+                    key={days}
+                    label={row.monthly ? undefined : days}
+                    title={row.monthly ? `${days}: ${times}` : times}
+                    accessibilityLabel={`${days}: ${row.times.join(', ')}`}
+                    divider={!!nextMass || index > 0}
+                    onPress={() => onSelectTab('events')}
+                  />
+                );
+              })}
+              {massTimes?.notes.map((note) => (
+                <SummaryRow
+                  key={note.startsAt.toISOString()}
+                  date={note.startsAt}
+                  title={
+                    note.reason
+                      ? `${t('schedule.notAt', { time: timeKey(note.startsAt) })}: ${note.reason}`
+                      : t('schedule.notAt', { time: timeKey(note.startsAt) })
+                  }
+                  divider
+                  onPress={() => onSelectTab('events')}
+                />
+              ))}
+            </SummaryList>
           </View>
         );
       }
@@ -374,37 +379,21 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
               onSeeAll={() => onSelectTab('events')}
               seeAllLabel={t('hub.seeAll')}
             />
-            {shown.map((event) => (
-              <Pressable
-                key={event.id}
-                accessibilityRole="button"
-                accessibilityLabel={event.title}
-                onPress={() => onSelectTab('events')}
-                style={styles.eventCard}
-              >
-                <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
-                  <AccessibleText variant="caption" color="#FFFFFF" style={styles.eventDateMonth}>
-                    {new Date(event.startsAt)
-                      .toLocaleDateString(undefined, { month: 'short' })
-                      .toUpperCase()}
-                  </AccessibleText>
-                  <AccessibleText variant="bodyLarge" color="#FFFFFF" style={styles.eventDateDay}>
-                    {new Date(event.startsAt).getDate()}
-                  </AccessibleText>
-                </View>
-                <View style={styles.eventText}>
-                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                    {event.title}
-                  </AccessibleText>
-                  {!!event.location && (
-                    <AccessibleText variant="caption" color={colors.textMuted}>
-                      {event.location}
-                    </AccessibleText>
-                  )}
-                </View>
-                <ChevronRightIcon size={20} color={colors.textMuted} />
-              </Pressable>
-            ))}
+            <SummaryList>
+              {shown.map((event, index) => {
+                const startsAt = new Date(event.startsAt);
+                return (
+                  <SummaryRow
+                    key={event.id}
+                    date={startsAt}
+                    title={event.title}
+                    detail={[timeKey(startsAt), event.location].filter(Boolean).join(' · ')}
+                    divider={index > 0}
+                    onPress={() => onSelectTab('events')}
+                  />
+                );
+              })}
+            </SummaryList>
           </View>
         );
       }
@@ -420,10 +409,23 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
               onSeeAll={() => onSelectTab('announcements')}
               seeAllLabel={t('hub.seeAll')}
             />
-            <PostList
-              items={shown}
-              onOpen={(item) => (onOpenAnnouncement ? onOpenAnnouncement(item) : onSelectTab('announcements'))}
-            />
+            <SummaryList>
+              {shown.map((item, index) => (
+                <SummaryRow
+                  key={item.id}
+                  date={new Date(item.createdAt)}
+                  showWeekday={false}
+                  title={item.title}
+                  important={item.important}
+                  imageUrl={item.imageUrl}
+                  accessibilityLabel={[item.important ? t('announcements.important') : null, item.title]
+                    .filter(Boolean)
+                    .join(': ')}
+                  divider={index > 0}
+                  onPress={() => (onOpenAnnouncement ? onOpenAnnouncement(item) : onSelectTab('announcements'))}
+                />
+              ))}
+            </SummaryList>
           </View>
         );
       }
@@ -438,27 +440,19 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
               onSeeAll={() => onSelectTab('livestreams')}
               seeAllLabel={t('hub.seeAll')}
             />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={nextLivestream.title}
-              onPress={() => onSelectTab('livestreams')}
-              style={styles.feedCard}
-            >
-              <View style={styles.livestreamRow}>
-                <View style={[styles.eventDateChip, { backgroundColor: poiTheme.accentStrong }]}>
-                  <PlayIcon size={22} color="#FFFFFF" />
-                </View>
-                <View style={styles.eventText}>
-                  <AccessibleText variant="bodyLarge" style={styles.cardTitle}>
-                    {nextLivestream.title}
-                  </AccessibleText>
-                  <AccessibleText variant="caption" color={colors.textMuted}>
-                    {formatShortDate(nextLivestream.scheduledAt)}
-                  </AccessibleText>
-                </View>
-                <ChevronRightIcon size={20} color={colors.textMuted} />
-              </View>
-            </Pressable>
+            <SummaryList>
+              <SummaryRow
+                date={new Date(nextLivestream.scheduledAt)}
+                title={nextLivestream.title}
+                detail={
+                  nextLivestream.status === 'live'
+                    ? t('livestream.live')
+                    : timeKey(new Date(nextLivestream.scheduledAt))
+                }
+                divider={false}
+                onPress={() => onSelectTab('livestreams')}
+              />
+            </SummaryList>
           </View>
         );
       }
@@ -535,21 +529,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     ...cardSurface,
   },
-  timesCard: {
-    ...cardSurface,
-    borderRadius: radii.lg,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  nextMass: {
-    paddingVertical: spacing.md,
-    gap: 2,
-  },
-  nextMassLabel: {
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -570,46 +549,5 @@ const styles = StyleSheet.create({
   },
   seeAllLabel: {
     fontWeight: '700',
-  },
-  eventCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-    minHeight: 64,
-  },
-  livestreamRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  eventDateChip: {
-    width: 48,
-    height: 48,
-    borderRadius: radii.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  eventDateMonth: {
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
-  },
-  eventDateDay: {
-    fontWeight: '800',
-  },
-  eventText: {
-    flex: 1,
-    gap: 2,
-  },
-  cardTitle: {
-    fontWeight: '700',
-  },
-  feedCard: {
-    ...cardSurface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-    gap: spacing.sm,
   },
 });
