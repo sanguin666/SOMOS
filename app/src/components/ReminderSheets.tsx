@@ -1,4 +1,5 @@
 import { Modal, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from './AccessibleButton';
 import { AccessibleText } from './AccessibleText';
 import { monthlyRuleLabel } from './Timetable';
@@ -61,13 +62,15 @@ export function TimesReminderSheet({
   onClose: () => void;
 }) {
   const { t, language } = useI18n();
+  const insets = useSafeAreaInsets();
   const sorted = [...events].sort(
     (a, b) => weekPosition(a) - weekPosition(b) || timeKey(new Date(a.startsAt)).localeCompare(timeKey(new Date(b.startsAt))),
   );
   return (
     <Modal visible={title !== null} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.scrim} accessibilityLabel={t('reminders.done')} onPress={onClose} />
-      <View style={styles.sheet}>
+      {/* Clear of Android's navigation buttons. */}
+      <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
         <AccessibleText variant="title" accessibilityRole="header">
           {t('reminders.timesTitle', { title: title ?? '' })}
         </AccessibleText>
@@ -127,6 +130,7 @@ export function RepeatReminderSheet({
   onCancel: () => void;
 }) {
   const { t, language } = useI18n();
+  const insets = useSafeAreaInsets();
   const locale = DATE_LOCALES[language] ?? language;
   const days = event ? weekdaysOf(event) : [];
   const every =
@@ -141,7 +145,8 @@ export function RepeatReminderSheet({
   return (
     <Modal visible={event !== null} transparent animationType="fade" onRequestClose={onCancel}>
       <Pressable style={styles.scrim} accessibilityLabel={t('reminders.cancel')} onPress={onCancel} />
-      <View style={styles.sheet}>
+      {/* Clear of Android's navigation buttons. */}
+      <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
         <AccessibleText variant="title" accessibilityRole="header">
           {event && startsAt ? t('reminders.askTitle', { title: event.title, time: timeKey(startsAt) }) : ''}
         </AccessibleText>
