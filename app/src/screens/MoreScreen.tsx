@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
 import {
@@ -72,6 +73,7 @@ export function MoreScreen({
   onOpenNotifications,
 }: Props) {
   const { t, language, setLanguage } = useI18n();
+  const insets = useSafeAreaInsets();
   const poiTheme = getPoiTheme(poi.type);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [confirmingLeave, setConfirmingLeave] = useState(false);
@@ -196,7 +198,7 @@ export function MoreScreen({
           accessibilityLabel={t('more.leaveCancel')}
           onPress={() => !leaving && setConfirmingLeave(false)}
         />
-        <View style={styles.confirmSheet}>
+        <View style={[styles.confirmSheet, { paddingBottom: insets.bottom + spacing.lg }]}>
           <AccessibleText variant="title">
             {t('more.leaveQuestion', { poiName: poi.name })}
           </AccessibleText>
@@ -285,7 +287,7 @@ export function MoreScreen({
           accessibilityLabel={t('places.close')}
           onPress={() => setLanguageOpen(false)}
         />
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
           <AccessibleText variant="title">{t('more.chooseLanguage')}</AccessibleText>
 
           {SUPPORTED_LANGUAGES.map((code, index) => {
