@@ -73,7 +73,7 @@ function weekdayOf(day: LocalDay): number {
 }
 
 /** The instant the wall clock in `timeZone` reads this day at hour:minute. */
-function atWallClock(day: LocalDay, hour: number, minute: number, timeZone: string): Date {
+export function atWallClock(day: LocalDay, hour: number, minute: number, timeZone: string): Date {
   const wanted = Date.UTC(day.year, day.month - 1, day.day, hour, minute);
   let guess = wanted;
   // Two corrections settle any offset, including across a clock change.
