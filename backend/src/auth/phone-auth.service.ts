@@ -32,6 +32,9 @@ const MAX_CODES_PER_HOUR = 5;
 // so five guesses across a ten-minute window is not a realistic attack.
 const MAX_ATTEMPTS = 5;
 
+// How long a member's sign-in lasts on their phone.
+const MEMBER_SESSION = '90d';
+
 /**
  * Turns whatever someone typed into one canonical form: digits, with a
  * leading `+` kept if they gave one. "+34 600 00 00 00", "+34-600-000-000"
@@ -133,7 +136,16 @@ export class PhoneAuthService {
     await this.codesRepository.save(record);
 
     const user = await this.usersService.findOrCreateByPhone(phone, firstName);
-    return { accessToken: await this.jwtService.signAsync({ sub: user.id }) };
+    return { accessToken: await this.memberToken(user.id) };
+  }
+
+  /**
+   * A member stays signed in on their phone for MEMBER_SESSION: being
+   * asked for a new code every week is exactly what this audience would
+   * give up on. Admin sessions keep the shorter default.
+   */
+  private memberToken(userId: string): Promise<string> {
+    return this.jwtService.signAsync({ sub: userId }, { expiresIn: MEMBER_SESSION });
   }
 
   /**
@@ -178,7 +190,7 @@ export class PhoneAuthService {
   async demoSignIn(): Promise<{ accessToken: string }> {
     const user = this.demoLoginEnabled() ? await this.usersService.findByPhone(DEMO_MEMBER_PHONE) : null;
     if (!user) throw new NotFoundException('No demo account here');
-    return { accessToken: await this.jwtService.signAsync({ sub: user.id }) };
+    return { accessToken: await this.memberToken(user.id) };
   }
 
   // Never in production, even if someone deploys without configuring a real

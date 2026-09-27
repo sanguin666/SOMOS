@@ -10,6 +10,8 @@ import { colors, spacing } from '../theme/theme';
 type Props = {
   onSignUp: () => void;
   onSignIn: () => void;
+  // Only while the backend offers the demo account; absent, no button.
+  onDemoSignIn?: () => void;
 };
 
 /**
@@ -20,8 +22,11 @@ type Props = {
  * an account on the first code that verifies, so "sign up" and "sign in"
  * differ only in where somebody lands afterwards, and pressing the wrong
  * one costs nothing.
+ *
+ * During the demo a third door sits under them: straight into the demo
+ * member's account, for showing the app without typing a number.
  */
-export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
+export function OnboardingScreen({ onSignUp, onSignIn, onDemoSignIn }: Props) {
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
@@ -69,6 +74,9 @@ export function OnboardingScreen({ onSignUp, onSignIn }: Props) {
         <View style={styles.buttons}>
           <AccessibleButton label={t('onboarding.signUp')} onPress={onSignUp} />
           <AccessibleButton label={t('onboarding.signIn')} variant="secondary" onPress={onSignIn} />
+          {onDemoSignIn && (
+            <AccessibleButton label={t('onboarding.demoSignIn')} variant="secondary" onPress={onDemoSignIn} />
+          )}
         </View>
       </View>
     </ImageBackground>

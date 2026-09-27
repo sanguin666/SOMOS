@@ -45,13 +45,17 @@ export function verifyPhoneCode(
 }
 
 /**
- * The demo account, when the backend offers one (no SMS sender, not in
- * production): "sign in" then goes straight into it, with no code. Null
- * means there is none and the phone login is the way in.
+ * Whether the backend offers the demo account (no SMS sender, not in
+ * production unless DEMO_LOGIN=on). Decides whether the "demo sign-in"
+ * button shows under the real sign-in.
  */
-export async function demoSignIn(): Promise<string | null> {
+export async function demoSignInAvailable(): Promise<boolean> {
   const { enabled } = await apiGet<{ enabled: boolean }>('/auth/demo');
-  if (!enabled) return null;
+  return enabled;
+}
+
+/** Straight into the demo member's account, with no code. */
+export async function demoSignIn(): Promise<string> {
   const { accessToken } = await apiPost<{ accessToken: string }>('/auth/demo', {});
   return accessToken;
 }

@@ -125,6 +125,7 @@ export type Translations = {
     welcome: string;
     signUp: string;
     signIn: string;
+    demoSignIn: string;
   };
   addPlace: {
     title: string;
@@ -567,6 +568,7 @@ const en: Translations = {
     welcome: 'Welcome',
     signUp: 'Sign up',
     signIn: 'Sign in',
+    demoSignIn: 'Demo sign-in (María García)',
   },
   addPlace: {
     title: 'Add the place you belong to.',
@@ -1011,6 +1013,7 @@ const es: Translations = {
     welcome: 'Bienvenido',
     signUp: 'Crear cuenta',
     signIn: 'Iniciar sesión',
+    demoSignIn: 'Entrar en la demo (María García)',
   },
   addPlace: {
     title: 'Añade el lugar al que perteneces.',
@@ -1455,6 +1458,7 @@ const fr: Translations = {
     welcome: 'Bienvenue',
     signUp: 'S’inscrire',
     signIn: 'Se connecter',
+    demoSignIn: 'Connexion démo (María García)',
   },
   addPlace: {
     title: 'Ajoutez le lieu auquel vous appartenez.',
@@ -1899,6 +1903,7 @@ const va: Translations = {
     welcome: 'Benvingut',
     signUp: 'Crear un compte',
     signIn: 'Iniciar sessió',
+    demoSignIn: 'Entrar en la demo (María García)',
   },
   addPlace: {
     title: 'Afig el lloc al qual pertanys.',
@@ -2343,6 +2348,7 @@ const gl: Translations = {
     welcome: 'Benvido',
     signUp: 'Crear conta',
     signIn: 'Iniciar sesión',
+    demoSignIn: 'Entrar na demo (María García)',
   },
   addPlace: {
     title: 'Engade o lugar ao que pertences.',
@@ -2788,6 +2794,7 @@ const pt: Translations = {
     welcome: 'Bem-vindo',
     signUp: 'Criar conta',
     signIn: 'Iniciar sessão',
+    demoSignIn: 'Entrar na demo (María García)',
   },
   addPlace: {
     title: 'Adicione o local a que pertence.',

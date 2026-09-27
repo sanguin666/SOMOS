@@ -13,7 +13,7 @@ import { PreviewApp, previewPoiId } from './src/preview/PreviewApp';
 import { I18nProvider, useI18n } from './src/i18n/I18nContext';
 import { enablePush, onNotificationTapped, refreshPush, type PushTarget } from './src/notifications/push';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
-import { demoSignIn, joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
+import { demoSignIn, demoSignInAvailable, joinPoi, leavePoi, setLastActivePoi } from './src/api/auth';
 import { getPoi } from './src/api/pois';
 import { forgetPlace, getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
 import { landingPoi } from './src/landing';
@@ -113,21 +113,28 @@ function AppRoutes() {
     setLanded(true);
   }, [ready, me, landed]);
 
+  // Whether the welcome screen offers the demo account under the real
+  // sign-in. Asked once; a backend that can't answer just hides it.
+  const [demoAvailable, setDemoAvailable] = useState(false);
+  useEffect(() => {
+    demoSignInAvailable().then(setDemoAvailable, () => setDemoAvailable(false));
+  }, []);
+
   /**
-   * "Sign in" during the demo goes straight into the demo member's
-   * account; anywhere without one (or if asking fails) it is the phone
+   * Straight into the demo member's account; if that fails, the phone
    * login as always. Landing is the effect above's job once `me` arrives.
    */
-  async function startSignIn() {
+  async function startDemoSignIn() {
     try {
-      const accessToken = await demoSignIn();
-      if (accessToken) {
-        await signIn(accessToken);
-        return;
-      }
+      await signIn(await demoSignIn());
+      return;
     } catch {
       // Fall through to the phone login.
     }
+    push({ name: 'signIn' });
+  }
+
+  function startSignIn() {
     push({ name: 'signIn' });
   }
 
@@ -252,6 +259,7 @@ function AppRoutes() {
         <OnboardingScreen
           onSignUp={() => push({ name: 'signIn' })}
           onSignIn={startSignIn}
+          onDemoSignIn={demoAvailable ? startDemoSignIn : undefined}
         />
       )}
 

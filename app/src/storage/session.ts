@@ -6,8 +6,8 @@ const STORAGE_KEY = 'ansae.session.v1';
  * The signed-in congregant's access token, kept on the device so someone
  * who signs in once stays signed in — an audience that struggles with a
  * password should not be asked for an SMS code every time they open the
- * app. The token itself expires after a week (see the backend's
- * auth.module.ts), and the app signs out cleanly when it does.
+ * app. The token itself lasts 90 days (MEMBER_SESSION in the backend's
+ * phone-auth.service.ts), and the app signs out cleanly when it runs out.
  */
 export async function getStoredToken(): Promise<string | null> {
   try {
@@ -32,5 +32,31 @@ export async function clearStoredToken(): Promise<void> {
     await AsyncStorage.removeItem(STORAGE_KEY);
   } catch {
     // Nothing useful to do — the in-memory session is cleared either way.
+  }
+}
+
+const LAST_LOGIN_KEY = 'ansae.last-login.v1';
+
+export type LastLogin = { phone: string; firstName: string };
+
+/**
+ * The number and first name last used to sign in on this phone, so after
+ * signing out (or a session running out) the form comes back filled in and
+ * signing in again is one tap and a code.
+ */
+export async function getLastLogin(): Promise<LastLogin | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_LOGIN_KEY);
+    return raw ? (JSON.parse(raw) as LastLogin) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function storeLastLogin(login: LastLogin): Promise<void> {
+  try {
+    await AsyncStorage.setItem(LAST_LOGIN_KEY, JSON.stringify(login));
+  } catch {
+    // The form just starts empty next time.
   }
 }

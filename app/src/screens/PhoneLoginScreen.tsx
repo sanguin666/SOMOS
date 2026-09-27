@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
@@ -6,6 +6,7 @@ import { AccessibleButton } from '../components/AccessibleButton';
 import { BackChevronIcon } from '../components/icons';
 import { requestPhoneCode, verifyPhoneCode } from '../api/auth';
 import { useAuth } from '../auth/AuthContext';
+import { getLastLogin, storeLastLogin } from '../storage/session';
 import { useI18n } from '../i18n/I18nContext';
 import { ApiError } from '../api/client';
 import { cardSurface, colors, fontSizes, radii, spacing } from '../theme/theme';
@@ -37,6 +38,16 @@ export function PhoneLoginScreen({ onBack, onSignedIn }: Props) {
   // back so the flow can be completed on a development machine.
   const [devCode, setDevCode] = useState<string | null>(null);
 
+  // Whoever signed in on this phone before finds their number and name
+  // already filled in; anything typed meanwhile is left alone.
+  useEffect(() => {
+    getLastLogin().then((last) => {
+      if (!last) return;
+      setPhone((current) => current || last.phone);
+      setFirstName((current) => current || last.firstName);
+    });
+  }, []);
+
   async function sendCode() {
     setBusy(true);
     setError(null);
@@ -57,6 +68,7 @@ export function PhoneLoginScreen({ onBack, onSignedIn }: Props) {
     setError(null);
     try {
       const { accessToken } = await verifyPhoneCode(phone.trim(), code.trim(), firstName);
+      await storeLastLogin({ phone: phone.trim(), firstName: firstName.trim() });
       await signIn(accessToken);
       onSignedIn();
     } catch (caught) {
