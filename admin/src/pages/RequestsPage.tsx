@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import { API_BASE_URL } from '../api/client';
 import {
   askForDocument,
@@ -82,9 +83,9 @@ export function RequestsPage() {
                 </p>
                 <p className="card-meta">
                   {statusName(item.status, t)} ·{' '}
-                  {t('requests.askedOn', { date: new Date(item.createdAt).toLocaleDateString(language) })}
+                  {t('requests.askedOn', { date: new Date(item.createdAt).toLocaleDateString(intlLocale(language)) })}
                   {item.appointmentAt &&
-                    ` · ${t('requests.appointmentOn', { date: new Date(item.appointmentAt).toLocaleString(language, { dateStyle: 'medium', timeStyle: 'short' }) })}`}
+                    ` · ${t('requests.appointmentOn', { date: new Date(item.appointmentAt).toLocaleString(intlLocale(language), { dateStyle: 'medium', timeStyle: 'short' }) })}`}
                 </p>
                 {(item.unread || item.documentsPending > 0) && (
                   <p style={{ margin: '4px 0 0', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -266,7 +267,7 @@ export function RequestDetailPage() {
   }
 
   const formatDateTime = (iso: string) =>
-    new Date(iso).toLocaleString(language, { dateStyle: 'medium', timeStyle: 'short' });
+    new Date(iso).toLocaleString(intlLocale(language), { dateStyle: 'medium', timeStyle: 'short' });
   const accountName = [request.requester?.firstName, request.requester?.lastName].filter(Boolean).join(' ');
 
   return (
@@ -281,7 +282,7 @@ export function RequestDetailPage() {
       </h2>
       <p className="muted">
         {statusName(request.status, t)} ·{' '}
-        {t('requests.askedOn', { date: new Date(request.createdAt).toLocaleDateString(language) })}
+        {t('requests.askedOn', { date: new Date(request.createdAt).toLocaleDateString(intlLocale(language)) })}
       </p>
 
       {error && <p className="error-text">{error}</p>}
@@ -372,7 +373,7 @@ export function RequestDetailPage() {
                   {document.note && <p className="card-meta">{document.note}</p>}
                   <span className={`badge ${document.receivedAt ? 'badge-active' : ''}`}>
                     {document.receivedAt
-                      ? t('requests.receivedOn', { date: new Date(document.receivedAt).toLocaleDateString(language) })
+                      ? t('requests.receivedOn', { date: new Date(document.receivedAt).toLocaleDateString(intlLocale(language)) })
                       : t('requests.awaited')}
                   </span>
                   {document.file && (

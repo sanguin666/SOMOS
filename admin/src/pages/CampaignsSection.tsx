@@ -1,5 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import {
   createCampaign,
   deleteCampaign,
@@ -271,7 +272,7 @@ export function CampaignsSection({ poiId }: { poiId: string }) {
             {campaign.endsAt && (
               <p className="card-meta">
                 {t('campaigns.endsOn', {
-                  date: new Date(campaign.endsAt).toLocaleDateString(language, {
+                  date: new Date(campaign.endsAt).toLocaleDateString(intlLocale(language), {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',

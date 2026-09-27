@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import { createBadge, deleteBadge, getBadges, reorderBadges, updateBadge, type BadgeInput } from '../api/badges';
 import { getCampaigns } from '../api/donations';
 import type { ActiveModule, BadgeKind, Campaign, ModuleType, PoiBadge } from '../api/types';
@@ -119,7 +120,7 @@ export function BadgesSection({ poiId, modules, onPreview }: Props) {
   // "29/09" in French, "09/29" in English.
   function shortDate(value: string): string {
     const [y, m, d] = value.split('-').map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString(language, { day: '2-digit', month: '2-digit' });
+    return new Date(y, m - 1, d).toLocaleDateString(intlLocale(language), { day: '2-digit', month: '2-digit' });
   }
 
   function describe(badge: PoiBadge): string {

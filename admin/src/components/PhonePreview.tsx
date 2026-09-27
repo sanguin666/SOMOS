@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/I18nContext';
-import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
+import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import type { PoiBadge, PoiPageBlock } from '../api/types';
 
 // The app's web version, which the phone frame loads in preview mode.
@@ -11,8 +11,6 @@ const APP_ORIGIN = new URL(APP_PREVIEW_URL).origin;
 // How long the app gets to say it has loaded before the frame explains
 // what to start.
 const READY_TIMEOUT_MS = 12_000;
-
-const LANGUAGE_NAMES: Record<SupportedLanguage, string> = { en: 'English', es: 'Español', fr: 'Français' };
 
 type Props = {
   poiId: string;

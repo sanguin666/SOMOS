@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import { useAuth } from '../auth/AuthContext';
 import { getEvents } from '../api/events';
 import {
@@ -171,7 +172,7 @@ export function MassIntentionsPage() {
   }, [poiId]);
 
   const formatWhen = (iso: string) =>
-    new Date(iso).toLocaleString(language, {
+    new Date(iso).toLocaleString(intlLocale(language), {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -365,7 +366,7 @@ export function MassIntentionsPage() {
           <p>
             {poiName}
             {poiName ? ' · ' : ''}
-            {new Date().toLocaleDateString(language, { day: 'numeric', month: 'long', year: 'numeric' })}
+            {new Date().toLocaleDateString(intlLocale(language), { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
 

@@ -1,6 +1,6 @@
 export type PoiType = 'church';
 
-export type SupportedLanguage = 'en' | 'es' | 'fr';
+export type SupportedLanguage = 'en' | 'es' | 'va' | 'gl' | 'pt' | 'fr';
 
 export type Poi = {
   id: string;

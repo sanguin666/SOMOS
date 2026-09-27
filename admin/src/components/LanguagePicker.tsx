@@ -1,22 +1,11 @@
 import { useState } from 'react';
 import { useI18n } from '../i18n/I18nContext';
-import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
+import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import { GlobeIcon, PickerRow, PickerSheet } from './PickerSheet';
 
 /**
- * Each language written in itself, never translated. Somebody who opened
- * the dashboard in a language they cannot read is exactly who this list
- * is for, so they have to recognise their own among the three.
- */
-const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
-  en: 'English',
-  es: 'Español',
-  fr: 'Français',
-};
-
-/**
  * The app's language picker: one row carrying the language it is
- * currently set to, rather than three abbreviations side by side. The
+ * currently set to, rather than six abbreviations side by side. The
  * list only appears once somebody asks for it.
  */
 export function LanguagePicker() {

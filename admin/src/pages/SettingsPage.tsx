@@ -4,18 +4,12 @@ import { useI18n } from '../i18n/I18nContext';
 import { activateModule, getActiveModules, setModuleStatus } from '../api/activeModules';
 import { getPoi } from '../api/pois';
 import { updatePoiLanguage, updatePoiProfile } from '../api/poiSettings';
-import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
+import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 import { MenuOrderCard } from './MenuOrderCard';
 import { DestructiveButton } from '../components/DestructiveButton';
 
 const LIVE_STATUSES = new Set(['trial', 'active']);
-
-const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
-  en: 'English',
-  es: 'Español',
-  fr: 'Français',
-};
 
 export function SettingsPage() {
   const poiId = usePoiId();

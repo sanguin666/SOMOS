@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import { createEvent, deleteEvent, getEvents, updateEvent, type EventInput } from '../api/events';
 import type { Event, EventCategory, EventException } from '../api/types';
 import { weekdaysOf } from '../schedule';
@@ -136,13 +137,13 @@ function inputFrom(draft: Draft): EventInput {
 // "2026-11-11" as "Wednesday 11 November", in the admin's language.
 function exceptionDay(date: string, language: string): string {
   const [y, m, d] = date.split('-').map(Number);
-  const text = new Date(y, m - 1, d).toLocaleDateString(language, { weekday: 'long', day: 'numeric', month: 'long' });
+  const text = new Date(y, m - 1, d).toLocaleDateString(intlLocale(language), { weekday: 'long', day: 'numeric', month: 'long' });
   return text.charAt(0).toLocaleUpperCase() + text.slice(1);
 }
 
 function weekdayName(day: number, language: string, style: 'long' | 'narrow' = 'long'): string {
   // 6 September 2026 is a Sunday.
-  return new Date(2026, 8, 6 + day, 12).toLocaleDateString(language, { weekday: style });
+  return new Date(2026, 8, 6 + day, 12).toLocaleDateString(intlLocale(language), { weekday: style });
 }
 
 const sameDays = (a: number[], b: number[]) => a.length === b.length && b.every((day) => a.includes(day));
@@ -186,9 +187,9 @@ const NTH_KEYS: Record<string, 'events.nth_1' | 'events.nth_2' | 'events.nth_3' 
  * 11 November", or the date of a one-off event, then where.
  */
 function whenLine(item: Event, t: T, language: string): string {
-  const timeOf = (iso: string) => new Date(iso).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
+  const timeOf = (iso: string) => new Date(iso).toLocaleTimeString(intlLocale(language), { hour: '2-digit', minute: '2-digit' });
   const dateOf = (iso: string) =>
-    new Date(iso).toLocaleDateString(language, { day: 'numeric', month: 'long', year: 'numeric' });
+    new Date(iso).toLocaleDateString(intlLocale(language), { day: 'numeric', month: 'long', year: 'numeric' });
   const end = item.endsAt ? ` – ${timeOf(item.endsAt)}` : '';
   const exceptions = item.exceptions ?? [];
   const parts =

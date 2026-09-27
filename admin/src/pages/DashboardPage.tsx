@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import { useAuth } from '../auth/AuthContext';
 import type { DashboardContext } from '../layout/usePoiId';
 import { getDashboard } from '../api/dashboard';
@@ -146,7 +147,7 @@ export function DashboardPage() {
     getCampaigns(poiId).then(setCampaigns).catch(() => setCampaigns([]));
   }, [poiId, givingLive]);
 
-  const locale = language === 'fr' ? 'fr-FR' : language === 'es' ? 'es-ES' : 'en-GB';
+  const locale = language === 'en' ? 'en-GB' : intlLocale(language);
   const dayTime = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   const formatWhen = (iso: string) => dayTime.format(new Date(iso));
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());

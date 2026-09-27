@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
+import { intlLocale } from '../i18n/translations';
 import {
   createAnnouncement,
   deleteAnnouncement,
@@ -247,7 +248,7 @@ export function AnnouncementsPage() {
             {item.body && <p>{item.body}</p>}
             {item.audioUrl && <p className="muted">{t('announcements.includesVoice')}</p>}
             <p className="card-meta">
-              {new Date(item.createdAt).toLocaleString(language, { dateStyle: 'long', timeStyle: 'short' })}
+              {new Date(item.createdAt).toLocaleString(intlLocale(language), { dateStyle: 'long', timeStyle: 'short' })}
             </p>
             <div className="card-actions">
               <button type="button" className="btn" onClick={() => startEdit(item)}>
