@@ -59,7 +59,7 @@ const NTH_KEYS: Record<string, 'schedule.nth_1' | 'schedule.nth_2' | 'schedule.n
   '-1': 'schedule.nth_last',
 };
 
-const DATE_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', va: 'ca-ES', fr: 'fr-FR' };
+const DATE_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', va: 'ca-ES', gl: 'gl-ES', pt: 'pt-PT', fr: 'fr-FR' };
 
 /**
  * The lines of a timetable, for a card that brings its own heading, then
