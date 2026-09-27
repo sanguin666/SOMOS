@@ -100,6 +100,18 @@ const PRODUCT_NAMES: Record<Language, Record<'gift' | 'monthly' | 'collection' |
     collection: 'Col·lecta — {name}',
     intention: 'Intenció de missa — {name}',
   },
+  [Language.GL]: {
+    gift: 'Doazón a {name}',
+    monthly: 'Doazón mensual a {name}',
+    collection: 'Colecta — {name}',
+    intention: 'Intención de misa — {name}',
+  },
+  [Language.PT]: {
+    gift: 'Donativo a {name}',
+    monthly: 'Donativo mensal a {name}',
+    collection: 'Ofertório — {name}',
+    intention: 'Intenção de missa — {name}',
+  },
 };
 
 function productName(poi: Poi, purpose: DonationPurpose, recurring: boolean): string {

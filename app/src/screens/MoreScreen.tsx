@@ -38,6 +38,8 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   en: 'English',
   es: 'Español',
   va: 'Valencià',
+  gl: 'Galego',
+  pt: 'Português',
   fr: 'Français',
 };
 
