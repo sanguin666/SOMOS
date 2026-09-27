@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DataSource } from 'typeorm';
+import { DataSource, In, type Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './users/entities/user.entity.js';
 import { Poi } from './pois/entities/poi.entity.js';
@@ -35,6 +35,7 @@ import { BadgeKind } from './common/enums/badge-kind.enum.js';
 import { EventCategory, EventRecurrence } from './events/entities/event-kinds.js';
 import { DEMO_MEMBER_PHONE } from './common/demo/demo-account.js';
 import { UPLOADS_ROOT, publicUrlFor } from './common/upload/multer-storage.js';
+import { atWallClock, localTime } from './events/occurrences.js';
 
 export const CARMEN_QR_TOKEN = 'DEMO-CARMEN';
 export const CARMEN_ADMIN_EMAIL = 'admin@carmen.example';
@@ -89,7 +90,66 @@ const DAY = 24 * HOUR;
  * here is only created when missing, so edits made in the admin survive
  * a re-run.
  */
+// The demo is a community in Spain, so its times are Spanish times,
+// whatever clock the server runs on (Railway's is UTC).
+export const CARMEN_TIME_ZONE = 'Europe/Madrid';
+
 export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
+  const previousZone = process.env.TZ;
+  // Node reads TZ again when it changes, so the Dates below are Madrid's.
+  process.env.TZ = CARMEN_TIME_ZONE;
+  try {
+    return await seedCarmenInMadrid(dataSource);
+  } finally {
+    if (previousZone === undefined) delete process.env.TZ;
+    else process.env.TZ = previousZone;
+  }
+}
+
+/**
+ * Seeds before 27 Sep 2026 wrote the timetable in the server's time zone:
+ * on Railway, UTC, so Sunday Mass at 10:00 showed as 12:00 on a phone in
+ * Spain. Moves the seeded events to the same wall-clock time in Madrid,
+ * once: after that Sunday Mass reads 10:00 in Madrid and nothing moves.
+ * Events the office added itself are left alone.
+ */
+async function moveUtcTimetableToMadrid(events: Repository<Event>, place: Poi): Promise<void> {
+  const seeded = await events.find({ where: { poi: { id: place.id }, title: In(SEEDED_EVENT_TITLES) } });
+  const sundayMass = seeded.find((event) => event.title === 'Misa dominical');
+  if (!sundayMass) return;
+  const inUtc = localTime(sundayMass.startsAt, 'UTC');
+  if (inUtc.hour !== 10 || localTime(sundayMass.startsAt, CARMEN_TIME_ZONE).hour === 10) return;
+  const move = (date: Date) => {
+    const wall = localTime(date, 'UTC');
+    return atWallClock(wall, wall.hour, wall.minute, CARMEN_TIME_ZONE);
+  };
+  for (const event of seeded) {
+    event.startsAt = move(event.startsAt);
+    if (event.endsAt) event.endsAt = move(event.endsAt);
+  }
+  await events.save(seeded);
+  console.log('Moved the Carmen timetable from UTC to Madrid time');
+}
+
+const SEEDED_EVENT_TITLES = [
+  'Misa',
+  'Misa vespertina del sábado',
+  'Misa dominical',
+  'Misa dominical con niños',
+  'Misa dominical de la tarde',
+  'Confesiones',
+  'Adoración eucarística',
+  'Rosario',
+  'Despacho abierto',
+  'Despacho abierto (sábado)',
+  'Misa del primer viernes',
+  'Reunión de padres de catequesis',
+  'Cursillo prematrimonial',
+  'Concierto del coro',
+  'Fiesta de la comunidad',
+];
+
+async function seedCarmenInMadrid(dataSource: DataSource): Promise<Poi> {
   const pois = dataSource.getRepository(Poi);
   const users = dataSource.getRepository(User);
   const memberships = dataSource.getRepository(UserPoi);
@@ -299,6 +359,8 @@ export async function seedCarmen(dataSource: DataSource): Promise<Poi> {
       }),
     ]);
     console.log('Seeded the Carmen timetable and events');
+  } else {
+    await moveUtcTimetableToMadrid(events, place);
   }
 
   // ---- News and community life ----
