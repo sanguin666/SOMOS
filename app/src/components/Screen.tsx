@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useRef } from 'react';
-import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing } from '../theme/theme';
+import { colors, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   children: ReactNode;
@@ -91,7 +91,7 @@ export function Screen({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   root: {
     flex: 1,
     backgroundColor: colors.background,
@@ -103,4 +103,4 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: spacing.md,
   },
-});
+}));

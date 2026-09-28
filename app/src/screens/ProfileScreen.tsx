@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
@@ -9,7 +9,7 @@ import { FormCard, FormDivider, FormField, FormRow } from '../components/FormCar
 import { CameraIcon, CloseIcon } from '../components/icons';
 import { updateMyProfile, uploadMyAvatar } from '../api/auth';
 import { useAuth } from '../auth/AuthContext';
-import { cardSurface, colors, fontSizes, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, fontSizes, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { useI18n } from '../i18n/I18nContext';
 
 type Props = {
@@ -291,7 +291,7 @@ export function ProfileScreen({ visible, onClose, onSignIn }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   scrim: {
     flex: 1,
-    backgroundColor: 'rgba(17,17,17,0.45)',
+    backgroundColor: colors.scrim,
   },
   pickerSheet: {
     backgroundColor: colors.surface,
@@ -365,4 +365,4 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
-});
+}));

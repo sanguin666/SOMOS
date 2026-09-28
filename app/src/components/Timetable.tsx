@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
 import { BellIcon } from './icons';
 import {
@@ -12,7 +12,7 @@ import {
 } from '../utils/schedule';
 import type { EventCategory } from '../api/types';
 import { useI18n } from '../i18n/I18nContext';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 /**
  * One kind of celebration's weekly times, as one white card: its name on
@@ -193,7 +193,7 @@ export function TimetableRows({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     ...cardSurface,
     borderRadius: radii.lg,
@@ -281,4 +281,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
-});
+}));

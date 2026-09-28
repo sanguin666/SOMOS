@@ -1,9 +1,9 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
 import { PersonIcon } from './icons';
 import { uploadUri } from '../api/client';
 import type { Me } from '../api/auth';
-import { colors } from '../theme/theme';
+import { colors, themedStyles } from '../theme/theme';
 
 /**
  * Somebody's picture, in a circle, with two fallbacks: their initials when
@@ -63,7 +63,7 @@ export function initialsOf(me: Me | null): string {
   return letters.join('').toUpperCase();
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   photo: {
     backgroundColor: colors.background,
   },
@@ -82,4 +82,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

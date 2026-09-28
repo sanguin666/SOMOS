@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 import {
   RecordingPresets,
   requestRecordingPermissionsAsync,
@@ -14,7 +14,7 @@ import { BackChevronIcon, MicIcon, PlayIcon } from '../components/icons';
 import { createAnnouncement } from '../api/announcements';
 import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -201,7 +201,7 @@ export function ComposeAnnouncementScreen({ poi, onBack, onCreated }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   iconButton: {
     width: 44,
     height: 44,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 9999,
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerFill,
   },
   recordingTime: {
     flex: 1,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.lg,
     borderRadius: 9999,
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerFill,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -309,4 +309,4 @@ const styles = StyleSheet.create({
   spacer: {
     minHeight: spacing.md,
   },
-});
+}));

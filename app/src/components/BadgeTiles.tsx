@@ -1,9 +1,9 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
 import { AlertIcon, CalendarIcon, ChaliceIcon, HeartIcon, MegaphoneIcon } from './icons';
 import type { BadgeTile } from '../utils/badges';
 import type { ModuleType } from '../api/types';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   tiles: BadgeTile[];
@@ -28,7 +28,7 @@ function TileIcon({ icon, color }: { icon: BadgeTile['icon']; color: string }) {
     case 'closed':
       // Open is the brand's coral, closed a quiet grey: never the only
       // sign, the label says it in words.
-      return <View style={[styles.dot, { backgroundColor: icon === 'open' ? colors.primary : '#9A8F82' }]} />;
+      return <View style={[styles.dot, { backgroundColor: icon === 'open' ? colors.primary : colors.quietDot }]} />;
   }
 }
 
@@ -100,7 +100,7 @@ export function BadgeTiles({ tiles, drafts, onOpen }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   important: {
     // The darker coral, not the brand's: white text on it has to clear
     // 4.5:1, and this is text at body size.
-    backgroundColor: colors.primaryStrong,
-    borderColor: colors.primaryStrong,
+    backgroundColor: colors.primaryFill,
+    borderColor: colors.primaryFill,
   },
   draft: {
     borderWidth: 2,
@@ -157,4 +157,4 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
   },
-});
+}));

@@ -1,9 +1,9 @@
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleText } from './AccessibleText';
 import { CheckIcon, CloseIcon, PinIcon, PlusIcon } from './icons';
 import type { SavedPlace } from '../storage/savedPlaces';
-import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { useI18n } from '../i18n/I18nContext';
 
 type Props = {
@@ -117,10 +117,10 @@ export function PlaceSwitcher({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   scrim: {
     flex: 1,
-    backgroundColor: 'rgba(17,17,17,0.45)',
+    backgroundColor: colors.scrim,
   },
   sheet: {
     backgroundColor: colors.surface,
@@ -186,4 +186,4 @@ const styles = StyleSheet.create({
   rowName: {
     fontWeight: '700',
   },
-});
+}));

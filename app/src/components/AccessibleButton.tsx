@@ -1,6 +1,6 @@
-import { Pressable, StyleSheet, type PressableProps, type ViewStyle } from 'react-native';
+import { Pressable, type PressableProps, type ViewStyle } from 'react-native';
 import { AccessibleText } from './AccessibleText';
-import { colors, fontSizes, minTouchTarget, radii, spacing } from '../theme/theme';
+import { colors, fontSizes, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 
 /**
  * Three buttons, and no fourth. A button is not a box, so all three are
@@ -59,7 +59,7 @@ export function AccessibleButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   base: {
     minHeight: minTouchTarget,
     borderRadius: radii.lg,
@@ -77,16 +77,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
-});
+}));
 
-const containerStyles = StyleSheet.create({
+const containerStyles = themedStyles(() => ({
   primary: { backgroundColor: colors.primary, borderColor: colors.primary },
   secondary: { backgroundColor: colors.surface, borderColor: colors.border },
   destructive: { backgroundColor: colors.surface, borderColor: colors.border },
-});
+}));
 
-const labelStyles = StyleSheet.create({
+const labelStyles = themedStyles(() => ({
   primary: { color: colors.primaryText },
   secondary: { color: colors.text },
   destructive: { color: colors.danger },
-});
+}));

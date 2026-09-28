@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as WebBrowser from 'expo-web-browser';
 import { AccessibleButton } from '../components/AccessibleButton';
@@ -21,7 +21,7 @@ import { useI18n } from '../i18n/I18nContext';
 import { intlLocale } from '../i18n/translations';
 import type { Poi } from '../api/types';
 import { formatWhen } from '../utils/schedule';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { statusColor } from './RequestsScreen';
 
 type Props = {
@@ -383,7 +383,7 @@ function FileLink({ file, onOpen, label }: { file: RequestFile; onOpen: (file: R
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
@@ -475,4 +475,4 @@ const styles = StyleSheet.create({
   underline: {
     textDecorationLine: 'underline',
   },
-});
+}));

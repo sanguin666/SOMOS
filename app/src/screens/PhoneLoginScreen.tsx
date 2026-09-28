@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
@@ -9,7 +9,7 @@ import { useAuth } from '../auth/AuthContext';
 import { getLastLogin, storeLastLogin } from '../storage/session';
 import { useI18n } from '../i18n/I18nContext';
 import { ApiError } from '../api/client';
-import { cardSurface, colors, fontSizes, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, fontSizes, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   onBack: () => void;
@@ -184,7 +184,7 @@ export function PhoneLoginScreen({ onBack, onSignedIn }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -214,4 +214,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.xs,
   },
-});
+}));

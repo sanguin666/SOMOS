@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
 import { ChevronRightIcon } from './icons';
 import { uploadUri } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import { calendarPage } from '../utils/schedule';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 /**
  * A summary as one white box of rows split by hairlines: the home page's
@@ -111,7 +111,7 @@ export function SummaryRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     ...cardSurface,
     borderRadius: radii.lg,
@@ -164,4 +164,4 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: radii.md,
   },
-});
+}));

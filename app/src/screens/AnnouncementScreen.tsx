@@ -1,11 +1,11 @@
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { AccessibleText } from '../components/AccessibleText';
 import { PlayIcon } from '../components/icons';
 import { uploadUri } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import type { Announcement } from '../api/types';
-import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 
 export function formatNewsDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -82,7 +82,7 @@ function VoiceButton({ path, label }: { path: string; label: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bold: {
     fontWeight: '700',
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   important: {
-    backgroundColor: colors.primaryStrong,
+    backgroundColor: colors.primaryFill,
     borderRadius: 6,
     paddingHorizontal: spacing.sm,
     paddingVertical: 1,
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingHorizontal: spacing.lg,
   },
-});
+}));

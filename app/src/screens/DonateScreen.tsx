@@ -1,5 +1,5 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, TextInput, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
@@ -23,7 +23,7 @@ import {
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { intlLocale } from '../i18n/translations';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { currencySymbol, formatAmount } from '../utils/currency';
 import type { Poi } from '../api/types';
 
@@ -774,7 +774,7 @@ function ProjectRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   flex: {
     flex: 1,
   },
@@ -967,4 +967,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 2,
   },
-});
+}));
