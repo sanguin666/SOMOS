@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { LogoMark } from '../components/LogoMark';
 import { LanguagePicker } from '../components/LanguagePicker';
+import { AppearancePicker } from '../components/AppearancePicker';
 import { PickerRow, PickerSheet, PinIcon } from '../components/PickerSheet';
 import { getActiveModules } from '../api/activeModules';
 import type { ActiveModule, ModuleType } from '../api/types';
@@ -124,6 +125,7 @@ export function DashboardLayout() {
         <div className="sidebar-footer">
           <hr className="menu-divider" />
           <LanguagePicker />
+          <AppearancePicker />
           <button type="button" className="btn btn-destructive btn-block" onClick={logout}>
             {t('layout.signOut')}
           </button>

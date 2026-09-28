@@ -31,8 +31,7 @@
   --color-card-border: rgba(92, 70, 44, 0.16);
   --radius: 16px;
 
-  /* Chart tokens (dataviz skill reference palette, light mode only — this
-     app doesn't have a dark theme yet). */
+  /* Chart tokens (dataviz skill reference palette); dark values below. */
   --series-1: #e1663f;
   --chart-grid: #e1e0d9;
   --chart-axis: #c3c2b7;
@@ -44,6 +43,35 @@
   font-size: 17px;
   line-height: 1.45;
   color-scheme: light;
+  --color-placeholder: #8a8175;
+  --color-scrim: rgba(17, 17, 17, 0.45);
+}
+
+/*
+ * Dark mode, the app's "warm dark" (Seb, 28 Sep 2026): the beige page and
+ * white boxes become dark browns, the orange buttons stay as they are,
+ * and small orange and red text goes lighter to stay readable. Set by
+ * useAppearance on <html>, and only once signed in: the sign-in page
+ * stays light. The phone preview inside stays light too.
+ */
+:root[data-theme='dark'] {
+  --color-bg: #17130f;
+  --color-surface: #27211b;
+  --color-text: #f5efe7;
+  --color-text-muted: #cfc5b8;
+  --color-primary-strong: #f2916b;
+  --color-primary-soft: #4a2c20;
+  --color-danger: #ff8a80;
+  --color-border: #f5efe7;
+  --color-card-border: rgba(255, 236, 214, 0.16);
+  --color-placeholder: #a2988b;
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  --chart-grid: #3a332b;
+  --chart-axis: #5a5046;
+  --chart-muted: #a89d90;
+  --delta-up: #6cc47a;
+  --delta-down: #ff8a80;
+  color-scheme: dark;
 }
 
 * {
@@ -326,7 +354,7 @@ a {
 
 .form input::placeholder,
 .form textarea::placeholder {
-  color: #8a8175;
+  color: var(--color-placeholder);
 }
 
 /* A row of a form that is read, not typed into: the value keeps the
@@ -598,7 +626,34 @@ a.btn {
    own there, and the orange line above it does the separating. */
 .sidebar .picker-row {
   border-color: transparent;
-  padding: 0 4px;
+  padding: 6px 4px;
+}
+
+/* The sidebar is narrow: what a row is set to goes under its name
+   ("Apparence / Automatique" doesn't fit on one line), with the icon and
+   the chevron centred beside the pair. */
+.sidebar .picker-row:has(.picker-row-value) {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 12px;
+  row-gap: 0;
+}
+
+.sidebar .picker-row:has(.picker-row-value) > svg {
+  grid-row: 1 / span 2;
+}
+
+.sidebar .picker-row:has(.picker-row-value) > svg:last-child {
+  grid-column: 3;
+}
+
+.sidebar .picker-row-label,
+.sidebar .picker-row-value {
+  grid-column: 2;
+}
+
+.sidebar .picker-row-value {
+  font-size: 15px;
 }
 
 .picker-row-label {
@@ -611,6 +666,11 @@ a.btn {
   font-size: 16px;
 }
 
+/* A long value ("Automático") squeezes the label, never the icons. */
+.picker-row > svg {
+  flex-shrink: 0;
+}
+
 .sheet {
   width: min(440px, calc(100vw - 32px));
   padding: 0;
@@ -621,7 +681,7 @@ a.btn {
 }
 
 .sheet::backdrop {
-  background: rgba(17, 17, 17, 0.45);
+  background: var(--color-scrim);
 }
 
 .sheet-body {
@@ -857,7 +917,7 @@ a.btn {
   position: absolute;
   transform: translate(-50%, -100%);
   background: var(--color-text);
-  color: #fff;
+  color: var(--color-surface);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 12px;
@@ -872,7 +932,7 @@ a.btn {
 }
 
 .chart-tooltip-label {
-  color: rgba(255, 255, 255, 0.75);
+  opacity: 0.75;
   margin-top: 2px;
 }
 
