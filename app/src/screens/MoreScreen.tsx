@@ -150,7 +150,7 @@ export function MoreScreen({
           style={styles.row}
         >
           {row.icon(poiTheme.accentStrong)}
-          <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+          <AccessibleText variant="bodyLarge" style={styles.rowLabel} {...ONE_LINE}>
             {row.label}
           </AccessibleText>
           <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -168,7 +168,7 @@ export function MoreScreen({
         style={styles.row}
       >
         <PinIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+        <AccessibleText variant="bodyLarge" style={styles.rowLabel} {...ONE_LINE}>
           {t('hub.switchPlace')}
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -181,7 +181,7 @@ export function MoreScreen({
         style={styles.row}
       >
         <PlusIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+        <AccessibleText variant="bodyLarge" style={styles.rowLabel} {...ONE_LINE}>
           {t('places.addPlace')}
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -199,7 +199,7 @@ export function MoreScreen({
         style={[styles.row, styles.rowDestructive]}
       >
         <ExitIcon size={26} color={colors.danger} />
-        <AccessibleText variant="bodyLarge" color={colors.danger} style={styles.rowLabel}>
+        <AccessibleText variant="bodyLarge" color={colors.danger} style={styles.rowLabel} {...ONE_LINE}>
           {t('more.leavePlace')}
         </AccessibleText>
       </Pressable>
@@ -263,11 +263,11 @@ export function MoreScreen({
         style={styles.row}
       >
         <BellIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+        <AccessibleText variant="bodyLarge" style={[styles.rowLabel, styles.rowLabelBesideValue]} {...ONE_LINE}>
           {t('notifications.title')}
         </AccessibleText>
         {notificationsOn !== null && (
-          <AccessibleText variant="body" color={colors.textMuted}>
+          <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} {...ONE_LINE}>
             {notificationsOn ? t('notifications.on') : t('notifications.off')}
           </AccessibleText>
         )}
@@ -284,10 +284,10 @@ export function MoreScreen({
         style={styles.row}
       >
         <GlobeIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+        <AccessibleText variant="bodyLarge" style={[styles.rowLabel, styles.rowLabelBesideValue]} {...ONE_LINE}>
           {t('home.languageLabel')}
         </AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
+        <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} {...ONE_LINE}>
           {LANGUAGE_NAMES[language]}
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -359,10 +359,10 @@ export function MoreScreen({
         style={styles.row}
       >
         <ContrastIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+        <AccessibleText variant="bodyLarge" style={[styles.rowLabel, styles.rowLabelBesideValue]} {...ONE_LINE}>
           {t('more.appearance')}
         </AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted}>
+        <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} {...ONE_LINE}>
           {appearanceLabel(preference, t)}
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -466,6 +466,10 @@ function moduleIcon(type: ModuleType): (color: string) => ReactNode {
   }
 }
 
+// Every More row stays on one line: a label too long for the row gets
+// smaller type rather than a second line, and so does a value beside it.
+const ONE_LINE = { numberOfLines: 1, adjustsFontSizeToFit: true, minimumFontScale: 0.7 } as const;
+
 const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
@@ -489,6 +493,20 @@ const styles = themedStyles(() => ({
   rowLabel: {
     flex: 1,
     fontWeight: '700',
+  },
+  // Beside a value, the label keeps its own width and the value takes
+  // what is left, so "Activadas" ends in "…" before the label does.
+  rowLabelBesideValue: {
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: 'auto',
+  },
+  rowValue: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
+    textAlign: 'right',
   },
   divider: {
     height: 1,
