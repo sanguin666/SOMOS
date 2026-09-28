@@ -263,11 +263,11 @@ export function MoreScreen({
         style={styles.row}
       >
         <BellIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={[styles.rowLabel, styles.rowLabelBesideValue]} {...ONE_LINE}>
+        <AccessibleText variant="bodyLarge" style={styles.rowLabelBesideValue} numberOfLines={1}>
           {t('notifications.title')}
         </AccessibleText>
         {notificationsOn !== null && (
-          <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} {...ONE_LINE}>
+          <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} numberOfLines={1}>
             {notificationsOn ? t('notifications.on') : t('notifications.off')}
           </AccessibleText>
         )}
@@ -284,10 +284,10 @@ export function MoreScreen({
         style={styles.row}
       >
         <GlobeIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={[styles.rowLabel, styles.rowLabelBesideValue]} {...ONE_LINE}>
+        <AccessibleText variant="bodyLarge" style={styles.rowLabelBesideValue} numberOfLines={1}>
           {t('home.languageLabel')}
         </AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} {...ONE_LINE}>
+        <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} numberOfLines={1}>
           {LANGUAGE_NAMES[language]}
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -359,10 +359,10 @@ export function MoreScreen({
         style={styles.row}
       >
         <ContrastIcon size={26} color={colors.textMuted} />
-        <AccessibleText variant="bodyLarge" style={[styles.rowLabel, styles.rowLabelBesideValue]} {...ONE_LINE}>
+        <AccessibleText variant="bodyLarge" style={styles.rowLabelBesideValue} numberOfLines={1}>
           {t('more.appearance')}
         </AccessibleText>
-        <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} {...ONE_LINE}>
+        <AccessibleText variant="body" color={colors.textMuted} style={styles.rowValue} numberOfLines={1}>
           {appearanceLabel(preference, t)}
         </AccessibleText>
         <ChevronRightIcon size={22} color={colors.textMuted} />
@@ -467,7 +467,7 @@ function moduleIcon(type: ModuleType): (color: string) => ReactNode {
 }
 
 // Every More row stays on one line: a label too long for the row gets
-// smaller type rather than a second line, and so does a value beside it.
+// smaller type rather than a second line.
 const ONE_LINE = { numberOfLines: 1, adjustsFontSizeToFit: true, minimumFontScale: 0.7 } as const;
 
 const styles = themedStyles(() => ({
@@ -495,11 +495,12 @@ const styles = themedStyles(() => ({
     fontWeight: '700',
   },
   // Beside a value, the label keeps its own width and the value takes
-  // what is left, so "Activadas" ends in "…" before the label does.
+  // what is left, so "Activadas" ends in "…" before the label does. No
+  // font fitting here: Android measured a fitted label of free width as
+  // zero and hid it.
   rowLabelBesideValue: {
-    flexGrow: 0,
-    flexShrink: 1,
-    flexBasis: 'auto',
+    flexShrink: 0,
+    fontWeight: '700',
   },
   rowValue: {
     flexGrow: 1,
