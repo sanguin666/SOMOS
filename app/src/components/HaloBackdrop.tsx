@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
-import { colors, currentColorScheme } from '../theme/theme';
 
 /**
  * The white that the welcome screen's words sit on: two overlapping soft
@@ -19,17 +18,11 @@ import { colors, currentColorScheme } from '../theme/theme';
 const SOLID = 0.77;
 
 export function HaloBackdrop({ width, height }: { width: number; height: number }) {
-  // White light on the light page; in dark mode a pool of the dark page
-  // instead, so the light words still sit on something dark.
-  const glow = currentColorScheme() === 'dark' ? colors.background : '#FFFFFF';
   return (
     // The viewBox is read as percentages of the screen: the blobs are
     // meant to stretch with it, so nothing here preserves the aspect
     // ratio.
-    // Keyed by the colour: a gradient's stops don't repaint when only
-    // their colour changes, so a switch of mode draws it afresh.
     <Svg
-      key={glow}
       style={StyleSheet.absoluteFill}
       width={width}
       height={height}
@@ -41,9 +34,9 @@ export function HaloBackdrop({ width, height }: { width: number; height: number 
         {/* Measured against each ellipse's own box, so one definition
             serves both however differently they are shaped. */}
         <RadialGradient id="halo">
-          <Stop offset="0" stopColor={glow} stopOpacity="1" />
-          <Stop offset={SOLID} stopColor={glow} stopOpacity="1" />
-          <Stop offset="1" stopColor={glow} stopOpacity="0" />
+          <Stop offset="0" stopColor="#FFFFFF" stopOpacity="1" />
+          <Stop offset={SOLID} stopColor="#FFFFFF" stopOpacity="1" />
+          <Stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
         </RadialGradient>
       </Defs>
 

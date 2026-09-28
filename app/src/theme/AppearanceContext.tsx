@@ -19,14 +19,15 @@ type AppearanceState = {
 const AppearanceContext = createContext<AppearanceState | null>(null);
 
 /**
- * Light or dark mode for the whole app, stored on the phone like the
- * language. The colour tokens are switched here, during render, so the
- * screens re-rendering below already read the new colours; anything that
- * should repaint on a switch has to sit under a component calling
- * `useAppearance` (App's routes do).
+ * Light or dark mode, stored on the phone like the language. This only
+ * works out which scheme the member wants; App's routes apply it with
+ * `applyColorScheme`, during render, so the screens below already read
+ * the new colours — and only once somebody is signed in: the welcome and
+ * sign-in screens always stay light (Seb, 28 Sep 2026).
  *
- * `forced` pins a scheme regardless of the phone or the choice: the
- * dashboard's phone preview is always light, like the dashboard.
+ * `forced` pins a scheme regardless of the phone or the choice, and
+ * applies it here: the dashboard's phone preview is always light, like
+ * the dashboard.
  */
 export function AppearanceProvider({ children, forced }: { children: ReactNode; forced?: ColorScheme }) {
   const system = useColorScheme();
@@ -55,7 +56,7 @@ export function AppearanceProvider({ children, forced }: { children: ReactNode; 
 
   const scheme: ColorScheme =
     forced ?? (preference === 'auto' ? (system === 'dark' ? 'dark' : 'light') : preference);
-  applyColorScheme(scheme);
+  if (forced) applyColorScheme(forced);
 
   if (!loaded && !forced) return null;
 

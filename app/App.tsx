@@ -17,7 +17,7 @@ import { demoSignIn, demoSignInAvailable, joinPoi, leavePoi, setLastActivePoi } 
 import { getPoi } from './src/api/pois';
 import { forgetPlace, getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
 import { landingPoi } from './src/landing';
-import { colors } from './src/theme/theme';
+import { applyColorScheme, colors } from './src/theme/theme';
 import { AppearanceProvider, useAppearance } from './src/theme/AppearanceContext';
 import type { Poi } from './src/api/types';
 
@@ -44,7 +44,11 @@ type Route =
 function AppRoutes() {
   const { ready, me, refresh, signIn } = useAuth();
   // Read so that a switch between light and dark repaints every screen.
-  const { scheme } = useAppearance();
+  // Dark mode is for the signed-in app only: the welcome and sign-in
+  // screens stay light whatever the phone or the choice says.
+  const { scheme: wanted } = useAppearance();
+  const scheme = me ? wanted : 'light';
+  applyColorScheme(scheme);
   const [stack, setStack] = useState<Route[]>([]);
   // Whether the opening route has been worked out for this session. The
   // stack alone can't say: "empty" is also what signing out leaves.
