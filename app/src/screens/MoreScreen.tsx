@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
@@ -11,6 +11,7 @@ import {
   CheckIcon,
   ChevronRightIcon,
   ClipboardIcon,
+  ContrastIcon,
   ExitIcon,
   BellIcon,
   GlobeIcon,
@@ -22,13 +23,14 @@ import {
 } from '../components/icons';
 import { hubMenu, type HubTab } from '../components/PoiShell';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
 import { getNotificationPreferences } from '../api/notifications';
 import { getPermissionState } from '../notifications/push';
 import { useAuth } from '../auth/AuthContext';
+import { useAppearance, type AppearancePreference } from '../theme/AppearanceContext';
 
 /**
  * Each language written in itself, never translated. Somebody who opened
@@ -43,6 +45,19 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   pt: 'Português',
   fr: 'Français',
 };
+
+const APPEARANCES: AppearancePreference[] = ['auto', 'light', 'dark'];
+
+function appearanceLabel(preference: AppearancePreference, t: ReturnType<typeof useI18n>['t']): string {
+  switch (preference) {
+    case 'auto':
+      return t('more.appearanceAuto');
+    case 'light':
+      return t('more.appearanceLight');
+    case 'dark':
+      return t('more.appearanceDark');
+  }
+}
 
 type Props = {
   poi: Poi;
@@ -76,6 +91,8 @@ export function MoreScreen({
   const insets = useSafeAreaInsets();
   const poiTheme = getPoiTheme(poi.type);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const { preference, setPreference } = useAppearance();
+  const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [confirmingLeave, setConfirmingLeave] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [leaveFailed, setLeaveFailed] = useState(false);
@@ -332,6 +349,75 @@ export function MoreScreen({
           />
         </View>
       </Modal>
+
+      {/* Light or dark, set the same way as the language: one row saying
+          what it is set to, and the choice in a sheet. */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${t('more.appearance')}: ${appearanceLabel(preference, t)}`}
+        onPress={() => setAppearanceOpen(true)}
+        style={styles.row}
+      >
+        <ContrastIcon size={26} color={colors.textMuted} />
+        <AccessibleText variant="bodyLarge" style={styles.rowLabel}>
+          {t('more.appearance')}
+        </AccessibleText>
+        <AccessibleText variant="body" color={colors.textMuted}>
+          {appearanceLabel(preference, t)}
+        </AccessibleText>
+        <ChevronRightIcon size={22} color={colors.textMuted} />
+      </Pressable>
+
+      <Modal
+        visible={appearanceOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setAppearanceOpen(false)}
+      >
+        <Pressable
+          style={styles.scrim}
+          accessibilityLabel={t('places.close')}
+          onPress={() => setAppearanceOpen(false)}
+        />
+        <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
+          <AccessibleText variant="title">{t('more.appearance')}</AccessibleText>
+          <AccessibleText variant="body" color={colors.textMuted}>
+            {t('more.appearanceExplainer')}
+          </AccessibleText>
+
+          {APPEARANCES.map((option, index) => {
+            const selected = option === preference;
+            const last = index === APPEARANCES.length - 1;
+            return (
+              <Pressable
+                key={option}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                accessibilityLabel={appearanceLabel(option, t)}
+                // The sheet stays open, so the switch is seen happening
+                // around it and can be taken back at once.
+                onPress={() => setPreference(option)}
+                style={[styles.languageOption, last && styles.languageOptionLast]}
+              >
+                <AccessibleText
+                  variant="bodyLarge"
+                  color={selected ? colors.primaryStrong : colors.text}
+                  style={styles.rowLabel}
+                >
+                  {appearanceLabel(option, t)}
+                </AccessibleText>
+                {selected && <CheckIcon size={24} color={colors.primaryStrong} />}
+              </Pressable>
+            );
+          })}
+
+          <AccessibleButton
+            label={t('places.close')}
+            variant="secondary"
+            onPress={() => setAppearanceOpen(false)}
+          />
+        </View>
+      </Modal>
     </>
   );
 }
@@ -380,7 +466,7 @@ function moduleIcon(type: ModuleType): (color: string) => ReactNode {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
@@ -411,7 +497,7 @@ const styles = StyleSheet.create({
   },
   scrim: {
     flex: 1,
-    backgroundColor: 'rgba(17,17,17,0.45)',
+    backgroundColor: colors.scrim,
   },
   sheet: {
     backgroundColor: colors.surface,
@@ -447,4 +533,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

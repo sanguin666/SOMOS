@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { FormCard, FormDivider, FormField } from '../components/FormCard';
@@ -9,7 +9,7 @@ import { SignInNotice } from '../components/SignInNotice';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import type { CommunityComment, CommunityPost, Poi } from '../api/types';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -124,7 +124,7 @@ export function CommunityThreadScreen({ poi, post, onBack, onSignIn }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   iconButton: {
     width: 44,
     height: 44,
@@ -152,4 +152,4 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.xs,
   },
-});
+}));

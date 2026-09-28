@@ -1,11 +1,11 @@
-import { Modal, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Modal, Pressable, Switch, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from './AccessibleButton';
 import { AccessibleText } from './AccessibleText';
 import { monthlyRuleLabel } from './Timetable';
 import { formatDays, timeKey, timetableTime, weekdayName, weekdaysOf } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
-import { colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import type { Event } from '../api/types';
 
 const DATE_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', va: 'ca-ES', gl: 'gl-ES', pt: 'pt-PT', fr: 'fr-FR' };
@@ -97,7 +97,7 @@ export function TimesReminderSheet({
                 <Switch
                   value={on}
                   onValueChange={(value) => onToggle(event.id, value)}
-                  trackColor={{ false: '#C9C4BC', true: colors.primary }}
+                  trackColor={{ false: colors.switchOff, true: colors.primary }}
                   thumbColor="#FFFFFF"
                   importantForAccessibility="no-hide-descendants"
                   accessibilityElementsHidden
@@ -161,10 +161,10 @@ export function RepeatReminderSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   scrim: {
     flex: 1,
-    backgroundColor: 'rgba(17,17,17,0.45)',
+    backgroundColor: colors.scrim,
   },
   sheet: {
     backgroundColor: colors.surface,
@@ -187,4 +187,4 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: '700',
   },
-});
+}));

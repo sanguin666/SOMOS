@@ -1,11 +1,11 @@
-import { ImageBackground, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ImageBackground, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
 import { HaloBackdrop } from '../components/HaloBackdrop';
 import { LogoMark } from '../components/icons';
 import { useI18n } from '../i18n/I18nContext';
-import { colors, spacing } from '../theme/theme';
+import { colors, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   onSignUp: () => void;
@@ -83,7 +83,7 @@ export function OnboardingScreen({ onSignUp, onSignIn, onDemoSignIn }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   root: {
     flex: 1,
     justifyContent: 'center',
@@ -110,4 +110,4 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginTop: spacing.lg,
   },
-});
+}));

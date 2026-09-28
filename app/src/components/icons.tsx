@@ -1,4 +1,5 @@
 import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
+import { colors } from '../theme/theme';
 
 type IconProps = {
   size?: number;
@@ -41,7 +42,7 @@ export function LogoMark({ size = 40, haloColor }: { size?: number; haloColor?: 
   );
 }
 
-export function BackChevronIcon({ size = 20, color = '#111111' }: IconProps) {
+export function BackChevronIcon({ size = 20, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -55,7 +56,7 @@ export function BackChevronIcon({ size = 20, color = '#111111' }: IconProps) {
   );
 }
 
-export function ChevronRightIcon({ size = 20, color = '#3D3D3D' }: IconProps) {
+export function ChevronRightIcon({ size = 20, color = colors.textMuted }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -69,7 +70,7 @@ export function ChevronRightIcon({ size = 20, color = '#3D3D3D' }: IconProps) {
   );
 }
 
-export function BellIcon({ size = 20, color = '#111111', filled = false }: IconProps & { filled?: boolean }) {
+export function BellIcon({ size = 20, color = colors.text, filled = false }: IconProps & { filled?: boolean }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -91,7 +92,7 @@ export function BellIcon({ size = 20, color = '#111111', filled = false }: IconP
   );
 }
 
-export function CheckIcon({ size = 20, color = '#111111' }: IconProps) {
+export function CheckIcon({ size = 20, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -105,7 +106,7 @@ export function CheckIcon({ size = 20, color = '#111111' }: IconProps) {
   );
 }
 
-export function HomeIcon({ size = 20, color = '#111111' }: IconProps) {
+export function HomeIcon({ size = 20, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -121,7 +122,7 @@ export function HomeIcon({ size = 20, color = '#111111' }: IconProps) {
 
 // Points at the place name in the hub banner to show it opens the place
 // switcher rather than being a plain label.
-export function ChevronDownIcon({ size = 20, color = '#111111' }: IconProps) {
+export function ChevronDownIcon({ size = 20, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -166,7 +167,7 @@ export function CandleIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
   );
 }
 
-export function MicIcon({ size = 24, color = '#111111' }: IconProps) {
+export function MicIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -186,7 +187,7 @@ export function MicIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
-export function PlusIcon({ size = 20, color = '#111111' }: IconProps) {
+export function PlusIcon({ size = 20, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Line x1={12} y1={5} x2={12} y2={19} stroke={color} strokeWidth={2.5} strokeLinecap="round" />
@@ -219,7 +220,7 @@ export function PlaceGlyphIcon({ size = 64, color = '#FFFFFF' }: IconProps) {
   );
 }
 
-export function CloseIcon({ size = 20, color = '#111111' }: IconProps) {
+export function CloseIcon({ size = 20, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -305,7 +306,7 @@ export function ChatBubbleIcon({ size = 24, color = '#FFFFFF' }: IconProps) {
   );
 }
 
-export function PinIcon({ size = 24, color = '#111111' }: IconProps) {
+export function PinIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -322,7 +323,7 @@ export function PinIcon({ size = 24, color = '#111111' }: IconProps) {
 
 // Three dots: the near-universal "there is more behind this" mark, kept
 // as filled circles so it stays legible at the tab bar's icon size.
-export function MoreDotsIcon({ size = 24, color = '#111111' }: IconProps) {
+export function MoreDotsIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx={5} cy={12} r={2} fill={color} />
@@ -335,7 +336,7 @@ export function MoreDotsIcon({ size = 24, color = '#111111' }: IconProps) {
 // The stand-in for somebody who has neither a picture nor a name yet —
 // head and shoulders, drawn rather than photographic so it never reads as
 // a real person's face.
-export function PersonIcon({ size = 24, color = '#111111' }: IconProps) {
+export function PersonIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={8} r={3.6} stroke={color} strokeWidth={2} />
@@ -351,7 +352,7 @@ export function PersonIcon({ size = 24, color = '#111111' }: IconProps) {
 
 // Sits on the profile picture to say the picture is the thing you press
 // to change it.
-export function CameraIcon({ size = 24, color = '#111111' }: IconProps) {
+export function CameraIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -365,7 +366,7 @@ export function CameraIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
-export function ExitIcon({ size = 24, color = '#111111' }: IconProps) {
+export function ExitIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Three walls and an open side: a doorway being stepped out of. */}
@@ -387,7 +388,7 @@ export function ExitIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
-export function GlobeIcon({ size = 24, color = '#111111' }: IconProps) {
+export function GlobeIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={2} />
@@ -404,12 +405,22 @@ export function GlobeIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
+// Light / dark mode: a circle half filled.
+export function ContrastIcon({ size = 24, color = colors.text }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={2} />
+      <Path d="M12 3a9 9 0 0 1 0 18Z" fill={color} />
+    </Svg>
+  );
+}
+
 // Requests to the office: a clipboard with a form on it.
-export function ClipboardIcon({ size = 24, color = '#111111' }: IconProps) {
+export function ClipboardIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Rect x={5} y={4} width={14} height={18} rx={2} stroke={color} strokeWidth={2} />
-      <Rect x={9} y={2} width={6} height={4} rx={1} stroke={color} strokeWidth={2} fill="#FFFFFF" />
+      <Rect x={9} y={2} width={6} height={4} rx={1} stroke={color} strokeWidth={2} fill={colors.surface} />
       <Line x1={8.5} y1={11} x2={15.5} y2={11} stroke={color} strokeWidth={2} strokeLinecap="round" />
       <Line x1={8.5} y1={15} x2={13.5} y2={15} stroke={color} strokeWidth={2} strokeLinecap="round" />
     </Svg>
@@ -417,7 +428,7 @@ export function ClipboardIcon({ size = 24, color = '#111111' }: IconProps) {
 }
 
 // Mass intentions: a chalice with the host above it.
-export function ChaliceIcon({ size = 24, color = '#111111' }: IconProps) {
+export function ChaliceIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={4} r={2.2} stroke={color} strokeWidth={1.8} />
@@ -428,7 +439,7 @@ export function ChaliceIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
-export function PaperclipIcon({ size = 24, color = '#111111' }: IconProps) {
+export function PaperclipIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -443,7 +454,7 @@ export function PaperclipIcon({ size = 24, color = '#111111' }: IconProps) {
 }
 
 // A paper still to hand in, or one handed in (with `done`).
-export function DocumentIcon({ size = 24, color = '#111111' }: IconProps) {
+export function DocumentIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
@@ -453,7 +464,7 @@ export function DocumentIcon({ size = 24, color = '#111111' }: IconProps) {
 }
 
 // Save to the phone: an arrow down onto a line.
-export function DownloadIcon({ size = 24, color = '#111111' }: IconProps) {
+export function DownloadIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M12 3v12M6 10l6 6 6-6M4 21h16" stroke={color} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
@@ -461,7 +472,7 @@ export function DownloadIcon({ size = 24, color = '#111111' }: IconProps) {
   );
 }
 
-export function AlertIcon({ size = 24, color = '#111111' }: IconProps) {
+export function AlertIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M12 3 2 21h20Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />

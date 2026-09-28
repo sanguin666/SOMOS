@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { ChevronRightIcon } from '../components/icons';
@@ -27,7 +27,7 @@ import type {
   PoiPageBlock,
 } from '../api/types';
 import type { HubTab } from '../components/PoiShell';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -509,7 +509,7 @@ function SectionHeader({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   draft: {
     borderWidth: 2,
     borderStyle: 'dashed',
@@ -550,4 +550,4 @@ const styles = StyleSheet.create({
   seeAllLabel: {
     fontWeight: '700',
   },
-});
+}));

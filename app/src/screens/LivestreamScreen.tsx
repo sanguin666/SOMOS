@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { PlayIcon } from '../components/icons';
 import { getLivestreams } from '../api/livestreams';
 import { useI18n } from '../i18n/I18nContext';
 import type { Livestream, Poi } from '../api/types';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -102,7 +102,7 @@ export function LivestreamScreen({ poi }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     ...cardSurface,
   },
   badgeLive: {
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerFill,
   },
   badgeMonth: {
     letterSpacing: 0.5,
@@ -160,4 +160,4 @@ const styles = StyleSheet.create({
   watchLabel: {
     fontWeight: '700',
   },
-});
+}));

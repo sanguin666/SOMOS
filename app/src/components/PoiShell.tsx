@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Screen } from './Screen';
 import { AccessibleText } from './AccessibleText';
 import { Avatar } from './Avatar';
@@ -20,7 +20,7 @@ import {
 } from './icons';
 import type { ActiveModule, ModuleType, Poi } from '../api/types';
 import type { Me } from '../api/auth';
-import { colors, floatingShadow, minTouchTarget, radii, spacing } from '../theme/theme';
+import { colors, floatingShadow, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -332,7 +332,7 @@ function TabBarItem({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   // A plain white banner across the full width, painted behind the
   // status bar too. It sits outside the scroll view, so it stays put
   // while the page moves under it.
@@ -415,4 +415,4 @@ const styles = StyleSheet.create({
   tabBarLabelActive: {
     fontWeight: '800',
   },
-});
+}));

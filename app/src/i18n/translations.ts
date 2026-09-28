@@ -99,6 +99,11 @@ export type Translations = {
     leaveCancel: string;
     leaveError: string;
     chooseLanguage: string;
+    appearance: string;
+    appearanceExplainer: string;
+    appearanceAuto: string;
+    appearanceLight: string;
+    appearanceDark: string;
   };
   profile: {
     title: string;
@@ -543,6 +548,11 @@ const en: Translations = {
     leaveCancel: 'No, stay',
     leaveError: "We couldn't do that. Please try again.",
     chooseLanguage: 'Choose a language',
+    appearance: 'Appearance',
+    appearanceExplainer: 'Automatic follows your phone’s setting.',
+    appearanceAuto: 'Automatic',
+    appearanceLight: 'Light',
+    appearanceDark: 'Dark',
   },
   profile: {
     title: 'Your settings',
@@ -989,6 +999,11 @@ const es: Translations = {
     leaveCancel: 'No, quedarme',
     leaveError: 'No hemos podido hacerlo. Inténtalo de nuevo.',
     chooseLanguage: 'Elige un idioma',
+    appearance: 'Apariencia',
+    appearanceExplainer: 'Automático sigue el ajuste de tu teléfono.',
+    appearanceAuto: 'Automático',
+    appearanceLight: 'Claro',
+    appearanceDark: 'Oscuro',
   },
   profile: {
     title: 'Tus ajustes',
@@ -1435,6 +1450,11 @@ const fr: Translations = {
     leaveCancel: 'Non, rester',
     leaveError: 'Nous n’avons pas pu le faire. Réessayez.',
     chooseLanguage: 'Choisissez une langue',
+    appearance: 'Apparence',
+    appearanceExplainer: 'Automatique suit le réglage de votre téléphone.',
+    appearanceAuto: 'Automatique',
+    appearanceLight: 'Clair',
+    appearanceDark: 'Sombre',
   },
   profile: {
     title: 'Vos réglages',
@@ -1881,6 +1901,11 @@ const va: Translations = {
     leaveCancel: 'No, quedar-me',
     leaveError: 'No ho hem pogut fer. Torna-ho a provar.',
     chooseLanguage: 'Tria un idioma',
+    appearance: 'Aparença',
+    appearanceExplainer: 'Automàtic segueix l’ajust del teu telèfon.',
+    appearanceAuto: 'Automàtic',
+    appearanceLight: 'Clar',
+    appearanceDark: 'Fosc',
   },
   profile: {
     title: 'La teua configuració',
@@ -2327,6 +2352,11 @@ const gl: Translations = {
     leaveCancel: 'Non, quedar',
     leaveError: 'Non puidemos facelo. Téntao de novo.',
     chooseLanguage: 'Escolle un idioma',
+    appearance: 'Aparencia',
+    appearanceExplainer: 'Automático segue o axuste do teu teléfono.',
+    appearanceAuto: 'Automático',
+    appearanceLight: 'Claro',
+    appearanceDark: 'Escuro',
   },
   profile: {
     title: 'Os teus axustes',
@@ -2774,6 +2804,11 @@ const pt: Translations = {
     leaveCancel: 'Não, ficar',
     leaveError: 'Não foi possível fazê-lo. Tente novamente.',
     chooseLanguage: 'Escolha um idioma',
+    appearance: 'Aparência',
+    appearanceExplainer: 'Automático segue a definição do seu telemóvel.',
+    appearanceAuto: 'Automático',
+    appearanceLight: 'Claro',
+    appearanceDark: 'Escuro',
   },
   profile: {
     title: 'As suas definições',

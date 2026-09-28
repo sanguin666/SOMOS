@@ -17,7 +17,8 @@ import { demoSignIn, demoSignInAvailable, joinPoi, leavePoi, setLastActivePoi } 
 import { getPoi } from './src/api/pois';
 import { forgetPlace, getSavedPlaces, rememberPlace, type SavedPlace } from './src/storage/savedPlaces';
 import { landingPoi } from './src/landing';
-import { colors } from './src/theme/theme';
+import { applyColorScheme, colors } from './src/theme/theme';
+import { AppearanceProvider, useAppearance } from './src/theme/AppearanceContext';
 import type { Poi } from './src/api/types';
 
 // Set once this phone has been asked about notifications, so the question
@@ -42,6 +43,12 @@ type Route =
  */
 function AppRoutes() {
   const { ready, me, refresh, signIn } = useAuth();
+  // Read so that a switch between light and dark repaints every screen.
+  // Dark mode is for the signed-in app only: the welcome and sign-in
+  // screens stay light whatever the phone or the choice says.
+  const { scheme: wanted } = useAppearance();
+  const scheme = me ? wanted : 'light';
+  applyColorScheme(scheme);
   const [stack, setStack] = useState<Route[]>([]);
   // Whether the opening route has been worked out for this session. The
   // stack alone can't say: "empty" is also what signing out leaves.
@@ -240,9 +247,10 @@ function AppRoutes() {
     }
   }
 
-  // Only the camera fills the screen behind the status bar, so only the
-  // scan screen needs light text up there.
-  const statusBarStyle = current?.name === 'scan' ? 'light' : 'auto';
+  // Light text up there over the camera and in dark mode. Not "auto":
+  // that follows the phone, which is wrong when the app was set to
+  // light or dark by hand.
+  const statusBarStyle = current?.name === 'scan' || scheme === 'dark' ? 'light' : 'dark';
 
   return (
     <>
@@ -329,11 +337,14 @@ export default function App() {
   const preview = previewPoiId();
   return (
     <SafeAreaProvider>
-      <I18nProvider>
-        <AuthProvider>
-          {preview ? <PreviewApp poiId={preview} /> : <AppRoutes />}
-        </AuthProvider>
-      </I18nProvider>
+      {/* The dashboard's preview stays light, like the dashboard around it. */}
+      <AppearanceProvider forced={preview ? 'light' : undefined}>
+        <I18nProvider>
+          <AuthProvider>
+            {preview ? <PreviewApp poiId={preview} /> : <AppRoutes />}
+          </AuthProvider>
+        </I18nProvider>
+      </AppearanceProvider>
     </SafeAreaProvider>
   );
 }

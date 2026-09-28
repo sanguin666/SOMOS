@@ -17,16 +17,17 @@ export type PoiTheme = {
   label: string;
 };
 
-const POI_THEMES: Record<PoiType, PoiTheme> = {
-  church: {
+// Functions rather than values so the accent follows light / dark mode.
+const POI_THEMES: Record<PoiType, () => PoiTheme> = {
+  church: () => ({
     accent: colors.primary,
     accentStrong: colors.primaryStrong,
     accentSoft: colors.primarySoft,
     accentText: colors.primaryText,
     label: 'Church',
-  },
+  }),
 };
 
 export function getPoiTheme(type: PoiType): PoiTheme {
-  return POI_THEMES[type] ?? POI_THEMES.church;
+  return (POI_THEMES[type] ?? POI_THEMES.church)();
 }

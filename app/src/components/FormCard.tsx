@@ -1,7 +1,7 @@
 import { type ReactNode, useState } from 'react';
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { TextInput, View, type TextInputProps } from 'react-native';
 import { AccessibleText } from './AccessibleText';
-import { cardSurface, colors, fontSizes, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, fontSizes, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 
 /**
  * A form, as one white card on the beige canvas.
@@ -75,7 +75,7 @@ export function FormField({ label, tall = false, ...rest }: FieldProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     ...cardSurface,
     borderRadius: radii.lg,
@@ -110,4 +110,4 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingTop: spacing.xs,
   },
-});
+}));

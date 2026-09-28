@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { CompactTimetable, type TimetableBells } from '../components/Timetable';
@@ -18,7 +18,7 @@ import {
   weeklyTimetable,
 } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import type { Event, EventCategory, Poi } from '../api/types';
 
 type Props = {
@@ -192,7 +192,7 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     minHeight: minTouchTarget,
     borderRadius: radii.lg,
-    backgroundColor: colors.primaryStrong,
+    backgroundColor: colors.primaryFill,
   },
   // The same shape as the live card below it, in the orange every call to
   // action wears, so the two read as a pair of ways into the week.
@@ -260,4 +260,4 @@ const styles = StyleSheet.create({
   bellButtonActive: {
     backgroundColor: colors.primary,
   },
-});
+}));

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { ChevronRightIcon, PlusIcon } from '../components/icons';
 import { getAnnouncements } from '../api/announcements';
 import { uploadUri } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import type { Announcement, Poi } from '../api/types';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import { formatNewsDate, ImportantLabel } from './AnnouncementScreen';
 
 type Props = {
@@ -198,7 +198,7 @@ function PostRow({ item, divider, onPress }: { item: Announcement; divider: bool
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   flex: {
     flex: 1,
     gap: 2,
@@ -290,4 +290,4 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     textTransform: 'uppercase',
   },
-});
+}));

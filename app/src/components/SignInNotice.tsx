@@ -1,8 +1,8 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
 import { AccessibleButton } from './AccessibleButton';
 import { useI18n } from '../i18n/I18nContext';
-import { cardSurface, colors, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 /**
  * Shown in place of a compose form when nobody is signed in. Reading never
@@ -20,11 +20,11 @@ export function SignInNotice({ onSignIn }: { onSignIn: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   box: {
     ...cardSurface,
     borderRadius: radii.lg,
     padding: spacing.md,
     gap: spacing.md,
   },
-});
+}));

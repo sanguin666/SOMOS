@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
@@ -19,7 +19,7 @@ import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
 import { formatAmount } from '../utils/currency';
 import { formatWhen, upcomingOccurrences, type Occurrence } from '../utils/schedule';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   poi: Poi;
@@ -362,7 +362,7 @@ function ChoiceRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
@@ -448,4 +448,4 @@ const styles = StyleSheet.create({
   amountText: {
     fontWeight: '800',
   },
-});
+}));

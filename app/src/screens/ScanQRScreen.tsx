@@ -11,7 +11,7 @@ import { extractPoiToken } from '../qr';
 import { DEMO_QR_TOKEN } from '../demo';
 import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { colors, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   onBack: () => void;
@@ -172,7 +172,7 @@ export function ScanQRScreen({ onBack, onFound }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   container: {
     flex: 1,
     backgroundColor: '#121214',
@@ -265,4 +265,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

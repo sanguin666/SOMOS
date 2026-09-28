@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, AppState, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, AppState, Pressable, Switch, View } from 'react-native';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleText } from '../components/AccessibleText';
 import { FormCard, FormDivider } from '../components/FormCard';
@@ -13,7 +13,7 @@ import { enablePush, getPermissionState, openPhoneSettings, type PermissionState
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../auth/AuthContext';
 import type { Poi } from '../api/types';
-import { colors, minTouchTarget, spacing } from '../theme/theme';
+import { colors, minTouchTarget, spacing, themedStyles } from '../theme/theme';
 
 const KINDS: { kind: NotificationKind; label: 'news' | 'requests' | 'events' | 'live'; hint: 'newsHint' | 'requestsHint' | 'eventsHint' | 'liveHint' }[] = [
   { kind: 'news', label: 'news', hint: 'newsHint' },
@@ -132,7 +132,7 @@ export function NotificationsScreen({ poi }: { poi: Poi }) {
                 <Switch
                   value={preferences[kind]}
                   onValueChange={(value) => void toggle(kind, value)}
-                  trackColor={{ false: '#C9C4BC', true: colors.primary }}
+                  trackColor={{ false: colors.switchOff, true: colors.primary }}
                   thumbColor="#FFFFFF"
                   importantForAccessibility="no-hide-descendants"
                   accessibilityElementsHidden
@@ -152,7 +152,7 @@ export function NotificationsScreen({ poi }: { poi: Poi }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   titleBlock: {
     gap: spacing.xs,
     marginTop: spacing.sm,
@@ -171,4 +171,4 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontWeight: '700',
   },
-});
+}));

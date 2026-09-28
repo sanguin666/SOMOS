@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
@@ -9,7 +9,7 @@ import { getPoiByQrCode } from '../api/pois';
 import { ApiError } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import type { Poi } from '../api/types';
-import { cardSurface, colors, fontSizes, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, fontSizes, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 
 type Props = {
   onScanQR: () => void;
@@ -102,7 +102,7 @@ export function AddPlaceScreen({ onScanQR, onOpenPoi, onBack }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -123,4 +123,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

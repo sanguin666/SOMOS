@@ -1,5 +1,5 @@
-import { Text, type TextProps, StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../theme/theme';
+import { Text, type TextProps } from 'react-native';
+import { colors, fontSizes, themedStyles } from '../theme/theme';
 
 type Variant = 'title' | 'body' | 'bodyLarge' | 'caption';
 
@@ -27,7 +27,7 @@ export function AccessibleText({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: {
     fontSize: fontSizes.title,
     fontWeight: '700',
@@ -45,4 +45,4 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.caption,
     color: colors.textMuted,
   },
-});
+}));

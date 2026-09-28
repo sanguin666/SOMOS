@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { BackChevronIcon, BellIcon, ChevronRightIcon } from '../components/icons';
 import { RepeatReminderSheet } from '../components/ReminderSheets';
@@ -8,7 +8,7 @@ import { dayKey, occurrencesOnDay, repeats, startOfWeek, timeKey, type Occurrenc
 import { useEventReminders } from '../notifications/useEventReminders';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
-import { cardSurface, colors, minTouchTarget, radii, spacing } from '../theme/theme';
+import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles, currentColorScheme } from '../theme/theme';
 import type { Event, EventCategory, Poi } from '../api/types';
 
 type Props = { poi: Poi };
@@ -20,7 +20,8 @@ const DAY_LOCALES: Record<string, string> = { en: 'en-GB', es: 'es-ES', va: 'ca-
 const DEFAULT_MINUTES = 60;
 
 // A pale fill and a strong edge per kind, so the kinds tell apart at a
-// glance while the dark text on the fill stays easy to read.
+// glance while the dark text on the fill stays easy to read. In dark mode
+// the fill goes dark and the edge light, so the light text still reads.
 const CATEGORY_COLORS: Record<EventCategory, { fill: string; edge: string }> = {
   mass: { fill: '#FBE3D9', edge: '#B8502E' },
   confession: { fill: '#EFE6FB', edge: '#6B4EA8' },
@@ -29,6 +30,18 @@ const CATEGORY_COLORS: Record<EventCategory, { fill: string; edge: string }> = {
   office_hours: { fill: '#F1ECE4', edge: '#7A6A55' },
   other: { fill: '#FDF0D5', edge: '#A86A00' },
 };
+const CATEGORY_COLORS_DARK: Record<EventCategory, { fill: string; edge: string }> = {
+  mass: { fill: '#4A2C20', edge: '#F2916B' },
+  confession: { fill: '#352A4A', edge: '#B89CF0' },
+  adoration: { fill: '#22382A', edge: '#7CC897' },
+  prayer: { fill: '#22382A', edge: '#7CC897' },
+  office_hours: { fill: '#3A3229', edge: '#C9B79E' },
+  other: { fill: '#43341A', edge: '#E8B04A' },
+};
+
+function categoryColors() {
+  return currentColorScheme() === 'dark' ? CATEGORY_COLORS_DARK : CATEGORY_COLORS;
+}
 
 function addDays(date: Date, days: number): Date {
   const next = new Date(date);
@@ -194,7 +207,7 @@ export function CalendarScreen({ poi }: Props) {
       {events !== null && items.length > 0 && (
         <View style={styles.list}>
           {items.map((o, i) => {
-            const tone = CATEGORY_COLORS[o.event.category] ?? CATEGORY_COLORS.other;
+            const tone = categoryColors()[o.event.category] ?? CATEGORY_COLORS.other;
             const when = o.endsAt ? `${time(o.startsAt)} – ${time(o.endsAt)}` : null;
             const details = [when, o.event.location].filter(Boolean).join(' · ');
             const past = sameDay(now, day) && endOf(o) <= now;
@@ -287,7 +300,7 @@ function NowLine({ label }: { label: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   weekHead: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -432,4 +445,4 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: colors.primary,
   },
-});
+}));
