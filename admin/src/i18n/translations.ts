@@ -45,6 +45,10 @@ export type Translations = {
     managing: string;
     language: string;
     chooseLanguage: string;
+    appearance: string;
+    appearanceAuto: string;
+    appearanceLight: string;
+    appearanceDark: string;
     choosePlace: string;
     close: string;
     signOut: string;
@@ -630,6 +634,10 @@ const en: Translations = {
     managing: 'Managing',
     language: 'Language',
     chooseLanguage: 'Choose a language',
+    appearance: 'Appearance',
+    appearanceAuto: 'Automatic',
+    appearanceLight: 'Light',
+    appearanceDark: 'Dark',
     choosePlace: 'Choose a place',
     close: 'Close',
     signOut: 'Sign out',
@@ -1216,6 +1224,10 @@ const es: Translations = {
     managing: 'Administrando',
     language: 'Idioma',
     chooseLanguage: 'Elige un idioma',
+    appearance: 'Apariencia',
+    appearanceAuto: 'Automático',
+    appearanceLight: 'Claro',
+    appearanceDark: 'Oscuro',
     choosePlace: 'Elige un lugar',
     close: 'Cerrar',
     signOut: 'Cerrar sesión',
@@ -1802,6 +1814,10 @@ const fr: Translations = {
     managing: 'Gestion de',
     language: 'Langue',
     chooseLanguage: 'Choisissez une langue',
+    appearance: 'Apparence',
+    appearanceAuto: 'Automatique',
+    appearanceLight: 'Clair',
+    appearanceDark: 'Sombre',
     choosePlace: 'Choisissez un lieu',
     close: 'Fermer',
     signOut: 'Se déconnecter',
@@ -2388,6 +2404,10 @@ const va: Translations = {
     managing: 'Administrant',
     language: 'Idioma',
     chooseLanguage: 'Tria un idioma',
+    appearance: 'Aparença',
+    appearanceAuto: 'Automàtic',
+    appearanceLight: 'Clar',
+    appearanceDark: 'Fosc',
     choosePlace: 'Tria un lloc',
     close: 'Tancar',
     signOut: 'Tancar la sessió',
@@ -2974,6 +2994,10 @@ const gl: Translations = {
     managing: 'Administrando',
     language: 'Idioma',
     chooseLanguage: 'Escolle un idioma',
+    appearance: 'Aparencia',
+    appearanceAuto: 'Automático',
+    appearanceLight: 'Claro',
+    appearanceDark: 'Escuro',
     choosePlace: 'Escolle un lugar',
     close: 'Pechar',
     signOut: 'Pechar a sesión',
@@ -3560,6 +3584,10 @@ const pt: Translations = {
     managing: 'A gerir',
     language: 'Idioma',
     chooseLanguage: 'Escolha um idioma',
+    appearance: 'Aparência',
+    appearanceAuto: 'Automático',
+    appearanceLight: 'Claro',
+    appearanceDark: 'Escuro',
     choosePlace: 'Escolha um local',
     close: 'Fechar',
     signOut: 'Terminar sessão',
