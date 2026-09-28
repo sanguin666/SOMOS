@@ -171,10 +171,6 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
           poi={poi}
           modules={modules}
           onSelectTab={selectTab}
-          onOpenAnnouncement={(item) => {
-            setTab('announcements');
-            setDrilldown({ kind: 'announcement', item });
-          }}
         />
       )}
 

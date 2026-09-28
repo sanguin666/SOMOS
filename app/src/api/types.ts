@@ -8,6 +8,9 @@ export type Poi = {
   city: string | null;
   postalCode: string | null;
   qrCodeToken: string;
+  // A few lines about the place, written in the admin; the home page
+  // shows it when the place hasn't built a page yet.
+  description?: string | null;
   // The order this place wants its modules in the bottom menu, set in the
   // admin dashboard. Modules it leaves out fall in behind the ones it
   // listed, in the app's own default order.

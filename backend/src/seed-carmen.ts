@@ -671,9 +671,6 @@ async function seedCarmenInMadrid(dataSource: DataSource): Promise<Poi> {
         title: 'Bienvenidos',
         body: 'Seas de toda la vida o acabes de llegar a L’Eliana, aquí tienes tu casa. Consulta los horarios, pide un sacramento o un certificado, y ayúdanos a cuidar nuestra iglesia desde el móvil.',
       },
-      { type: PageBlockType.CELEBRATION_TIMES, itemCount: 3 },
-      { type: PageBlockType.NEXT_EVENTS, itemCount: 3 },
-      { type: PageBlockType.LATEST_ANNOUNCEMENTS, itemCount: 2 },
       {
         type: PageBlockType.TEXT,
         title: 'Cómo llegar',

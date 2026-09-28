@@ -1,25 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { AccessibleButton } from '../components/AccessibleButton';
-import { ChevronRightIcon } from '../components/icons';
 import { uploadUri } from '../api/client';
 import { getPoiBadges, getPoiPageBlocks } from '../api/poiPage';
 import { getCampaigns, type Campaign } from '../api/donations';
-import { getAnnouncements } from '../api/announcements';
 import { getEvents } from '../api/events';
-import { getLivestreams } from '../api/livestreams';
-import { monthlyRuleLabel } from '../components/Timetable';
-import { SummaryList, SummaryRow } from '../components/SummaryList';
 import { BadgeTiles } from '../components/BadgeTiles';
 import { badgeTiles } from '../utils/badges';
 import { usePreview } from '../preview/PreviewContext';
-import { formatWhen, repeats, shortDays, timeKey, upcomingOccurrences, weeklyTimetable } from '../utils/schedule';
 import type {
   ActiveModule,
-  Announcement,
   Event,
-  Livestream,
   ModuleType,
   PageBlockType,
   Poi,
@@ -28,59 +20,40 @@ import type {
 } from '../api/types';
 import type { HubTab } from '../components/PoiShell';
 import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
-import { getPoiTheme } from '../theme/poiThemes';
 import { useI18n } from '../i18n/I18nContext';
 
 type Props = {
   poi: Poi;
   modules: ActiveModule[] | null;
   onSelectTab: (tab: HubTab) => void;
-  // Opens one news post on its own page; without it a post opens the tab.
-  onOpenAnnouncement?: (item: Announcement) => void;
 };
 
-// What a POI that hasn't built a page yet gets: the two things a
-// congregant opens the app for. The admin dashboard offers exactly this
-// as a starting point, so a POI can adopt it and then edit it.
-const DEFAULT_BLOCKS: PoiPageBlock[] = [
-  {
-    id: 'default:celebration-times',
-    type: 'celebration_times',
-    position: 0,
-    title: null,
-    body: null,
-    imageUrl: null,
-    itemCount: 1,
-  },
-  {
-    id: 'default:next-events',
-    type: 'next_events',
-    position: 0,
-    title: null,
-    body: null,
-    imageUrl: null,
-    itemCount: 1,
-  },
-  {
-    id: 'default:latest-announcements',
-    type: 'latest_announcements',
-    position: 1,
-    title: null,
-    body: null,
-    imageUrl: null,
-    itemCount: 2,
-  },
-];
+// What a POI that hasn't built a page yet gets: its own description,
+// so the home page talks about the place from the start.
+function defaultBlocks(poi: Poi): PoiPageBlock[] {
+  if (!poi.description) return [];
+  return [
+    { id: 'default:about', type: 'text', position: 0, title: null, body: poi.description, imageUrl: null, itemCount: 1 },
+  ];
+}
 
-// A live block is only worth rendering while the module behind it is on.
+// A block is only worth rendering while the module behind it is on.
 const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
-  celebration_times: 'events',
-  next_events: 'events',
-  past_events: 'events',
-  latest_announcements: 'announcements',
-  next_livestream: 'livestreams',
   donate: 'donations',
 };
+
+// Block types a page may still hold from before but no longer shows.
+// The home page talks about the place itself, not lists from the other
+// sections (Seb, 28 Sep 2026): Mass times, events, news and the
+// livestream are behind their own buttons in the menu. Kept as types so
+// they can come back later.
+const RETIRED_BLOCKS = new Set<PageBlockType>([
+  'celebration_times',
+  'next_events',
+  'past_events',
+  'latest_announcements',
+  'next_livestream',
+]);
 
 /**
  * A POI's home page: the blocks its admins arranged in the dashboard, in
@@ -88,9 +61,8 @@ const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
  * built one. This is what a congregant lands on when they open the place,
  * before they pick anything from the menu.
  */
-export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }: Props) {
+export function PoiHomeScreen({ poi, modules, onSelectTab }: Props) {
   const { t, language } = useI18n();
-  const poiTheme = getPoiTheme(poi.type);
 
   const [savedBlocks, setBlocks] = useState<PoiPageBlock[] | null>(null);
   const [savedBadges, setBadges] = useState<PoiBadge[]>([]);
@@ -100,14 +72,12 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
   const blocks = preview?.blocks
     ? preview.blocks.length > 0
       ? preview.blocks
-      : DEFAULT_BLOCKS
+      : defaultBlocks(poi)
     : savedBlocks;
   const badges = preview?.badges ?? savedBadges;
   const drafts = new Set(preview?.drafts ?? []);
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [events, setEvents] = useState<Event[] | null>(null);
-  const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
-  const [livestreams, setLivestreams] = useState<Livestream[] | null>(null);
 
   const isLive = (type: ModuleType) =>
     modules?.some((m) => m.moduleType === type && m.status !== 'expired' && m.status !== 'cancelled') ??
@@ -117,18 +87,18 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
     let cancelled = false;
     getPoiPageBlocks(poi.id)
       .then((result) => {
-        if (!cancelled) setBlocks(result.length > 0 ? result : DEFAULT_BLOCKS);
+        if (!cancelled) setBlocks(result.length > 0 ? result : defaultBlocks(poi));
       })
       // A page nobody could load shouldn't leave the screen blank — the
       // default page is still better than nothing, and every module stays
       // reachable from the tab bar either way.
       .catch(() => {
-        if (!cancelled) setBlocks(DEFAULT_BLOCKS);
+        if (!cancelled) setBlocks(defaultBlocks(poi));
       });
     return () => {
       cancelled = true;
     };
-  }, [poi.id]);
+  }, [poi.id, poi.description]);
 
   useEffect(() => {
     let cancelled = false;
@@ -143,18 +113,15 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
     };
   }, [poi.id]);
 
-  // Each live block's content is fetched once, only if some block on the
-  // page actually asks for it and its module is on.
   const visible = (blocks ?? []).filter((block) => {
+    if (RETIRED_BLOCKS.has(block.type)) return false;
     const required = BLOCK_MODULE[block.type];
     return !required || isLive(required);
   });
-  const needsEvents =
-    visible.some((b) => b.type === 'celebration_times' || b.type === 'next_events' || b.type === 'past_events') ||
-    (isLive('events') && badges.some((b) => b.kind !== 'message' && b.kind !== 'campaign'));
+  // The badges are the one place other sections still show: fetched
+  // only when a badge needs them.
+  const needsEvents = isLive('events') && badges.some((b) => b.kind !== 'message' && b.kind !== 'campaign');
   const needsCampaigns = isLive('donations') && badges.some((b) => b.kind === 'campaign');
-  const needsAnnouncements = visible.some((b) => b.type === 'latest_announcements');
-  const needsLivestreams = visible.some((b) => b.type === 'next_livestream');
 
   useEffect(() => {
     if (!needsEvents) return;
@@ -182,32 +149,6 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
     };
   }, [poi.id, needsCampaigns]);
 
-  useEffect(() => {
-    if (!needsAnnouncements) return;
-    let cancelled = false;
-    getAnnouncements(poi.id)
-      .then((result) => {
-        if (!cancelled) setAnnouncements(result);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [poi.id, needsAnnouncements]);
-
-  useEffect(() => {
-    if (!needsLivestreams) return;
-    let cancelled = false;
-    getLivestreams(poi.id)
-      .then((result) => {
-        if (!cancelled) setLivestreams(result);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [poi.id, needsLivestreams]);
-
   if (blocks === null) {
     return (
       <AccessibleText variant="body" color={colors.textMuted}>
@@ -219,34 +160,6 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
   // The badges come first, above everything the page holds.
   const tiles = badgeTiles(badges, { events, campaigns, isLive, now: new Date(), language, t });
   const top = <BadgeTiles tiles={tiles} drafts={drafts} onOpen={onSelectTab} />;
-
-  if (visible.length === 0) {
-    return (
-      <>
-        {top}
-        <AccessibleText variant="body" color={colors.textMuted}>
-          {t('hub.noModules')}
-        </AccessibleText>
-      </>
-    );
-  }
-
-  const now = Date.now();
-  // The next and past event blocks are for one-off events. The weekly
-  // ones have the timetable block, and would otherwise sit in "past"
-  // forever, their first occurrence being long gone.
-  const oneOffs = (events ?? []).filter((e) => !repeats(e));
-  const upcoming = oneOffs
-    .filter((e) => new Date(e.startsAt).getTime() >= now)
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const past = oneOffs
-    .filter((e) => new Date(e.startsAt).getTime() < now)
-    .sort((a, b) => b.startsAt.localeCompare(a.startsAt));
-  // The API returns livestreams newest-scheduled first, so the last
-  // not-yet-ended one is the soonest to come. If they have all ended, show
-  // the most recent as a replay.
-  const notEnded = (livestreams ?? []).filter((l) => l.status !== 'ended');
-  const nextLivestream = notEnded[notEnded.length - 1] ?? (livestreams ?? [])[0];
 
   return (
     <>
@@ -298,165 +211,6 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
           </View>
         );
 
-      case 'celebration_times': {
-        // Succinct by design: the next Mass, then the week's Masses
-        // in a few lines. Confessions and the rest are one tap away.
-        const today = new Date(now);
-        const timetable = weeklyTimetable(events ?? [], today);
-        const [nextMass] = upcomingOccurrences(events ?? [], today, 1, (e) => e.category === 'mass');
-        const massTimes = timetable.find((section) => section.category === 'mass');
-        if (!nextMass && !massTimes) return null;
-        return (
-          <View key={block.id} style={styles.section}>
-            <SectionHeader
-              label={block.title || t('hub.celebrationTimes')}
-              accent={poiTheme.accentStrong}
-              onSeeAll={() => onSelectTab('events')}
-              seeAllLabel={t('hub.seeAll')}
-            />
-            <SummaryList>
-              {nextMass && (
-                <SummaryRow
-                  date={nextMass.startsAt}
-                  title={`${t('hub.nextMass')} ${timeKey(nextMass.startsAt)}`}
-                  detail={[nextMass.event.title, nextMass.event.location].filter(Boolean).join(' · ')}
-                  accessibilityLabel={`${t('hub.nextMass')}: ${formatWhen(nextMass.startsAt, today, language, {
-                    today: t('schedule.today'),
-                    tomorrow: t('schedule.tomorrow'),
-                  })}`}
-                  divider={false}
-                  onPress={() => onSelectTab('events')}
-                />
-              )}
-              {massTimes?.rows.map((row, index) => {
-                const days = row.monthly ? monthlyRuleLabel(row.monthly, t, language) : shortDays(row.days, language);
-                const times = row.times.join(' · ');
-                return (
-                  <SummaryRow
-                    key={days}
-                    label={row.monthly ? undefined : days}
-                    title={row.monthly ? `${days}: ${times}` : times}
-                    accessibilityLabel={`${days}: ${row.times.join(', ')}`}
-                    divider={!!nextMass || index > 0}
-                    onPress={() => onSelectTab('events')}
-                  />
-                );
-              })}
-              {massTimes?.notes.map((note) => (
-                <SummaryRow
-                  key={note.startsAt.toISOString()}
-                  date={note.startsAt}
-                  title={
-                    note.reason
-                      ? `${t('schedule.notAt', { time: timeKey(note.startsAt) })}: ${note.reason}`
-                      : t('schedule.notAt', { time: timeKey(note.startsAt) })
-                  }
-                  divider
-                  onPress={() => onSelectTab('events')}
-                />
-              ))}
-            </SummaryList>
-          </View>
-        );
-      }
-
-      case 'next_events':
-      case 'past_events': {
-        const list = block.type === 'next_events' ? upcoming : past;
-        const shown = list.slice(0, block.itemCount);
-        if (shown.length === 0) return null;
-        const fallbackHeading =
-          block.type === 'past_events'
-            ? t('hub.pastEvents')
-            : block.itemCount === 1
-              ? t('hub.nextEvent')
-              : t('hub.upcomingEvents');
-        return (
-          <View key={block.id} style={styles.section}>
-            <SectionHeader
-              label={block.title || fallbackHeading}
-              accent={poiTheme.accentStrong}
-              onSeeAll={() => onSelectTab('events')}
-              seeAllLabel={t('hub.seeAll')}
-            />
-            <SummaryList>
-              {shown.map((event, index) => {
-                const startsAt = new Date(event.startsAt);
-                return (
-                  <SummaryRow
-                    key={event.id}
-                    date={startsAt}
-                    title={event.title}
-                    detail={[timeKey(startsAt), event.location].filter(Boolean).join(' · ')}
-                    divider={index > 0}
-                    onPress={() => onSelectTab('events')}
-                  />
-                );
-              })}
-            </SummaryList>
-          </View>
-        );
-      }
-
-      case 'latest_announcements': {
-        const shown = (announcements ?? []).slice(0, block.itemCount);
-        if (shown.length === 0) return null;
-        return (
-          <View key={block.id} style={styles.section}>
-            <SectionHeader
-              label={block.title || t('hub.latestAnnouncements')}
-              accent={poiTheme.accentStrong}
-              onSeeAll={() => onSelectTab('announcements')}
-              seeAllLabel={t('hub.seeAll')}
-            />
-            <SummaryList>
-              {shown.map((item, index) => (
-                <SummaryRow
-                  key={item.id}
-                  date={new Date(item.createdAt)}
-                  showWeekday={false}
-                  title={item.title}
-                  important={item.important}
-                  imageUrl={item.imageUrl}
-                  accessibilityLabel={[item.important ? t('announcements.important') : null, item.title]
-                    .filter(Boolean)
-                    .join(': ')}
-                  divider={index > 0}
-                  onPress={() => (onOpenAnnouncement ? onOpenAnnouncement(item) : onSelectTab('announcements'))}
-                />
-              ))}
-            </SummaryList>
-          </View>
-        );
-      }
-
-      case 'next_livestream': {
-        if (!nextLivestream) return null;
-        return (
-          <View key={block.id} style={styles.section}>
-            <SectionHeader
-              label={block.title || t('hub.nextLivestream')}
-              accent={poiTheme.accentStrong}
-              onSeeAll={() => onSelectTab('livestreams')}
-              seeAllLabel={t('hub.seeAll')}
-            />
-            <SummaryList>
-              <SummaryRow
-                date={new Date(nextLivestream.scheduledAt)}
-                title={nextLivestream.title}
-                detail={
-                  nextLivestream.status === 'live'
-                    ? t('livestream.live')
-                    : timeKey(new Date(nextLivestream.scheduledAt))
-                }
-                divider={false}
-                onPress={() => onSelectTab('livestreams')}
-              />
-            </SummaryList>
-          </View>
-        );
-      }
-
       case 'donate':
         return (
           <View key={block.id} style={styles.section}>
@@ -483,32 +237,6 @@ export function PoiHomeScreen({ poi, modules, onSelectTab, onOpenAnnouncement }:
   }
 }
 
-function SectionHeader({
-  label,
-  accent,
-  onSeeAll,
-  seeAllLabel,
-}: {
-  label: string;
-  accent: string;
-  onSeeAll: () => void;
-  seeAllLabel: string;
-}) {
-  return (
-    <View style={styles.sectionHeader}>
-      <AccessibleText variant="caption" style={styles.sectionLabel}>
-        {label}
-      </AccessibleText>
-      <Pressable accessibilityRole="button" accessibilityLabel={seeAllLabel} onPress={onSeeAll} style={styles.seeAllButton}>
-        <AccessibleText variant="caption" color={accent} style={styles.seeAllLabel}>
-          {seeAllLabel}
-        </AccessibleText>
-        <ChevronRightIcon size={16} color={accent} />
-      </Pressable>
-    </View>
-  );
-}
-
 const styles = themedStyles(() => ({
   draft: {
     borderWidth: 2,
@@ -528,26 +256,5 @@ const styles = themedStyles(() => ({
     aspectRatio: 16 / 9,
     borderRadius: radii.lg,
     ...cardSurface,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  sectionLabel: {
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    flexShrink: 1,
-  },
-  seeAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    minHeight: 32,
-  },
-  seeAllLabel: {
-    fontWeight: '700',
   },
 }));

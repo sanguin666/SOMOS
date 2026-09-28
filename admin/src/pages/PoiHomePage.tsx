@@ -3,6 +3,7 @@ import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
 import { API_BASE_URL } from '../api/client';
 import { getActiveModules } from '../api/activeModules';
+import { getPoi } from '../api/pois';
 import {
   createPageBlock,
   deletePageBlock,
@@ -28,28 +29,24 @@ const BLOCK_MODULE: Partial<Record<PageBlockType, ModuleType>> = {
   celebration_times: 'events',
 };
 
-const COUNTED_BLOCKS = new Set<PageBlockType>([
+const COUNTED_BLOCKS = new Set<PageBlockType>(['latest_announcements']);
+
+// No longer offered or shown (Seb, 28 Sep 2026): the home page talks
+// about the place, not lists from other sections, which stay behind their
+// own buttons in the app's menu. A page that still holds one keeps it in
+// the database, hidden here and in the app, so they can come back later.
+const RETIRED_BLOCKS = new Set<PageBlockType>([
+  'celebration_times',
   'next_events',
   'past_events',
   'latest_announcements',
+  'next_livestream',
 ]);
 
 const ADDABLE_BLOCKS: PageBlockType[] = [
   'text',
   'image',
-  'next_events',
-  'past_events',
-  'latest_announcements',
-  'next_livestream',
   'donate',
-  'celebration_times',
-];
-
-// Matches the app's fallback page, so "start from the default" gives a POI
-// exactly what its congregants were already seeing, ready to edit.
-const DEFAULT_PAGE: { type: PageBlockType; itemCount: number }[] = [
-  { type: 'next_events', itemCount: 1 },
-  { type: 'latest_announcements', itemCount: 2 },
 ];
 
 const LIVE_STATUSES = new Set(['trial', 'active']);
@@ -59,6 +56,9 @@ export function PoiHomePage() {
   const { t } = useI18n();
   const [blocks, setBlocks] = useState<PoiPageBlock[] | null>(null);
   const [saved, setSaved] = useState<Record<string, PoiPageBlock>>({});
+  // Retired blocks the page still holds: the server wants every block in
+  // a reorder, so they ride along at the end.
+  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
   const [modules, setModules] = useState<ActiveModule[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -78,7 +78,9 @@ export function PoiHomePage() {
     celebration_times: t('homePage.blockCelebrationTimes'),
   };
 
-  function adopt(list: PoiPageBlock[]) {
+  function adopt(all: PoiPageBlock[]) {
+    const list = all.filter((b) => !RETIRED_BLOCKS.has(b.type));
+    setHiddenIds(all.filter((b) => RETIRED_BLOCKS.has(b.type)).map((b) => b.id));
     setBlocks(list);
     setSaved(Object.fromEntries(list.map((b) => [b.id, b])));
   }
@@ -151,9 +153,9 @@ export function PoiHomePage() {
   async function startFromDefault() {
     setError(null);
     try {
-      for (const block of DEFAULT_PAGE) {
-        await createPageBlock(poiId, block);
-      }
+      // Matches the app's fallback page: the place's own description.
+      const poi = await getPoi(poiId);
+      await createPageBlock(poiId, { type: 'text', body: poi.description ?? '' });
       adopt(await getPageBlocks(poiId));
     } catch {
       setError(t('homePage.saveError'));
@@ -179,7 +181,7 @@ export function PoiHomePage() {
     setBlocks(next);
     setError(null);
     try {
-      adopt(await reorderPageBlocks(poiId, next.map((b) => b.id)));
+      adopt(await reorderPageBlocks(poiId, [...next.map((b) => b.id), ...hiddenIds]));
     } catch {
       setError(t('homePage.saveError'));
       // Put the list back the way the server still has it.
