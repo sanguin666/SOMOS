@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Event } from '../api/types';
 import {
+  dayHeading,
   formatDays,
   formatWhen,
   occurrencesOf,
@@ -161,6 +162,17 @@ describe('formatWhen', () => {
     expect(formatWhen(at(2026, 9, 12, 10), MONDAY, 'en', words)).toBe('Saturday · 10:00');
     expect(formatWhen(at(2026, 9, 20, 10), MONDAY, 'fr', words)).toBe('Dimanche 20 septembre · 10:00');
     expect(formatWhen(at(2026, 8, 20, 9, 15), MONDAY, 'en', words)).toBe('20 August · 09:15');
+  });
+});
+
+describe('dayHeading', () => {
+  const words = { today: 'Hoy', tomorrow: 'Mañana', yesterday: 'Ayer' };
+  it('names today, tomorrow and yesterday, then the weekday and date', () => {
+    expect(dayHeading(at(2026, 9, 7, 20), MONDAY, 'es', words)).toBe('Hoy');
+    expect(dayHeading(at(2026, 9, 8, 8), MONDAY, 'es', words)).toBe('Mañana');
+    expect(dayHeading(at(2026, 9, 6, 8), MONDAY, 'es', words)).toBe('Ayer');
+    expect(dayHeading(at(2026, 9, 30, 20), MONDAY, 'es', words)).toBe('Miércoles 30 sept');
+    expect(dayHeading(at(2027, 1, 3, 10), MONDAY, 'en', words)).toBe('Sunday 3 Jan 2027');
   });
 });
 

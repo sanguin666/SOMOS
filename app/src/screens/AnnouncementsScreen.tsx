@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
-import { ChevronRightIcon, PlusIcon } from '../components/icons';
+import { groupByDay, SummaryDay, SummaryList, SummaryRow } from '../components/SummaryList';
+import { PlusIcon } from '../components/icons';
 import { getAnnouncements } from '../api/announcements';
 import { uploadUri } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
 import type { Announcement, Poi } from '../api/types';
-import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
+import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 import { formatNewsDate, ImportantLabel } from './AnnouncementScreen';
 
 type Props = {
@@ -23,8 +24,8 @@ const NEW_FOR_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * The News tab: the newest post big, with its photo and the start of its
- * text, then every earlier one as a row in one white box — the same list
- * as the projects on the Donations tab. Any post opens its own page.
+ * text, then every earlier one under the day it was posted, in one white
+ * box — the same list as the Events tab's coming events. Any post opens its own page.
  */
 export function AnnouncementsScreen({ poi, onCompose, onOpen, canCompose }: Props) {
   const { t } = useI18n();
@@ -141,69 +142,34 @@ function LatestPost({ item, onPress }: { item: Announcement; onPress: () => void
 }
 
 /**
- * Posts as rows in one white box: on the News tab under the newest post,
- * and as the home page's latest news.
+ * Earlier posts on the News tab, grouped under the day they were posted
+ * ("Hoy", "Ayer", "Lunes 28 sept") in one white box.
  */
 export function PostList({ items, onOpen }: { items: Announcement[]; onOpen: (item: Announcement) => void }) {
-  return (
-    <View style={styles.listCard}>
-      {items.map((item, index) => (
-        <PostRow key={item.id} item={item} divider={index > 0} onPress={() => onOpen(item)} />
-      ))}
-    </View>
-  );
-}
-
-/** An earlier post: its photo, or its date on a coral tile, then its title. */
-function PostRow({ item, divider, onPress }: { item: Announcement; divider: boolean; onPress: () => void }) {
   const { t } = useI18n();
-  const created = new Date(item.createdAt);
-  const date = formatNewsDate(item.createdAt);
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${item.title}, ${date}`}
-      onPress={onPress}
-      style={[styles.row, divider && styles.divider]}
-    >
-      {item.imageUrl ? (
-        <Image source={{ uri: uploadUri(item.imageUrl) }} style={styles.thumb} resizeMode="cover" />
-      ) : (
-        <View style={[styles.thumb, styles.dateTile]}>
-          <AccessibleText variant="bodyLarge" color={colors.primaryStrong} style={styles.dateDay}>
-            {created.getDate()}
-          </AccessibleText>
-          <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.dateMonth}>
-            {created.toLocaleDateString(undefined, { month: 'short' }).replace('.', '')}
-          </AccessibleText>
-        </View>
-      )}
-      <View style={styles.flex}>
-        {item.important && <ImportantLabel />}
-        <AccessibleText variant="bodyLarge" style={styles.bold}>
-          {item.title}
-        </AccessibleText>
-        {/* A date tile already says the day, so the line under the title
-            only repeats it next to a photo. */}
-        {(!!item.imageUrl || !!item.audioUrl) && (
-          <AccessibleText variant="caption">
-            {[item.imageUrl ? date : null, item.audioUrl ? t('announcements.voiceMessage') : null]
-              .filter(Boolean)
-              .join(' · ')}
-          </AccessibleText>
-        )}
-      </View>
-      <ChevronRightIcon size={22} color={colors.textMuted} />
-    </Pressable>
+    <SummaryList>
+      {groupByDay(items, (item) => new Date(item.createdAt)).map((day, dayIndex) => (
+        <Fragment key={day.date.toDateString()}>
+          <SummaryDay date={day.date} first={dayIndex === 0} />
+          {day.items.map((item) => (
+            <SummaryRow
+              key={item.id}
+              title={item.title}
+              above={item.important ? <ImportantLabel /> : null}
+              detail={item.audioUrl ? t('announcements.voiceMessage') : null}
+              imageUrl={item.imageUrl}
+              accessibilityLabel={`${item.title}, ${formatNewsDate(item.createdAt)}`}
+              onPress={() => onOpen(item)}
+            />
+          ))}
+        </Fragment>
+      ))}
+    </SummaryList>
   );
 }
 
 const styles = themedStyles(() => ({
-  flex: {
-    flex: 1,
-    gap: 2,
-    alignItems: 'flex-start',
-  },
   bold: {
     fontWeight: '700',
   },
@@ -252,42 +218,5 @@ const styles = themedStyles(() => ({
     textTransform: 'uppercase',
     letterSpacing: 0.6,
     marginTop: spacing.md,
-  },
-  listCard: {
-    ...cardSurface,
-    borderRadius: radii.lg,
-    overflow: 'hidden',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    minHeight: minTouchTarget,
-    padding: spacing.md,
-  },
-  divider: {
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-  },
-  thumb: {
-    width: 60,
-    height: 60,
-    borderRadius: radii.md,
-  },
-  // Not a box inside the white one: a filled tile, like the thumbnails.
-  dateTile: {
-    backgroundColor: colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dateDay: {
-    fontWeight: '800',
-    lineHeight: 26,
-  },
-  dateMonth: {
-    fontWeight: '700',
-    fontSize: 13,
-    lineHeight: 15,
-    textTransform: 'uppercase',
   },
 }));
