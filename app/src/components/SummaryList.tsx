@@ -1,85 +1,80 @@
 import type { ReactNode } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { AccessibleText } from './AccessibleText';
 import { ChevronRightIcon } from './icons';
 import { uploadUri } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
-import { calendarPage } from '../utils/schedule';
+import { dayHeading } from '../utils/schedule';
 import { cardSurface, colors, radii, spacing, themedStyles } from '../theme/theme';
 
 /**
- * A summary as one white box of rows split by hairlines: the home page's
- * Mass times, coming events, news and livestream, and the Events tab's
- * coming events. Each row has its date on the left as a small calendar
- * page in orange text, the full title (it wraps, never cut), an optional
- * grey line under it, and the item's photo on the right when it has one.
+ * A list grouped by day, in one white box: the Events tab's coming events
+ * and the News tab's earlier posts. Each day opens with a small orange
+ * heading ("Hoy", "Mañana", "Miércoles 30 sept"), then its rows: an
+ * optional time on the left, the full title (it wraps, never cut), an
+ * optional grey line under it, the photo on the right when there is one.
  */
 export function SummaryList({ children }: { children: ReactNode }) {
   return <View style={styles.card}>{children}</View>;
 }
 
+/** Items in the order given, split wherever the calendar day changes. */
+export function groupByDay<T>(items: T[], dateOf: (item: T) => Date): { date: Date; items: T[] }[] {
+  const groups: { date: Date; items: T[] }[] = [];
+  for (const item of items) {
+    const date = dateOf(item);
+    const last = groups[groups.length - 1];
+    if (last && last.date.toDateString() === date.toDateString()) last.items.push(item);
+    else groups.push({ date, items: [item] });
+  }
+  return groups;
+}
+
+/** The heading over one day's rows; every day but the first has a hairline above. */
+export function SummaryDay({ date, first }: { date: Date; first: boolean }) {
+  const { t, language } = useI18n();
+  const text = dayHeading(date, new Date(), language, {
+    today: t('schedule.today'),
+    tomorrow: t('schedule.tomorrow'),
+    yesterday: t('schedule.yesterday'),
+  });
+  return (
+    <AccessibleText
+      variant="caption"
+      color={colors.primaryStrong}
+      accessibilityRole="header"
+      style={[styles.day, !first && styles.divider]}
+    >
+      {text}
+    </AccessibleText>
+  );
+}
+
 type RowProps = {
-  // The day it happens or was posted, drawn as MIÉ / 30 / SEPT; or, for
-  // a timetable line, a short label such as "Lun–sáb".
-  date?: Date;
-  label?: string;
-  // Hide the weekday, for something already past (a news post).
-  showWeekday?: boolean;
+  // Drawn in the narrow column on the left: an event's time.
+  lead?: string;
   title: string;
   detail?: string | null;
-  // Shown before the title: the dot of an important news post.
-  important?: boolean;
+  // Shown above the title: the label of an important news post.
+  above?: ReactNode;
   imageUrl?: string | null;
-  divider: boolean;
   onPress?: () => void;
   accessibilityLabel?: string;
   // Drawn in place of the chevron, e.g. the Events tab's bell.
   accessory?: ReactNode;
 };
 
-export function SummaryRow({
-  date,
-  label,
-  showWeekday = true,
-  title,
-  detail,
-  important = false,
-  imageUrl,
-  divider,
-  onPress,
-  accessibilityLabel,
-  accessory,
-}: RowProps) {
-  const { language } = useI18n();
-  const page = date ? calendarPage(date, language) : null;
+export function SummaryRow({ lead, title, detail, above, imageUrl, onPress, accessibilityLabel, accessory }: RowProps) {
   const content = (
     <>
-      <View style={styles.dateColumn}>
-        {page ? (
-          <>
-            {showWeekday && (
-              <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.dateSmall}>
-                {page.weekday}
-              </AccessibleText>
-            )}
-            <AccessibleText variant="bodyLarge" color={colors.primaryStrong} style={styles.dateDay}>
-              {page.day}
-            </AccessibleText>
-            <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.dateSmall}>
-              {page.month}
-            </AccessibleText>
-          </>
-        ) : (
-          !!label && (
-            <AccessibleText variant="caption" color={colors.primaryStrong} style={styles.label}>
-              {label}
-            </AccessibleText>
-          )
-        )}
-      </View>
+      {!!lead && (
+        <AccessibleText variant="body" color={colors.primaryStrong} style={styles.lead}>
+          {lead}
+        </AccessibleText>
+      )}
       <View style={styles.text}>
+        {above}
         <AccessibleText variant="body" style={styles.title}>
-          {important && <Text style={styles.importantDot}>{'● '}</Text>}
           {title}
         </AccessibleText>
         {!!detail && (
@@ -94,7 +89,7 @@ export function SummaryRow({
   );
   if (!onPress) {
     return (
-      <View style={[styles.row, divider && styles.divider]} accessible accessibilityLabel={accessibilityLabel}>
+      <View style={styles.row} accessible accessibilityLabel={accessibilityLabel}>
         {content}
       </View>
     );
@@ -104,7 +99,7 @@ export function SummaryRow({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? title}
       onPress={onPress}
-      style={[styles.row, divider && styles.divider]}
+      style={styles.row}
     >
       {content}
     </Pressable>
@@ -116,48 +111,38 @@ const styles = themedStyles(() => ({
     ...cardSurface,
     borderRadius: radii.lg,
     paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xs,
+  },
+  day: {
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    paddingTop: spacing.sm + 2,
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+    marginTop: spacing.xs,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.xs + 2,
   },
-  divider: {
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-  },
-  // Wide enough for "Lun–sáb" and "SEPT"; the calendar page is centred
-  // in it, a label sits at its top.
-  dateColumn: {
-    width: 76,
-    alignItems: 'center',
+  // Wide enough for "20:00" at the largest text size the app offers.
+  lead: {
+    minWidth: 48,
+    fontWeight: '800',
     alignSelf: 'flex-start',
-  },
-  dateSmall: {
-    fontWeight: '800',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    lineHeight: 20,
-  },
-  dateDay: {
-    fontWeight: '800',
-    lineHeight: 28,
-  },
-  label: {
-    fontWeight: '800',
-    textAlign: 'center',
-    paddingTop: 2,
   },
   text: {
     flex: 1,
     gap: 2,
+    alignItems: 'flex-start',
   },
   title: {
     fontWeight: '700',
-  },
-  importantDot: {
-    color: colors.primaryStrong,
   },
   thumb: {
     width: 56,

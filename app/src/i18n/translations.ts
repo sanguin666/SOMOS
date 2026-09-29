@@ -336,6 +336,7 @@ export type Translations = {
     comingUp: string;
     today: string;
     tomorrow: string;
+    yesterday: string;
     category_mass: string;
     category_confession: string;
     category_adoration: string;
@@ -787,6 +788,7 @@ const en: Translations = {
     comingUp: 'COMING UP',
     today: 'Today',
     tomorrow: 'Tomorrow',
+    yesterday: 'Yesterday',
     category_mass: 'Masses',
     category_confession: 'Confessions',
     category_adoration: 'Adoration',
@@ -1238,6 +1240,7 @@ const es: Translations = {
     comingUp: 'PRÓXIMAMENTE',
     today: 'Hoy',
     tomorrow: 'Mañana',
+    yesterday: 'Ayer',
     category_mass: 'Misas',
     category_confession: 'Confesiones',
     category_adoration: 'Adoración',
@@ -1689,6 +1692,7 @@ const fr: Translations = {
     comingUp: 'À VENIR',
     today: 'Aujourd’hui',
     tomorrow: 'Demain',
+    yesterday: 'Hier',
     category_mass: 'Messes',
     category_confession: 'Confessions',
     category_adoration: 'Adoration',
@@ -2140,6 +2144,7 @@ const va: Translations = {
     comingUp: 'PRÒXIMAMENT',
     today: 'Hui',
     tomorrow: 'Demà',
+    yesterday: 'Ahir',
     category_mass: 'Misses',
     category_confession: 'Confessions',
     category_adoration: 'Adoració',
@@ -2591,6 +2596,7 @@ const gl: Translations = {
     comingUp: 'PROXIMAMENTE',
     today: 'Hoxe',
     tomorrow: 'Mañá',
+    yesterday: 'Onte',
     category_mass: 'Misas',
     category_confession: 'Confesións',
     category_adoration: 'Adoración',
@@ -3043,6 +3049,7 @@ const pt: Translations = {
     comingUp: 'EM BREVE',
     today: 'Hoje',
     tomorrow: 'Amanhã',
+    yesterday: 'Ontem',
     category_mass: 'Missas',
     category_confession: 'Confissões',
     category_adoration: 'Adoração',

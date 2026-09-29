@@ -299,18 +299,28 @@ export function weekdayName(day: number, language: string, style: 'long' | 'shor
 }
 
 /**
- * A date as the three lines of a small calendar page: "MIÉ", "30",
- * "SEPT". Short names without their trailing dot, upper-cased by the
- * caller's style.
+ * The heading over a day's rows in a list: "Hoy", "Mañana", "Ayer", or
+ * "Miércoles 30 sept", with the year only when it is not this one. The
+ * caller supplies the words for today, tomorrow and yesterday.
  */
-export function calendarPage(date: Date, language: string): { weekday: string; day: string; month: string } {
+export function dayHeading(
+  date: Date,
+  now: Date,
+  language: string,
+  words: { today: string; tomorrow: string; yesterday: string },
+): string {
+  if (sameDay(date, now)) return words.today;
+  if (sameDay(date, addDays(now, 1))) return words.tomorrow;
+  if (sameDay(date, addDays(now, -1))) return words.yesterday;
   const locale = DAY_LOCALES[language] ?? language;
   const clean = (text: string) => text.replace(/\.$/, '');
-  return {
-    weekday: clean(date.toLocaleDateString(locale, { weekday: 'short' })),
-    day: String(date.getDate()),
-    month: clean(date.toLocaleDateString(locale, { month: 'short' })),
-  };
+  const parts = [
+    capitalise(date.toLocaleDateString(locale, { weekday: 'long' })),
+    String(date.getDate()),
+    clean(date.toLocaleDateString(locale, { month: 'short' })),
+  ];
+  if (date.getFullYear() !== now.getFullYear()) parts.push(String(date.getFullYear()));
+  return parts.join(' ');
 }
 
 /**
@@ -324,15 +334,6 @@ export function formatDays(days: number[], language: string): string {
     return capitalise(`${first}–${last}`);
   }
   return capitalise(days.map((day) => weekdayName(day, language)).join(', '));
-}
-
-/**
- * `formatDays` kept short enough for the narrow date column of a summary
- * row: "Lun–sáb", "Sáb, dom", "Dom".
- */
-export function shortDays(days: number[], language: string): string {
-  if (days.length >= 3) return formatDays(days, language);
-  return capitalise(days.map((day) => weekdayName(day, language, 'short').replace(/\.$/, '')).join(', '));
 }
 
 function sameDay(a: Date, b: Date): boolean {
