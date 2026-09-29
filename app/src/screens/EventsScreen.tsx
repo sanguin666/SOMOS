@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { AccessibleText } from '../components/AccessibleText';
 import { BellIcon, CalendarIcon, ChevronRightIcon, PlayIcon } from '../components/icons';
 import { CompactTimetable, type TimetableBells } from '../components/Timetable';
 import { TimesReminderSheet } from '../components/ReminderSheets';
-import { SummaryList, SummaryRow } from '../components/SummaryList';
+import { groupByDay, SummaryDay, SummaryList, SummaryRow } from '../components/SummaryList';
 import { getEvents } from '../api/events';
 import { useEventReminders } from '../notifications/useEventReminders';
 import { useAuth } from '../auth/AuthContext';
@@ -18,7 +18,7 @@ import {
   weeklyTimetable,
 } from '../utils/schedule';
 import { useI18n } from '../i18n/I18nContext';
-import { cardSurface, colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
+import { colors, minTouchTarget, radii, spacing, themedStyles } from '../theme/theme';
 import type { Event, EventCategory, Poi } from '../api/types';
 
 type Props = {
@@ -29,11 +29,6 @@ type Props = {
   // Opens the week as a calendar, one day at a time.
   onOpenCalendar?: () => void;
 };
-
-function formatDetails(event: Event): string {
-  const time = timeKey(new Date(event.startsAt));
-  return event.location ? `${time} · ${event.location}` : time;
-}
 
 export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
   const { t } = useI18n();
@@ -157,35 +152,43 @@ export function EventsScreen({ poi, onWatchLive, onOpenCalendar }: Props) {
       )}
       {oneOffs.length > 0 && (
         <SummaryList>
-          {oneOffs.map((event, index) => {
-            const startsAt = new Date(event.startsAt);
-            const isNotifying = reminders.isOn(event.id);
-            return (
-              <SummaryRow
-                key={event.id}
-                date={startsAt}
-                title={event.title}
-                detail={formatDetails(event)}
-                accessibilityLabel={`${event.title}, ${formatDetails(event)}`}
-                divider={index > 0}
-                accessory={
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={
-                      isNotifying
-                        ? t('events.notifyOn', { title: event.title })
-                        : t('events.notifyOff', { title: event.title })
+          {groupByDay(oneOffs, (event) => new Date(event.startsAt)).map((day, dayIndex) => (
+            <Fragment key={day.date.toDateString()}>
+              <SummaryDay date={day.date} first={dayIndex === 0} />
+              {day.items.map((event) => {
+                const time = timeKey(new Date(event.startsAt));
+                const isNotifying = reminders.isOn(event.id);
+                return (
+                  <SummaryRow
+                    key={event.id}
+                    lead={time}
+                    title={event.title}
+                    detail={event.location}
+                    accessibilityLabel={[event.title, time, event.location].filter(Boolean).join(', ')}
+                    accessory={
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                          isNotifying
+                            ? t('events.notifyOn', { title: event.title })
+                            : t('events.notifyOff', { title: event.title })
+                        }
+                        onPress={() => void reminders.set(event.id, isNotifying ? undefined : null)}
+                        hitSlop={8}
+                        style={styles.bellButton}
+                      >
+                        <BellIcon
+                          size={22}
+                          color={isNotifying ? colors.primary : colors.textMuted}
+                          filled={isNotifying}
+                        />
+                      </Pressable>
                     }
-                    onPress={() => void reminders.set(event.id, isNotifying ? undefined : null)}
-                    hitSlop={8}
-                    style={[styles.bellButton, isNotifying && styles.bellButtonActive]}
-                  >
-                    <BellIcon size={18} color={isNotifying ? '#FFFFFF' : colors.textMuted} filled={isNotifying} />
-                  </Pressable>
-                }
-              />
-            );
-          })}
+                  />
+                );
+              })}
+            </Fragment>
+          ))}
         </SummaryList>
       )}
     </>
@@ -249,15 +252,13 @@ const styles = themedStyles(() => ({
   liveTitle: {
     fontWeight: '800',
   },
+  // Just the bell, orange and filled when on: no frame, so the row stays
+  // one white box; the tap area keeps the full touch size.
   bellButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 9999,
-    ...cardSurface,
+    width: minTouchTarget,
+    height: minTouchTarget,
+    marginRight: -spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  bellButtonActive: {
-    backgroundColor: colors.primary,
   },
 }));
