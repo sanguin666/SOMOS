@@ -29,6 +29,7 @@ const NAV: { to: string; label: `layout.${keyof Translations['layout']}`; module
   { to: 'prayer-requests', label: 'layout.navPrayerRequests', module: 'prayer_requests' },
   { to: 'community', label: 'layout.navCommunity', module: 'community' },
   { to: 'my-qr', label: 'layout.navMyQr' },
+  { to: 'modules', label: 'layout.navModules' },
   { to: 'settings', label: 'layout.navSettings' },
 ];
 

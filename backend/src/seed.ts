@@ -458,6 +458,10 @@ async function seed() {
   // The default demo since 24 Sep 2026.
   const carmen = await seedCarmen(dataSource);
 
+  // Module billing (30 Sep 2026): the demos keep every module on at no
+  // charge ("Offert"), as the migration does for every existing community.
+  await poiRepository.update([poi.id, poi2.id, carmen.id], { billingComped: true });
+
   console.log('\nDemo POI ready:');
   console.log(`  id:       ${poi.id}`);
   console.log(`  QR token: ${poi.qrCodeToken}`);

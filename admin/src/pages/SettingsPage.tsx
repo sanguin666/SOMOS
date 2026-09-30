@@ -1,23 +1,18 @@
 import { useEffect, useState } from 'react';
-import { usePoiId, useRefreshModules } from '../layout/usePoiId';
+import { usePoiId } from '../layout/usePoiId';
 import { useI18n } from '../i18n/I18nContext';
-import { activateModule, getActiveModules, setModuleStatus } from '../api/activeModules';
+import { getActiveModules } from '../api/activeModules';
 import { getPoi } from '../api/pois';
 import { updatePoiLanguage, updatePoiProfile } from '../api/poiSettings';
 import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../i18n/translations';
-import type { ActiveModule, ModuleType, Poi } from '../api/types';
+import type { ActiveModule, Poi } from '../api/types';
 import { MenuOrderCard } from './MenuOrderCard';
-import { DestructiveButton } from '../components/DestructiveButton';
-
-const LIVE_STATUSES = new Set(['trial', 'active']);
 
 export function SettingsPage() {
   const poiId = usePoiId();
-  const refreshModules = useRefreshModules();
   const { t } = useI18n();
   const [modules, setModules] = useState<ActiveModule[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pendingType, setPendingType] = useState<ModuleType | null>(null);
 
   const [poi, setPoi] = useState<Poi | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('en');
@@ -29,18 +24,6 @@ export function SettingsPage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profileSaved, setProfileSaved] = useState(false);
-
-  const ALL_MODULE_TYPES: { type: ModuleType; label: string }[] = [
-    { type: 'donations', label: t('moduleNames.donations') },
-    { type: 'events', label: t('moduleNames.events') },
-    { type: 'announcements', label: t('moduleNames.announcements') },
-    { type: 'prayer_requests', label: t('moduleNames.prayerRequests') },
-    { type: 'livestreams', label: t('moduleNames.livestream') },
-    { type: 'community', label: t('moduleNames.community') },
-    { type: 'requests', label: t('moduleNames.requests') },
-    { type: 'mass_intentions', label: t('moduleNames.massIntentions') },
-    { type: 'daily_readings', label: t('moduleNames.readings') },
-  ];
 
   function load() {
     getActiveModules(poiId)
@@ -55,25 +38,6 @@ export function SettingsPage() {
   }
 
   useEffect(load, [poiId]);
-
-  async function handleToggle(type: ModuleType, existing: ActiveModule | undefined) {
-    setPendingType(type);
-    try {
-      if (!existing) {
-        const created = await activateModule(poiId, type);
-        setModules((current) => [...(current ?? []), created]);
-      } else {
-        const isLive = LIVE_STATUSES.has(existing.status);
-        const updated = await setModuleStatus(poiId, existing.id, isLive ? 'cancelled' : 'active');
-        setModules((current) => current?.map((m) => (m.id === existing.id ? updated : m)) ?? null);
-      }
-      refreshModules();
-    } catch {
-      setError(t('modules.updateError'));
-    } finally {
-      setPendingType(null);
-    }
-  }
 
   async function saveLanguage() {
     setSavingLanguage(true);
@@ -187,48 +151,7 @@ export function SettingsPage() {
         <MenuOrderCard poi={poi} modules={modules} onSaved={setPoi} />
       )}
 
-      <h3 style={{ marginTop: 24 }}>{t('modules.modulesSectionTitle')}</h3>
-
       {error && <p className="error-text">{error}</p>}
-      {modules === null && !error && <p className="muted">{t('modules.loading')}</p>}
-
-      {/* One white card, one row per module — not a card each. */}
-      {modules !== null && (
-        <div className="card card-list">
-          {ALL_MODULE_TYPES.map(({ type, label }) => {
-            const existing = modules.find((m) => m.moduleType === type);
-            const isLive = existing ? LIVE_STATUSES.has(existing.status) : false;
-            return (
-              <div key={type} className="card-row">
-                <div>
-                  <p className="card-title">{label}</p>
-                  <span className={`badge ${isLive ? 'badge-active' : ''}`}>
-                    {existing ? existing.status : t('modules.notActivated')}
-                  </span>
-                </div>
-                <div className="card-actions" style={{ marginTop: 0 }}>
-                  {isLive ? (
-                    <DestructiveButton
-                      label={t('modules.deactivate')}
-                      disabled={pendingType === type}
-                      onConfirm={() => handleToggle(type, existing)}
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      disabled={pendingType === type}
-                      onClick={() => handleToggle(type, existing)}
-                    >
-                      {t('modules.activate')}
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }

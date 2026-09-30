@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { useI18n } from '../i18n/I18nContext';
-import { intlLocale } from '../i18n/translations';
+import { intlLocale, type Translations } from '../i18n/translations';
 import { useAuth } from '../auth/AuthContext';
 import type { DashboardContext } from '../layout/usePoiId';
 import { getDashboard } from '../api/dashboard';
@@ -13,6 +13,22 @@ import { typeName } from '../requestTypes';
 import { occurrencesBetween } from '../schedule';
 
 type T = ReturnType<typeof useI18n>['t'];
+
+const MODULE_NAME_KEYS: Record<ModuleType, `moduleNames.${keyof Translations['moduleNames']}`> = {
+  donations: 'moduleNames.donations',
+  events: 'moduleNames.events',
+  announcements: 'moduleNames.announcements',
+  prayer_requests: 'moduleNames.prayerRequests',
+  livestreams: 'moduleNames.livestream',
+  community: 'moduleNames.community',
+  requests: 'moduleNames.requests',
+  mass_intentions: 'moduleNames.massIntentions',
+  daily_readings: 'moduleNames.readings',
+};
+
+function moduleName(type: ModuleType, t: T): string {
+  return t(MODULE_NAME_KEYS[type]);
+}
 
 const LIVE_STATUSES = new Set(['trial', 'active']);
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -156,9 +172,25 @@ export function DashboardPage() {
   if (error) return <div><h2>{t('dashboard.title')}</h2><p className="error-text">{error}</p></div>;
   if (!summary) return <div><h2>{t('dashboard.title')}</h2><p className="muted">{t('dashboard.loading')}</p></div>;
 
-  const todos = todoRows(summary, t, formatWhen, isLive);
-
   const now = new Date();
+  const todos = todoRows(summary, t, formatWhen, isLive);
+  // A free month ending within the week: the office decides on the
+  // Modules page whether to keep the module.
+  const endingTrials = (modules ?? []).filter(
+    (m) => m.status === 'trial' && m.trialEndsAt && new Date(m.trialEndsAt).getTime() - now.getTime() < WEEK_MS,
+  );
+  if (endingTrials.length) {
+    const dayMonth = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' });
+    todos.push({
+      key: 'trials',
+      count: endingTrials.length,
+      title: t('dashboard.trialsEnding'),
+      meta: listed(endingTrials.map((m) => `${moduleName(m.moduleType, t)}, ${dayMonth.format(new Date(m.trialEndsAt!))}`), t),
+      action: t('dashboard.actionSee'),
+      to: '../modules',
+    });
+  }
+
   const week: WeekRow[] = [];
   const eventsLive = isLive('events');
   const requestsLive = isLive('requests');
