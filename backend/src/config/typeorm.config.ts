@@ -18,6 +18,7 @@ import { ServiceRequest } from '../service-requests/entities/service-request.ent
 import { ServiceRequestMessage } from '../service-requests/entities/service-request-message.entity.js';
 import { ServiceRequestDocument } from '../service-requests/entities/service-request-document.entity.js';
 import { MassIntention } from '../mass-intentions/entities/mass-intention.entity.js';
+import { DailyReading } from '../daily-readings/entities/daily-reading.entity.js';
 import { PoiBadge } from '../poi-badges/entities/poi-badge.entity.js';
 import { PushToken } from '../notifications/entities/push-token.entity.js';
 import { EventReminder } from '../notifications/entities/event-reminder.entity.js';
@@ -46,6 +47,7 @@ export const ENTITIES = [
   ServiceRequestMessage,
   ServiceRequestDocument,
   MassIntention,
+  DailyReading,
   PoiBadge,
   PushToken,
   EventReminder,

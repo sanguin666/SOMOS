@@ -65,6 +65,7 @@ export type Translations = {
     noAdminPois: string;
     navRequests: string;
     navMassIntentions: string;
+    navReadings: string;
   };
   donations: {
     title: string;
@@ -266,6 +267,7 @@ export type Translations = {
     community: string;
     requests: string;
     massIntentions: string;
+    readings: string;
   };
   menuOrder: {
     title: string;
@@ -613,6 +615,57 @@ export type Translations = {
     giftCountMany: string;
     openReceipt: string;
   };
+  readings: {
+    title: string;
+    subtitle: string;
+    earlier: string;
+    later: string;
+    backToToday: string;
+    pickDay: string;
+    state_published: string;
+    state_draft: string;
+    state_empty: string;
+    loading: string;
+    loadError: string;
+    date: string;
+    visibleNow: string;
+    visibleFrom: string;
+    wordLabel: string;
+    wordPlaceholder: string;
+    textNumber: string;
+    kindLabel: string;
+    kind_first: string;
+    kind_psalm: string;
+    kind_second: string;
+    kind_gospel: string;
+    kind_other: string;
+    customTitle: string;
+    reference: string;
+    referencePlaceholder: string;
+    text: string;
+    textPlaceholder: string;
+    removeText: string;
+    addText: string;
+    notifyLabel: string;
+    notifyYes: string;
+    notifyNo: string;
+    notifyTime: string;
+    notifyHint: string;
+    notifySent: string;
+    publish: string;
+    saveChanges: string;
+    saveDraft: string;
+    unpublish: string;
+    deleteDay: string;
+    publishedOn: string;
+    draftSaved: string;
+    saveError: string;
+    linkLabel: string;
+    linkHint: string;
+    linkSave: string;
+    linkSaved: string;
+    linkError: string;
+  };
 };
 
 const en: Translations = {
@@ -654,6 +707,7 @@ const en: Translations = {
     noAdminPois: "Your account isn't an admin of any community yet.",
     navRequests: 'Requests',
     navMassIntentions: 'Mass intentions',
+    navReadings: 'Daily readings',
   },
   donations: {
     title: 'Donations',
@@ -855,6 +909,7 @@ const en: Translations = {
     community: 'Community',
     requests: 'Requests & appointments',
     massIntentions: 'Mass intentions',
+    readings: 'Daily readings',
   },
   menuOrder: {
     title: 'Bottom menu order',
@@ -1203,6 +1258,57 @@ const en: Translations = {
     giftCountMany: '{{n}} gifts',
     openReceipt: 'Open the receipt',
   },
+  readings: {
+    title: 'Daily readings',
+    subtitle: 'The texts members read in the app, one day at a time. Prepare them ahead: each published day appears in the app from midnight on its date.',
+    earlier: 'Earlier',
+    later: 'Later',
+    backToToday: 'Back to today',
+    pickDay: 'Pick a day',
+    state_published: 'Published',
+    state_draft: 'Draft',
+    state_empty: 'Nothing yet',
+    loading: 'Loading…',
+    loadError: 'Couldn’t load the readings.',
+    date: 'Date',
+    visibleNow: 'Visible in the app',
+    visibleFrom: 'Will appear at midnight on that day',
+    wordLabel: 'A word for today (optional)',
+    wordPlaceholder: 'A few lines for members: what to take from today’s texts, an invitation…',
+    textNumber: 'Text {{number}}',
+    kindLabel: 'Kind of text',
+    kind_first: 'First reading',
+    kind_psalm: 'Psalm',
+    kind_second: 'Second reading',
+    kind_gospel: 'Gospel',
+    kind_other: 'Other',
+    customTitle: 'Heading',
+    reference: 'Reference',
+    referencePlaceholder: 'e.g. Lk 10, 1-12',
+    text: 'Text',
+    textPlaceholder: 'Paste or type the text here',
+    removeText: 'Remove this text',
+    addText: 'Add a text',
+    notifyLabel: 'Notification',
+    notifyYes: 'Notify members at',
+    notifyNo: 'No notification',
+    notifyTime: 'Notification time',
+    notifyHint: 'Sent once on the day, at this time, to members who kept readings notifications on.',
+    notifySent: 'The notification for this day has been sent.',
+    publish: 'Publish',
+    saveChanges: 'Save changes',
+    saveDraft: 'Save as draft',
+    unpublish: 'Unpublish',
+    deleteDay: 'Delete this day',
+    publishedOn: 'Published: members will see it on {{date}}.',
+    draftSaved: 'Draft saved. Members don’t see it yet.',
+    saveError: 'Couldn’t save. Please try again.',
+    linkLabel: 'Link to the full readings (optional)',
+    linkHint: 'An official site where members can read the day’s full texts. {date} in the address becomes the day’s date, e.g. https://www.aelf.org/{date}/romain/messe',
+    linkSave: 'Save the link',
+    linkSaved: 'Link saved.',
+    linkError: 'This link isn’t valid. It must start with https://',
+  },
 };
 
 const es: Translations = {
@@ -1244,6 +1350,7 @@ const es: Translations = {
     noAdminPois: 'Tu cuenta todavía no es administradora de ninguna comunidad.',
     navRequests: 'Solicitudes',
     navMassIntentions: 'Intenciones de misa',
+    navReadings: 'Lecturas del día',
   },
   donations: {
     title: 'Donaciones',
@@ -1445,6 +1552,7 @@ const es: Translations = {
     community: 'Comunidad',
     requests: 'Solicitudes y citas',
     massIntentions: 'Intenciones de misa',
+    readings: 'Lecturas del día',
   },
   menuOrder: {
     title: 'Orden del menú inferior',
@@ -1793,6 +1901,57 @@ const es: Translations = {
     giftCountMany: '{{n}} donativos',
     openReceipt: 'Abrir el certificado',
   },
+  readings: {
+    title: 'Lecturas del día',
+    subtitle: 'Los textos que los miembros leen en la app, día a día. Prepáralos con antelación: cada día publicado aparece en la app a medianoche de su fecha.',
+    earlier: 'Antes',
+    later: 'Después',
+    backToToday: 'Volver a hoy',
+    pickDay: 'Elige un día',
+    state_published: 'Publicado',
+    state_draft: 'Borrador',
+    state_empty: 'Nada todavía',
+    loading: 'Cargando…',
+    loadError: 'No se han podido cargar las lecturas.',
+    date: 'Fecha',
+    visibleNow: 'Visible en la app',
+    visibleFrom: 'Aparecerá a medianoche ese día',
+    wordLabel: 'Una palabra para hoy (opcional)',
+    wordPlaceholder: 'Unas líneas para los miembros: qué llevarse de los textos de hoy, una invitación…',
+    textNumber: 'Texto {{number}}',
+    kindLabel: 'Tipo de texto',
+    kind_first: 'Primera lectura',
+    kind_psalm: 'Salmo',
+    kind_second: 'Segunda lectura',
+    kind_gospel: 'Evangelio',
+    kind_other: 'Otro',
+    customTitle: 'Título',
+    reference: 'Cita',
+    referencePlaceholder: 'p. ej. Lc 10, 1-12',
+    text: 'Texto',
+    textPlaceholder: 'Pega o escribe aquí el texto',
+    removeText: 'Quitar este texto',
+    addText: 'Añadir un texto',
+    notifyLabel: 'Notificación',
+    notifyYes: 'Avisar a los miembros a las',
+    notifyNo: 'Sin notificación',
+    notifyTime: 'Hora de la notificación',
+    notifyHint: 'Se envía una vez ese día, a esta hora, a los miembros que tienen activadas las notificaciones de lecturas.',
+    notifySent: 'La notificación de este día ya se ha enviado.',
+    publish: 'Publicar',
+    saveChanges: 'Guardar cambios',
+    saveDraft: 'Guardar como borrador',
+    unpublish: 'Despublicar',
+    deleteDay: 'Eliminar este día',
+    publishedOn: 'Publicado: los miembros lo verán el {{date}}.',
+    draftSaved: 'Borrador guardado. Los miembros todavía no lo ven.',
+    saveError: 'No se ha podido guardar. Inténtalo de nuevo.',
+    linkLabel: 'Enlace a las lecturas completas (opcional)',
+    linkHint: 'Una web oficial donde los miembros pueden leer los textos completos del día. {date} en la dirección se convierte en la fecha del día, p. ej. https://www.aelf.org/{date}/romain/messe',
+    linkSave: 'Guardar el enlace',
+    linkSaved: 'Enlace guardado.',
+    linkError: 'El enlace no es válido. Debe empezar por https://',
+  },
 };
 
 const fr: Translations = {
@@ -1834,6 +1993,7 @@ const fr: Translations = {
     noAdminPois: "Votre compte n'est encore administrateur d'aucune communauté.",
     navRequests: 'Demandes',
     navMassIntentions: 'Intentions de messe',
+    navReadings: 'Lectures du jour',
   },
   donations: {
     title: 'Dons',
@@ -2035,6 +2195,7 @@ const fr: Translations = {
     community: 'Communauté',
     requests: 'Demandes et rendez-vous',
     massIntentions: 'Intentions de messe',
+    readings: 'Lectures du jour',
   },
   menuOrder: {
     title: 'Ordre du menu du bas',
@@ -2383,6 +2544,57 @@ const fr: Translations = {
     giftCountMany: '{{n}} dons',
     openReceipt: 'Ouvrir le reçu',
   },
+  readings: {
+    title: 'Lectures du jour',
+    subtitle: 'Les textes que les membres lisent dans l’app, jour après jour. Préparez-les à l’avance : chaque jour publié apparaît dans l’app à minuit le jour même.',
+    earlier: 'Plus tôt',
+    later: 'Plus tard',
+    backToToday: 'Revenir à aujourd’hui',
+    pickDay: 'Choisir un jour',
+    state_published: 'Publié',
+    state_draft: 'Brouillon',
+    state_empty: 'Rien pour l’instant',
+    loading: 'Chargement…',
+    loadError: 'Impossible de charger les lectures.',
+    date: 'Date',
+    visibleNow: 'Visible dans l’app',
+    visibleFrom: 'Apparaîtra à minuit ce jour-là',
+    wordLabel: 'Un mot pour aujourd’hui (facultatif)',
+    wordPlaceholder: 'Quelques lignes pour les membres : ce qu’on peut retenir des textes du jour, une invitation…',
+    textNumber: 'Texte {{number}}',
+    kindLabel: 'Type de texte',
+    kind_first: 'Première lecture',
+    kind_psalm: 'Psaume',
+    kind_second: 'Deuxième lecture',
+    kind_gospel: 'Évangile',
+    kind_other: 'Autre',
+    customTitle: 'Titre',
+    reference: 'Référence',
+    referencePlaceholder: 'ex. Lc 10, 1-12',
+    text: 'Texte',
+    textPlaceholder: 'Collez ou tapez le texte ici',
+    removeText: 'Retirer ce texte',
+    addText: 'Ajouter un texte',
+    notifyLabel: 'Notification',
+    notifyYes: 'Prévenir les membres à',
+    notifyNo: 'Pas de notification',
+    notifyTime: 'Heure de la notification',
+    notifyHint: 'Envoyée une fois ce jour-là, à cette heure, aux membres qui ont gardé les notifications des lectures.',
+    notifySent: 'La notification de ce jour a été envoyée.',
+    publish: 'Publier',
+    saveChanges: 'Enregistrer les modifications',
+    saveDraft: 'Enregistrer en brouillon',
+    unpublish: 'Dépublier',
+    deleteDay: 'Supprimer ce jour',
+    publishedOn: 'Publié : les membres le verront le {{date}}.',
+    draftSaved: 'Brouillon enregistré. Les membres ne le voient pas encore.',
+    saveError: 'Impossible d’enregistrer. Veuillez réessayer.',
+    linkLabel: 'Lien vers les lectures complètes (facultatif)',
+    linkHint: 'Un site officiel où les membres lisent les textes complets du jour. {date} dans l’adresse devient la date du jour, ex. https://www.aelf.org/{date}/romain/messe',
+    linkSave: 'Enregistrer le lien',
+    linkSaved: 'Lien enregistré.',
+    linkError: 'Ce lien n’est pas valide. Il doit commencer par https://',
+  },
 };
 
 const va: Translations = {
@@ -2424,6 +2636,7 @@ const va: Translations = {
     noAdminPois: 'El teu compte encara no administra cap comunitat.',
     navRequests: 'Sol·licituds',
     navMassIntentions: 'Intencions de missa',
+    navReadings: 'Lectures del dia',
   },
   donations: {
     title: 'Donatius',
@@ -2625,6 +2838,7 @@ const va: Translations = {
     community: 'Comunitat',
     requests: 'Sol·licituds i cites',
     massIntentions: 'Intencions de missa',
+    readings: 'Lectures del dia',
   },
   menuOrder: {
     title: 'Orde del menú inferior',
@@ -2973,6 +3187,57 @@ const va: Translations = {
     giftCountMany: '{{n}} donatius',
     openReceipt: 'Obrir el certificat',
   },
+  readings: {
+    title: 'Lectures del dia',
+    subtitle: 'Els textos que els membres lligen en l’app, dia a dia. Prepara’ls amb antelació: cada dia publicat apareix en l’app a mitjanit de la seua data.',
+    earlier: 'Abans',
+    later: 'Després',
+    backToToday: 'Tornar a hui',
+    pickDay: 'Tria un dia',
+    state_published: 'Publicat',
+    state_draft: 'Esborrany',
+    state_empty: 'Res encara',
+    loading: 'S’està carregant…',
+    loadError: 'No s’han pogut carregar les lectures.',
+    date: 'Data',
+    visibleNow: 'Visible en l’app',
+    visibleFrom: 'Apareixerà a mitjanit eixe dia',
+    wordLabel: 'Una paraula per a hui (opcional)',
+    wordPlaceholder: 'Unes línies per als membres: què endur-se dels textos de hui, una invitació…',
+    textNumber: 'Text {{number}}',
+    kindLabel: 'Tipus de text',
+    kind_first: 'Primera lectura',
+    kind_psalm: 'Salm',
+    kind_second: 'Segona lectura',
+    kind_gospel: 'Evangeli',
+    kind_other: 'Altre',
+    customTitle: 'Títol',
+    reference: 'Cita',
+    referencePlaceholder: 'p. ex. Lc 10, 1-12',
+    text: 'Text',
+    textPlaceholder: 'Apega o escriu ací el text',
+    removeText: 'Llevar este text',
+    addText: 'Afegir un text',
+    notifyLabel: 'Notificació',
+    notifyYes: 'Avisar els membres a les',
+    notifyNo: 'Sense notificació',
+    notifyTime: 'Hora de la notificació',
+    notifyHint: 'S’envia una vegada eixe dia, a esta hora, als membres que tenen activades les notificacions de lectures.',
+    notifySent: 'La notificació d’este dia ja s’ha enviat.',
+    publish: 'Publicar',
+    saveChanges: 'Guardar els canvis',
+    saveDraft: 'Guardar com a esborrany',
+    unpublish: 'Despublicar',
+    deleteDay: 'Eliminar este dia',
+    publishedOn: 'Publicat: els membres el voran el {{date}}.',
+    draftSaved: 'Esborrany guardat. Els membres encara no el veuen.',
+    saveError: 'No s’ha pogut guardar. Torna-ho a provar.',
+    linkLabel: 'Enllaç a les lectures completes (opcional)',
+    linkHint: 'Una web oficial on els membres poden llegir els textos complets del dia. {date} en l’adreça es convertix en la data del dia, p. ex. https://www.aelf.org/{date}/romain/messe',
+    linkSave: 'Guardar l’enllaç',
+    linkSaved: 'Enllaç guardat.',
+    linkError: 'L’enllaç no és vàlid. Ha de començar per https://',
+  },
 };
 
 const gl: Translations = {
@@ -3014,6 +3279,7 @@ const gl: Translations = {
     noAdminPois: 'A túa conta aínda non é administradora de ningunha comunidade.',
     navRequests: 'Solicitudes',
     navMassIntentions: 'Intencións de misa',
+    navReadings: 'Lecturas do día',
   },
   donations: {
     title: 'Doazóns',
@@ -3215,6 +3481,7 @@ const gl: Translations = {
     community: 'Comunidade',
     requests: 'Solicitudes e citas',
     massIntentions: 'Intencións de misa',
+    readings: 'Lecturas do día',
   },
   menuOrder: {
     title: 'Orde do menú inferior',
@@ -3563,6 +3830,57 @@ const gl: Translations = {
     giftCountMany: '{{n}} doazóns',
     openReceipt: 'Abrir o certificado',
   },
+  readings: {
+    title: 'Lecturas do día',
+    subtitle: 'Os textos que os membros len na app, día a día. Prepáraos con antelación: cada día publicado aparece na app á medianoite da súa data.',
+    earlier: 'Antes',
+    later: 'Despois',
+    backToToday: 'Volver a hoxe',
+    pickDay: 'Escolle un día',
+    state_published: 'Publicado',
+    state_draft: 'Borrador',
+    state_empty: 'Nada aínda',
+    loading: 'Cargando…',
+    loadError: 'Non se puideron cargar as lecturas.',
+    date: 'Data',
+    visibleNow: 'Visible na app',
+    visibleFrom: 'Aparecerá á medianoite ese día',
+    wordLabel: 'Unha palabra para hoxe (opcional)',
+    wordPlaceholder: 'Unhas liñas para os membros: que levar dos textos de hoxe, unha invitación…',
+    textNumber: 'Texto {{number}}',
+    kindLabel: 'Tipo de texto',
+    kind_first: 'Primeira lectura',
+    kind_psalm: 'Salmo',
+    kind_second: 'Segunda lectura',
+    kind_gospel: 'Evanxeo',
+    kind_other: 'Outro',
+    customTitle: 'Título',
+    reference: 'Cita',
+    referencePlaceholder: 'p. ex. Lc 10, 1-12',
+    text: 'Texto',
+    textPlaceholder: 'Pega ou escribe aquí o texto',
+    removeText: 'Quitar este texto',
+    addText: 'Engadir un texto',
+    notifyLabel: 'Notificación',
+    notifyYes: 'Avisar os membros ás',
+    notifyNo: 'Sen notificación',
+    notifyTime: 'Hora da notificación',
+    notifyHint: 'Envíase unha vez ese día, a esta hora, aos membros que teñen activadas as notificacións de lecturas.',
+    notifySent: 'A notificación deste día xa se enviou.',
+    publish: 'Publicar',
+    saveChanges: 'Gardar os cambios',
+    saveDraft: 'Gardar como borrador',
+    unpublish: 'Despublicar',
+    deleteDay: 'Eliminar este día',
+    publishedOn: 'Publicado: os membros verano o {{date}}.',
+    draftSaved: 'Borrador gardado. Os membros aínda non o ven.',
+    saveError: 'Non se puido gardar. Téntao de novo.',
+    linkLabel: 'Ligazón ás lecturas completas (opcional)',
+    linkHint: 'Unha web oficial onde os membros poden ler os textos completos do día. {date} no enderezo convértese na data do día, p. ex. https://www.aelf.org/{date}/romain/messe',
+    linkSave: 'Gardar a ligazón',
+    linkSaved: 'Ligazón gardada.',
+    linkError: 'A ligazón non é válida. Debe comezar por https://',
+  },
 };
 
 const pt: Translations = {
@@ -3604,6 +3922,7 @@ const pt: Translations = {
     noAdminPois: 'A sua conta ainda não é administradora de nenhuma comunidade.',
     navRequests: 'Pedidos',
     navMassIntentions: 'Intenções de missa',
+    navReadings: 'Leituras do dia',
   },
   donations: {
     title: 'Donativos',
@@ -3805,6 +4124,7 @@ const pt: Translations = {
     community: 'Comunidade',
     requests: 'Pedidos e marcações',
     massIntentions: 'Intenções de missa',
+    readings: 'Leituras do dia',
   },
   menuOrder: {
     title: 'Ordem do menu inferior',
@@ -4152,6 +4472,57 @@ const pt: Translations = {
     giftCountOne: '1 donativo',
     giftCountMany: '{{n}} donativos',
     openReceipt: 'Abrir o recibo',
+  },
+  readings: {
+    title: 'Leituras do dia',
+    subtitle: 'Os textos que os membros leem na app, dia a dia. Prepare-os com antecedência: cada dia publicado aparece na app à meia-noite da sua data.',
+    earlier: 'Antes',
+    later: 'Depois',
+    backToToday: 'Voltar a hoje',
+    pickDay: 'Escolha um dia',
+    state_published: 'Publicado',
+    state_draft: 'Rascunho',
+    state_empty: 'Nada ainda',
+    loading: 'A carregar…',
+    loadError: 'Não foi possível carregar as leituras.',
+    date: 'Data',
+    visibleNow: 'Visível na app',
+    visibleFrom: 'Aparecerá à meia-noite desse dia',
+    wordLabel: 'Uma palavra para hoje (opcional)',
+    wordPlaceholder: 'Algumas linhas para os membros: o que levar dos textos de hoje, um convite…',
+    textNumber: 'Texto {{number}}',
+    kindLabel: 'Tipo de texto',
+    kind_first: 'Primeira leitura',
+    kind_psalm: 'Salmo',
+    kind_second: 'Segunda leitura',
+    kind_gospel: 'Evangelho',
+    kind_other: 'Outro',
+    customTitle: 'Título',
+    reference: 'Referência',
+    referencePlaceholder: 'p. ex. Lc 10, 1-12',
+    text: 'Texto',
+    textPlaceholder: 'Cole ou escreva aqui o texto',
+    removeText: 'Retirar este texto',
+    addText: 'Adicionar um texto',
+    notifyLabel: 'Notificação',
+    notifyYes: 'Avisar os membros às',
+    notifyNo: 'Sem notificação',
+    notifyTime: 'Hora da notificação',
+    notifyHint: 'Enviada uma vez nesse dia, a esta hora, aos membros que mantêm as notificações de leituras ativas.',
+    notifySent: 'A notificação deste dia já foi enviada.',
+    publish: 'Publicar',
+    saveChanges: 'Guardar alterações',
+    saveDraft: 'Guardar como rascunho',
+    unpublish: 'Despublicar',
+    deleteDay: 'Eliminar este dia',
+    publishedOn: 'Publicado: os membros vão vê-lo a {{date}}.',
+    draftSaved: 'Rascunho guardado. Os membros ainda não o veem.',
+    saveError: 'Não foi possível guardar. Tente novamente.',
+    linkLabel: 'Ligação para as leituras completas (opcional)',
+    linkHint: 'Um site oficial onde os membros podem ler os textos completos do dia. {date} no endereço passa a ser a data do dia, p. ex. https://www.aelf.org/{date}/romain/messe',
+    linkSave: 'Guardar a ligação',
+    linkSaved: 'Ligação guardada.',
+    linkError: 'A ligação não é válida. Tem de começar por https://',
   },
 };
 

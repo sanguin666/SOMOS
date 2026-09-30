@@ -1508,3 +1508,87 @@ label.link-button:focus-within {
   font-size: 14px;
   color: var(--color-text-muted);
 }
+
+/* ---------- Lectures du jour ---------- */
+
+/* The fortnight to prepare: a pill per day, the chosen one in the coral
+   wash, and a dot for a day that already has texts (filled once it is
+   published, a ring while it is a draft). */
+.readings-strip-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.readings-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.readings-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 72px;
+  padding: 8px 0;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.readings-day-on {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-weight: 700;
+}
+
+.readings-day-name {
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.readings-day-number {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.readings-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.readings-dot-published {
+  background: var(--color-primary-strong);
+}
+
+.readings-dot-draft {
+  border: 1.5px solid var(--color-primary-strong);
+}
+
+.readings-legend {
+  margin: 0 0 16px;
+}
+
+/* Each text of the day starts under an orange line, so the form reads
+   as the app will: one white block, texts split by the brand's colour. */
+.form .readings-section-start {
+  border-top: 1px solid var(--color-primary);
+}
+
+.form textarea.readings-text {
+  min-height: 160px;
+}
+
+.form input.readings-time {
+  width: auto;
+  font-weight: 700;
+}

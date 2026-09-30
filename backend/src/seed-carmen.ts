@@ -24,6 +24,7 @@ import {
 import { ServiceRequestMessage } from './service-requests/entities/service-request-message.entity.js';
 import { ServiceRequestDocument } from './service-requests/entities/service-request-document.entity.js';
 import { MassIntention, MassIntentionStatus } from './mass-intentions/entities/mass-intention.entity.js';
+import { DailyReading } from './daily-readings/entities/daily-reading.entity.js';
 import { ModuleType } from './common/enums/module-type.enum.js';
 import { ModuleStatus } from './common/enums/module-status.enum.js';
 import { LivestreamStatus } from './common/enums/livestream-status.enum.js';
@@ -168,6 +169,7 @@ async function seedCarmenInMadrid(dataSource: DataSource): Promise<Poi> {
   const messages = dataSource.getRepository(ServiceRequestMessage);
   const documents = dataSource.getRepository(ServiceRequestDocument);
   const intentions = dataSource.getRepository(MassIntention);
+  const readings = dataSource.getRepository(DailyReading);
 
   const picture = await carmenPicture();
   let poi = await pois.findOne({ where: { qrCodeToken: CARMEN_QR_TOKEN } });
@@ -205,6 +207,7 @@ async function seedCarmenInMadrid(dataSource: DataSource): Promise<Poi> {
     ModuleType.PRAYER_REQUESTS,
     ModuleType.COMMUNITY,
     ModuleType.LIVESTREAMS,
+    ModuleType.DAILY_READINGS,
   ]) {
     if (!(await modules.count({ where: { ...where, moduleType } }))) {
       await modules.save(modules.create({ poi: place, moduleType, status: ModuleStatus.ACTIVE }));
@@ -694,6 +697,49 @@ async function seedCarmenInMadrid(dataSource: DataSource): Promise<Poi> {
       { kind: BadgeKind.CAMPAIGN, campaignId: belfry?.id ?? null },
     ];
     await badges.save(rows.map((row, position) => badges.create({ ...row, poi: place, position })));
+  }
+
+  // ---- Lectures du jour ----
+  // A fortnight around the day the seed runs, each with a word from the
+  // priest, a line of a psalm and one Gospel verse: the office pastes the
+  // full texts in real life. The link opens today's Gospel on Vatican News.
+
+  if (!place.readingsLinkUrl) {
+    place.readingsLinkUrl = 'https://www.vaticannews.va/es/evangelio-de-hoy.html';
+    await pois.save(place);
+  }
+  if (!(await readings.count({ where }))) {
+    const verses: [string, string, string][] = [
+      ['Jn 3, 16', 'Porque tanto amó Dios al mundo, que entregó a su Hijo único, para que todo el que cree en él no perezca, sino que tenga vida eterna.', 'Dios no se cansa de amarnos. Hoy, antes de dormir, da gracias por una persona que te ha mostrado ese amor.'],
+      ['Mt 11, 28', 'Venid a mí todos los que estáis cansados y agobiados, y yo os aliviaré.', 'Si llegas cansado a esta semana, no estás solo. La iglesia está abierta por la mañana para rezar en silencio.'],
+      ['Jn 15, 12', 'Este es mi mandamiento: que os améis unos a otros como yo os he amado.', 'Un gesto concreto hoy: llama a alguien de la comunidad que hace tiempo que no ves.'],
+      ['Lc 6, 36', 'Sed misericordiosos como vuestro Padre es misericordioso.', 'El sábado a las 18:00 hay confesiones. Es un buen momento para dejar lo que pesa.'],
+      ['Mt 5, 9', 'Bienaventurados los que trabajan por la paz, porque ellos serán llamados hijos de Dios.', 'Rezamos hoy por la paz, en el mundo y en nuestras casas.'],
+      ['Jn 14, 27', 'La paz os dejo, mi paz os doy.', 'Lee despacio este versículo dos veces. ¿Qué palabra se te queda?'],
+      ['Mt 28, 20', 'Yo estoy con vosotros todos los días, hasta el final de los tiempos.', 'Terminamos la semana con esta promesa. ¡Os espero el domingo!'],
+    ];
+    const day = (offset: number) => {
+      const date = new Date();
+      date.setDate(date.getDate() + offset);
+      return date.toLocaleDateString('en-CA', { timeZone: CARMEN_TIME_ZONE });
+    };
+    const rows: Partial<DailyReading>[] = [];
+    for (let offset = -3; offset <= 14; offset += 1) {
+      const [reference, text, word] = verses[(offset + 21) % verses.length];
+      rows.push({
+        date: day(offset),
+        word: `${word}\n\nP. Vicente`,
+        sections: [
+          { kind: 'psalm', reference: 'Sal 22', text: 'El Señor es mi pastor, nada me falta.' },
+          { kind: 'gospel', reference, text },
+        ],
+        published: true,
+        notifyAt: '07:30',
+        // Days gone by count as sent: seeding never notifies.
+        notifiedAt: offset <= 0 ? new Date() : null,
+      });
+    }
+    await readings.save(rows.map((row) => readings.create({ ...row, poi: place })));
   }
 
   return place;

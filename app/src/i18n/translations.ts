@@ -85,6 +85,7 @@ export type Translations = {
     switchPlace: string;
     requestsLabel: string;
     massIntentionsLabel: string;
+    readingsLabel: string;
     celebrationTimes: string;
     nextMass: string;
   };
@@ -431,6 +432,8 @@ export type Translations = {
     eventsHint: string;
     live: string;
     liveHint: string;
+    readings: string;
+    readingsHint: string;
     phoneOff: string;
     turnOn: string;
     openSettings: string;
@@ -464,6 +467,21 @@ export type Translations = {
     status_confirmed: string;
     status_celebrated: string;
     status_cancelled: string;
+  };
+  readings: {
+    title: string;
+    today: string;
+    previousDay: string;
+    nextDay: string;
+    nothingToday: string;
+    word: string;
+    officialLink: string;
+    loadError: string;
+    kind_first: string;
+    kind_psalm: string;
+    kind_second: string;
+    kind_gospel: string;
+    kind_other: string;
   };
 };
 
@@ -535,6 +553,7 @@ const en: Translations = {
     switchPlace: 'Change place',
     requestsLabel: 'Requests',
     massIntentionsLabel: 'Intentions',
+    readingsLabel: 'Readings',
     celebrationTimes: 'Celebration times',
     nextMass: 'Next Mass',
   },
@@ -883,6 +902,8 @@ const en: Translations = {
     eventsHint: 'One hour before events you rang the bell for',
     live: 'Live',
     liveHint: 'When a celebration starts live',
+    readings: 'Daily readings',
+    readingsHint: 'When the day’s readings are ready',
     phoneOff: 'Notifications are turned off for ANSAE on this phone.',
     turnOn: 'Turn on notifications',
     openSettings: 'Open the phone’s settings',
@@ -916,6 +937,21 @@ const en: Translations = {
     status_confirmed: 'Planned',
     status_celebrated: 'Celebrated',
     status_cancelled: 'Cancelled',
+  },
+  readings: {
+    title: 'Daily readings',
+    today: 'Today',
+    previousDay: 'Previous day',
+    nextDay: 'Next day',
+    nothingToday: 'The texts for today haven’t been posted yet.',
+    word: 'A word for today',
+    officialLink: 'Read the full readings',
+    loadError: 'Couldn’t load the readings. Please try again.',
+    kind_first: 'First reading',
+    kind_psalm: 'Psalm',
+    kind_second: 'Second reading',
+    kind_gospel: 'Gospel',
+    kind_other: 'Reading',
   },
 };
 
@@ -987,6 +1023,7 @@ const es: Translations = {
     switchPlace: 'Cambiar de lugar',
     requestsLabel: 'Solicitudes',
     massIntentionsLabel: 'Intenciones',
+    readingsLabel: 'Lecturas',
     celebrationTimes: 'Horarios de celebraciones',
     nextMass: 'Próxima misa',
   },
@@ -1335,6 +1372,8 @@ const es: Translations = {
     eventsHint: 'Una hora antes de los eventos con la campana activada',
     live: 'En directo',
     liveHint: 'Cuando una celebración empieza en directo',
+    readings: 'Lecturas del día',
+    readingsHint: 'Cuando las lecturas del día están listas',
     phoneOff: 'Las notificaciones de ANSAE están desactivadas en este teléfono.',
     turnOn: 'Activar las notificaciones',
     openSettings: 'Abrir los ajustes del teléfono',
@@ -1368,6 +1407,21 @@ const es: Translations = {
     status_confirmed: 'Prevista',
     status_celebrated: 'Celebrada',
     status_cancelled: 'Cancelada',
+  },
+  readings: {
+    title: 'Lecturas del día',
+    today: 'Hoy',
+    previousDay: 'Día anterior',
+    nextDay: 'Día siguiente',
+    nothingToday: 'Todavía no se han publicado los textos de hoy.',
+    word: 'Una palabra para hoy',
+    officialLink: 'Leer las lecturas completas',
+    loadError: 'No se han podido cargar las lecturas. Inténtalo de nuevo.',
+    kind_first: 'Primera lectura',
+    kind_psalm: 'Salmo',
+    kind_second: 'Segunda lectura',
+    kind_gospel: 'Evangelio',
+    kind_other: 'Lectura',
   },
 };
 
@@ -1439,6 +1493,7 @@ const fr: Translations = {
     switchPlace: 'Changer de lieu',
     requestsLabel: 'Demandes',
     massIntentionsLabel: 'Intentions',
+    readingsLabel: 'Lectures',
     celebrationTimes: 'Horaires des célébrations',
     nextMass: 'Prochaine messe',
   },
@@ -1787,6 +1842,8 @@ const fr: Translations = {
     eventsHint: 'Une heure avant les événements dont vous avez activé la cloche',
     live: 'En direct',
     liveHint: 'Quand une célébration commence en direct',
+    readings: 'Lectures du jour',
+    readingsHint: 'Quand les lectures du jour sont prêtes',
     phoneOff: 'Les notifications d’ANSAE sont désactivées sur ce téléphone.',
     turnOn: 'Activer les notifications',
     openSettings: 'Ouvrir les réglages du téléphone',
@@ -1820,6 +1877,21 @@ const fr: Translations = {
     status_confirmed: 'Prévue',
     status_celebrated: 'Célébrée',
     status_cancelled: 'Annulée',
+  },
+  readings: {
+    title: 'Lectures du jour',
+    today: 'Aujourd’hui',
+    previousDay: 'Jour précédent',
+    nextDay: 'Jour suivant',
+    nothingToday: 'Les textes du jour ne sont pas encore publiés.',
+    word: 'Un mot pour aujourd’hui',
+    officialLink: 'Lire les lectures complètes',
+    loadError: 'Impossible de charger les lectures. Veuillez réessayer.',
+    kind_first: 'Première lecture',
+    kind_psalm: 'Psaume',
+    kind_second: 'Deuxième lecture',
+    kind_gospel: 'Évangile',
+    kind_other: 'Lecture',
   },
 };
 
@@ -1891,6 +1963,7 @@ const va: Translations = {
     switchPlace: 'Canviar de lloc',
     requestsLabel: 'Sol·licituds',
     massIntentionsLabel: 'Intencions',
+    readingsLabel: 'Lectures',
     celebrationTimes: 'Horaris de celebracions',
     nextMass: 'Pròxima missa',
   },
@@ -2239,6 +2312,8 @@ const va: Translations = {
     eventsHint: 'Una hora abans dels esdeveniments amb la campana activada',
     live: 'En directe',
     liveHint: 'Quan una celebració comença en directe',
+    readings: 'Lectures del dia',
+    readingsHint: 'Quan les lectures del dia estan a punt',
     phoneOff: 'Les notificacions d’ANSAE estan desactivades en este telèfon.',
     turnOn: 'Activar les notificacions',
     openSettings: 'Obrir la configuració del telèfon',
@@ -2272,6 +2347,21 @@ const va: Translations = {
     status_confirmed: 'Prevista',
     status_celebrated: 'Celebrada',
     status_cancelled: 'Cancel·lada',
+  },
+  readings: {
+    title: 'Lectures del dia',
+    today: 'Hui',
+    previousDay: 'Dia anterior',
+    nextDay: 'Dia següent',
+    nothingToday: 'Encara no s’han publicat els textos de hui.',
+    word: 'Una paraula per a hui',
+    officialLink: 'Llegir les lectures completes',
+    loadError: 'No s’han pogut carregar les lectures. Torna-ho a provar.',
+    kind_first: 'Primera lectura',
+    kind_psalm: 'Salm',
+    kind_second: 'Segona lectura',
+    kind_gospel: 'Evangeli',
+    kind_other: 'Lectura',
   },
 };
 
@@ -2343,6 +2433,7 @@ const gl: Translations = {
     switchPlace: 'Cambiar de lugar',
     requestsLabel: 'Solicitudes',
     massIntentionsLabel: 'Intencións',
+    readingsLabel: 'Lecturas',
     celebrationTimes: 'Horarios das celebracións',
     nextMass: 'Próxima misa',
   },
@@ -2691,6 +2782,8 @@ const gl: Translations = {
     eventsHint: 'Unha hora antes dos eventos coa campá activada',
     live: 'En directo',
     liveHint: 'Cando unha celebración comeza en directo',
+    readings: 'Lecturas do día',
+    readingsHint: 'Cando as lecturas do día están listas',
     phoneOff: 'As notificacións de ANSAE están desactivadas neste teléfono.',
     turnOn: 'Activar as notificacións',
     openSettings: 'Abrir os axustes do teléfono',
@@ -2724,6 +2817,21 @@ const gl: Translations = {
     status_confirmed: 'Prevista',
     status_celebrated: 'Celebrada',
     status_cancelled: 'Cancelada',
+  },
+  readings: {
+    title: 'Lecturas do día',
+    today: 'Hoxe',
+    previousDay: 'Día anterior',
+    nextDay: 'Día seguinte',
+    nothingToday: 'Aínda non se publicaron os textos de hoxe.',
+    word: 'Unha palabra para hoxe',
+    officialLink: 'Ler as lecturas completas',
+    loadError: 'Non se puideron cargar as lecturas. Téntao de novo.',
+    kind_first: 'Primeira lectura',
+    kind_psalm: 'Salmo',
+    kind_second: 'Segunda lectura',
+    kind_gospel: 'Evanxeo',
+    kind_other: 'Lectura',
   },
 };
 
@@ -2796,6 +2904,7 @@ const pt: Translations = {
     switchPlace: 'Mudar de local',
     requestsLabel: 'Pedidos',
     massIntentionsLabel: 'Intenções',
+    readingsLabel: 'Leituras',
     celebrationTimes: 'Horários das celebrações',
     nextMass: 'Próxima missa',
   },
@@ -3144,6 +3253,8 @@ const pt: Translations = {
     eventsHint: 'Uma hora antes dos eventos com o sino ativado',
     live: 'Em direto',
     liveHint: 'Quando uma celebração começa em direto',
+    readings: 'Leituras do dia',
+    readingsHint: 'Quando as leituras do dia estiverem prontas',
     phoneOff: 'As notificações da ANSAE estão desativadas neste telemóvel.',
     turnOn: 'Ativar as notificações',
     openSettings: 'Abrir as definições do telemóvel',
@@ -3177,6 +3288,21 @@ const pt: Translations = {
     status_confirmed: 'Prevista',
     status_celebrated: 'Celebrada',
     status_cancelled: 'Cancelada',
+  },
+  readings: {
+    title: 'Leituras do dia',
+    today: 'Hoje',
+    previousDay: 'Dia anterior',
+    nextDay: 'Dia seguinte',
+    nothingToday: 'Os textos de hoje ainda não foram publicados.',
+    word: 'Uma palavra para hoje',
+    officialLink: 'Ler as leituras completas',
+    loadError: 'Não foi possível carregar as leituras. Tente novamente.',
+    kind_first: 'Primeira leitura',
+    kind_psalm: 'Salmo',
+    kind_second: 'Segunda leitura',
+    kind_gospel: 'Evangelho',
+    kind_other: 'Leitura',
   },
 };
 

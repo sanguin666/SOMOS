@@ -15,11 +15,12 @@ import { useAuth } from '../auth/AuthContext';
 import type { Poi } from '../api/types';
 import { colors, minTouchTarget, spacing, themedStyles } from '../theme/theme';
 
-const KINDS: { kind: NotificationKind; label: 'news' | 'requests' | 'events' | 'live'; hint: 'newsHint' | 'requestsHint' | 'eventsHint' | 'liveHint' }[] = [
+const KINDS: { kind: NotificationKind; label: 'news' | 'requests' | 'events' | 'live' | 'readings'; hint: 'newsHint' | 'requestsHint' | 'eventsHint' | 'liveHint' | 'readingsHint' }[] = [
   { kind: 'news', label: 'news', hint: 'newsHint' },
   { kind: 'requests', label: 'requests', hint: 'requestsHint' },
   { kind: 'events', label: 'events', hint: 'eventsHint' },
   { kind: 'live', label: 'live', hint: 'liveHint' },
+  { kind: 'readings', label: 'readings', hint: 'readingsHint' },
 ];
 
 /**

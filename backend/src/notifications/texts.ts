@@ -10,6 +10,7 @@ import { ServiceRequestStatus, ServiceRequestType } from '../service-requests/en
 const TEXTS = {
   en: {
     live: 'Live now: {title}',
+    readingsReady: 'Today’s readings are here.',
     inOneHour: 'In 1 hour: {title}',
     requestTitle: 'Your request: {type}',
     officeReplied: 'The office replied: “{body}”',
@@ -20,6 +21,7 @@ const TEXTS = {
   },
   es: {
     live: 'En directo: {title}',
+    readingsReady: 'Ya están las lecturas de hoy.',
     inOneHour: 'Dentro de 1 hora: {title}',
     requestTitle: 'Tu solicitud: {type}',
     officeReplied: 'La oficina ha respondido: «{body}»',
@@ -30,6 +32,7 @@ const TEXTS = {
   },
   fr: {
     live: 'En direct : {title}',
+    readingsReady: 'Les lectures du jour sont disponibles.',
     inOneHour: 'Dans 1 heure : {title}',
     requestTitle: 'Votre demande : {type}',
     officeReplied: 'L’accueil a répondu : « {body} »',
@@ -40,6 +43,7 @@ const TEXTS = {
   },
   va: {
     live: 'En directe: {title}',
+    readingsReady: 'Ja estan les lectures de hui.',
     inOneHour: 'D’ací a 1 hora: {title}',
     requestTitle: 'La teua sol·licitud: {type}',
     officeReplied: 'El despatx ha respost: «{body}»',
@@ -50,6 +54,7 @@ const TEXTS = {
   },
   gl: {
     live: 'En directo: {title}',
+    readingsReady: 'Xa están as lecturas de hoxe.',
     inOneHour: 'Dentro de 1 hora: {title}',
     requestTitle: 'A túa solicitude: {type}',
     officeReplied: 'O despacho respondeu: «{body}»',
@@ -60,6 +65,7 @@ const TEXTS = {
   },
   pt: {
     live: 'Em direto: {title}',
+    readingsReady: 'As leituras de hoje já estão disponíveis.',
     inOneHour: 'Daqui a 1 hora: {title}',
     requestTitle: 'O seu pedido: {type}',
     officeReplied: 'A secretaria respondeu: «{body}»',
