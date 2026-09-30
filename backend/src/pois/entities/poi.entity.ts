@@ -11,6 +11,7 @@ import { UserPoi } from '../../user-pois/entities/user-poi.entity.js';
 import { ActiveModule } from '../../active-modules/entities/active-module.entity.js';
 import { PoiType } from '../../common/enums/poi-type.enum.js';
 import { Language } from '../../common/enums/language.enum.js';
+import { BillingInterval } from '../../common/enums/billing-interval.enum.js';
 import { ModuleType } from '../../common/enums/module-type.enum.js';
 
 /**
@@ -96,6 +97,25 @@ export class Poi {
 
   @Column('varchar', { name: 'receipt_signatory', nullable: true })
   receiptSignatory?: string | null;
+
+  // ---- Module billing (Seb, 30 Sep 2026) ----
+  // Monthly or yearly, one choice for every paid module, so one bill.
+  @Column({ name: 'billing_interval', type: 'enum', enum: BillingInterval, default: BillingInterval.MONTHLY })
+  billingInterval!: BillingInterval;
+
+  // "Offert": every module on at no charge. Set on the communities that
+  // existed before billing, the demos among them; only ANSAE sets it.
+  @Column({ name: 'billing_comped', default: false })
+  billingComped!: boolean;
+
+  // How the community pays, as shown back to it ("Prélèvement SEPA ·
+  // •••• 4521"). Demo stage: nothing is charged, so only the label is kept.
+  @Column('varchar', { name: 'payment_method_label', nullable: true })
+  paymentMethodLabel?: string | null;
+
+  // The one date every paid module renews on. null while nothing is paid.
+  @Column({ name: 'billing_renews_at', type: 'timestamptz', nullable: true })
+  billingRenewsAt?: Date | null;
 
   @Column({ nullable: true })
   address?: string;

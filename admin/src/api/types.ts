@@ -106,6 +106,32 @@ export type ActiveModule = {
   status: ModuleStatus;
   startDate: string;
   expirationDate: string | null;
+  // Module billing (30 Sep 2026): the free month, what is paid for, and a
+  // stop that takes effect when the paid period ends.
+  trialEndsAt: string | null;
+  paidUntil: string | null;
+  cancelAtPeriodEnd: boolean;
+};
+
+export type BillingInterval = 'monthly' | 'yearly';
+
+export type BillingInvoice = {
+  id: string;
+  issuedAt: string;
+  amount: number;
+  lines: { moduleType: ModuleType; amount: number; periodStart: string; periodEnd: string }[];
+};
+
+export type BillingSummary = {
+  interval: BillingInterval;
+  // "Offert": every module on at no charge.
+  comped: boolean;
+  paymentMethod: string | null;
+  renewsAt: string | null;
+  prices: Record<BillingInterval, number>;
+  freeModules: ModuleType[];
+  modules: ActiveModule[];
+  invoices: BillingInvoice[];
 };
 
 export type Announcement = {

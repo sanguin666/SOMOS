@@ -1639,3 +1639,110 @@ label.link-button:focus-within {
   width: auto;
   font-weight: 700;
 }
+
+/* ---------- Modules (module billing, 30 Sep 2026) ---------- */
+
+.modules-heading {
+  margin-top: 24px;
+}
+
+.module-row {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.module-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.module-row-text {
+  min-width: 0;
+}
+
+.module-desc {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.module-actions {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.module-confirm {
+  margin-top: 8px;
+}
+
+.module-confirm p {
+  margin: 0;
+}
+
+.module-alert {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-primary-strong);
+}
+
+.module-alert + .module-alert {
+  margin-top: 8px;
+}
+
+.billing-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  margin: 12px 0 4px;
+}
+
+.billing-figures p {
+  margin: 0;
+}
+
+.billing-figure {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.form-label {
+  font-size: 15px;
+}
+
+.form .radio-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 17px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.form .radio-row input[type='radio'] {
+  width: 20px;
+  min-height: 20px;
+  height: 20px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+}
+
+.billing-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 17px;
+  color: var(--color-text);
+}
+
+@media (max-width: 640px) {
+  .module-row-main,
+  .billing-line {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
