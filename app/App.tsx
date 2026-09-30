@@ -9,6 +9,7 @@ import { ScanQRScreen } from './src/screens/ScanQRScreen';
 import { PoiHubScreen } from './src/screens/PoiHubScreen';
 import { PhoneLoginScreen } from './src/screens/PhoneLoginScreen';
 import { PlaceSwitcher } from './src/components/PlaceSwitcher';
+import { IntroAnimation } from './src/components/IntroAnimation';
 import { PreviewApp, previewPoiId } from './src/preview/PreviewApp';
 import { I18nProvider, useI18n } from './src/i18n/I18nContext';
 import { enablePush, onNotificationTapped, refreshPush, type PushTarget } from './src/notifications/push';
@@ -55,6 +56,9 @@ function AppRoutes() {
   const [landed, setLanded] = useState(false);
   const current = stack[stack.length - 1];
   const { language } = useI18n();
+  // The hearts opening plays once per launch, over whatever is loading
+  // underneath, so it never holds anything up.
+  const [introDone, setIntroDone] = useState(false);
   // What a tapped notification asked to open, handed to the place's hub.
   // `nonce` makes tapping the same notification twice open it twice.
   const [pushTarget, setPushTarget] = useState<(PushTarget & { nonce: number }) | null>(null);
@@ -323,6 +327,8 @@ function AppRoutes() {
           onClose={closeSwitcher}
         />
       )}
+
+      {!introDone && <IntroAnimation onDone={() => setIntroDone(true)} />}
 
       <StatusBar style={statusBarStyle} />
     </>
