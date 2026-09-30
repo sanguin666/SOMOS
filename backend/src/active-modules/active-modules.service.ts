@@ -5,6 +5,7 @@ import { ActiveModule } from './entities/active-module.entity.js';
 import { PoisService } from '../pois/pois.service.js';
 import { ActivateModuleDto } from './dto/activate-module.dto.js';
 import { UpdateActiveModuleDto } from './dto/update-active-module.dto.js';
+import { ModuleBillingService } from './module-billing.service.js';
 
 @Injectable()
 export class ActiveModulesService {
@@ -12,6 +13,7 @@ export class ActiveModulesService {
     @InjectRepository(ActiveModule)
     private readonly activeModuleRepository: Repository<ActiveModule>,
     private readonly poisService: PoisService,
+    private readonly billing: ModuleBillingService,
   ) {}
 
   async activate(
@@ -41,10 +43,10 @@ export class ActiveModulesService {
     return this.activeModuleRepository.save(activeModule);
   }
 
-  findActiveModulesForPoi(poiId: string): Promise<ActiveModule[]> {
-    return this.activeModuleRepository.find({
-      where: { poi: { id: poiId } },
-    });
+  // Settled first, so a trial that ended or a period that ran out while
+  // nobody looked is already off when the app asks.
+  async findActiveModulesForPoi(poiId: string): Promise<ActiveModule[]> {
+    return this.billing.settle(poiId);
   }
 
   async update(

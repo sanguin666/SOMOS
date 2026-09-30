@@ -43,6 +43,19 @@ export class ActiveModule {
   @Column({ name: 'expiration_date', type: 'timestamptz', nullable: true })
   expirationDate?: Date | null;
 
+  // The free month: set once, when the trial starts. A module that has a
+  // row has had its trial, whatever its status now.
+  @Column({ name: 'trial_ends_at', type: 'timestamptz', nullable: true })
+  trialEndsAt?: Date | null;
+
+  // Paid up to here; renews on the community's billing date.
+  @Column({ name: 'paid_until', type: 'timestamptz', nullable: true })
+  paidUntil?: Date | null;
+
+  // Stopped by the office: stays on until paidUntil, then switches off.
+  @Column({ name: 'cancel_at_period_end', default: false })
+  cancelAtPeriodEnd!: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
