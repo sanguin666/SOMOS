@@ -737,7 +737,16 @@ a.btn {
   align-items: center;
   justify-content: center;
   padding: 32px 16px;
-  background: var(--color-bg) url('/login-background.jpg') center / cover no-repeat;
+  position: relative;
+  background: var(--color-bg);
+}
+
+/* The picture sits on its own layer so it can fade in over the beige. */
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/login-background.jpg') center / cover no-repeat;
 }
 
 .login-panel {
@@ -751,6 +760,7 @@ a.btn {
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  position: relative;
 }
 
 @media (max-width: 600px) {
@@ -765,6 +775,43 @@ a.btn {
 
 .login-panel svg[aria-label='ANSAE'] {
   align-self: center;
+}
+
+.login-panel .intro-mark {
+  max-width: 100%;
+  height: auto;
+}
+
+/* The opening, in the app's beats: the picture (0 to 0.7 s), the white
+   box (0.5 to 0.9 s), the hearts meeting (IntroLogoMark, 0.9 to 2.7 s),
+   the name (2.75 s), then the form (3.05 s). */
+.login-intro::before {
+  animation: login-fade-in 0.7s ease-out both;
+}
+
+.login-intro .login-panel {
+  animation: login-rise-in 0.4s 0.5s ease-out both;
+}
+
+.login-intro .login-wordmark {
+  animation: login-rise-in 0.4s 2.75s ease-out both;
+}
+
+.login-intro .login-step {
+  animation: login-fade-in 0.4s 3.05s ease-out both;
+}
+
+@keyframes login-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes login-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 .login-wordmark {

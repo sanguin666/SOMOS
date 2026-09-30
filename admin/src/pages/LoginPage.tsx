@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { ApiError } from '../api/client';
-import { LogoMark } from '../components/LogoMark';
+import { IntroLogoMark } from '../components/IntroLogoMark';
 import { LanguagePicker } from '../components/LanguagePicker';
 
 export function LoginPage() {
@@ -14,6 +14,23 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // The page arrives in steps, like the app opening: the picture, then
+  // the white box, then the hearts meeting, then the form. Any click or
+  // key jumps to the end, and it never plays for somebody who has asked
+  // for less motion.
+  const [skipIntro, setSkipIntro] = useState(
+    () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+  );
+  useEffect(() => {
+    if (skipIntro) return;
+    const skip = () => setSkipIntro(true);
+    window.addEventListener('pointerdown', skip);
+    window.addEventListener('keydown', skip);
+    return () => {
+      window.removeEventListener('pointerdown', skip);
+      window.removeEventListener('keydown', skip);
+    };
+  }, [skipIntro]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -33,13 +50,13 @@ export function LoginPage() {
   // light over the illustration, then one white form, the orange button
   // and the language row — nothing else to read and nothing to get wrong.
   return (
-    <div className="login-page">
+    <div className={skipIntro ? 'login-page' : 'login-page login-intro'}>
       <form className="login-panel" onSubmit={handleSubmit}>
-        <LogoMark size={180} />
+        <IntroLogoMark size={180} delay={900} skip={skipIntro} />
         <h1 className="login-wordmark">{t('login.heading')}</h1>
-        <p className="login-subtitle">{t('login.subtitle')}</p>
+        <p className="login-subtitle login-step">{t('login.subtitle')}</p>
 
-        <div className="card form">
+        <div className="card form login-step">
           <label>
             {t('login.emailLabel')}
             <input
@@ -63,11 +80,13 @@ export function LoginPage() {
         </div>
 
         {error && <p className="error-text">{error}</p>}
-        <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+        <button type="submit" className="btn btn-primary btn-block login-step" disabled={submitting}>
           {submitting ? t('login.signingIn') : t('login.signIn')}
         </button>
 
-        <LanguagePicker />
+        <div className="login-step">
+          <LanguagePicker />
+        </div>
       </form>
     </div>
   );
