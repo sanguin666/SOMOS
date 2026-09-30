@@ -23,6 +23,7 @@ import { ServiceRequestsModule } from './service-requests/service-requests.modul
 import { MassIntentionsModule } from './mass-intentions/mass-intentions.module.js';
 import { PrivateFilesModule } from './private-files/private-files.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { DailyReadingsModule } from './daily-readings/daily-readings.module.js';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
     DashboardModule,
     ServiceRequestsModule,
     MassIntentionsModule,
+    DailyReadingsModule,
     PrivateFilesModule,
     NotificationsModule,
   ],

@@ -16,4 +16,8 @@ export class UpdateNotificationPreferencesDto {
   @IsOptional()
   @IsBoolean()
   live?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  readings?: boolean;
 }

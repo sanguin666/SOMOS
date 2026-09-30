@@ -16,6 +16,7 @@ const DEFAULT_MENU_ORDER: ModuleType[] = [
   'donations',
   'requests',
   'mass_intentions',
+  'daily_readings',
   'prayer_requests',
   'community',
   'livestreams',
@@ -196,5 +197,7 @@ export function moduleName(type: ModuleType, t: ReturnType<typeof useI18n>['t'])
       return t('moduleNames.requests');
     case 'mass_intentions':
       return t('moduleNames.massIntentions');
+    case 'daily_readings':
+      return t('moduleNames.readings');
   }
 }

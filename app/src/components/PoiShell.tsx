@@ -11,6 +11,7 @@ import {
   ChatBubbleIcon,
   ChevronDownIcon,
   ClipboardIcon,
+  BookIcon,
   HeartIcon,
   HomeIcon,
   LogoMark,
@@ -51,6 +52,7 @@ const DEFAULT_MENU_ORDER: ModuleType[] = [
   'donations',
   'requests',
   'mass_intentions',
+  'daily_readings',
   'prayer_requests',
   'community',
   'livestreams',
@@ -294,6 +296,8 @@ function describe(tab: HubTab, t: Translate): Described {
       return { icon: (c) => <ClipboardIcon size={24} color={c} />, label: t('hub.requestsLabel') };
     case 'mass_intentions':
       return { icon: (c) => <ChaliceIcon size={24} color={c} />, label: t('hub.massIntentionsLabel') };
+    case 'daily_readings':
+      return { icon: (c) => <BookIcon size={24} color={c} />, label: t('hub.readingsLabel') };
     case 'more':
       return { icon: (c) => <MoreDotsIcon size={24} color={c} />, label: t('hub.moreLabel') };
   }

@@ -23,6 +23,7 @@ const NAV: { to: string; label: `layout.${keyof Translations['layout']}`; module
   { to: 'donations', label: 'layout.navDonations', module: 'donations' },
   { to: 'events', label: 'layout.navEvents', module: 'events' },
   { to: 'mass-intentions', label: 'layout.navMassIntentions', module: 'mass_intentions' },
+  { to: 'readings', label: 'layout.navReadings', module: 'daily_readings' },
   { to: 'announcements', label: 'layout.navAnnouncements', module: 'announcements' },
   { to: 'livestreams', label: 'layout.navLivestreams', module: 'livestreams' },
   { to: 'prayer-requests', label: 'layout.navPrayerRequests', module: 'prayer_requests' },
