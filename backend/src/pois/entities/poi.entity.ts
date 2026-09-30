@@ -77,6 +77,11 @@ export class Poi {
   })
   massIntentionOffering?: number | null;
 
+  // Lectures du jour: an official site for the day's readings, shown as a
+  // button under what the office wrote. `{date}` becomes YYYY-MM-DD.
+  @Column({ name: 'readings_link_url', type: 'varchar', nullable: true })
+  readingsLinkUrl?: string | null;
+
   // Who issues the tax receipts: the legal body behind the community (in
   // France the diocesan association, in Spain the parish or diocese with
   // its own CIF), which is rarely the name people know the place by.

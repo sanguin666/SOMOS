@@ -16,6 +16,7 @@ import { DonationsPage } from './pages/DonationsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { RequestDetailPage, RequestsPage } from './pages/RequestsPage';
 import { MassIntentionsPage } from './pages/MassIntentionsPage';
+import { ReadingsPage } from './pages/ReadingsPage';
 
 // Reconciles the UI's language with the account's saved one on login.
 // An explicit choice never gets silently discarded either direction: if
@@ -92,6 +93,7 @@ function AppRoutes() {
         <Route path="requests" element={<RequestsPage />} />
         <Route path="requests/:requestId" element={<RequestDetailPage />} />
         <Route path="mass-intentions" element={<MassIntentionsPage />} />
+        <Route path="readings" element={<ReadingsPage />} />
         <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="livestreams" element={<LivestreamsPage />} />
         <Route path="prayer-requests" element={<PrayerRequestsPage />} />

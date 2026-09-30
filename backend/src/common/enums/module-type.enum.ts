@@ -16,4 +16,6 @@ export enum ModuleType {
   // A Mass said for someone, asked for with the offering the community
   // sets, and listed for the celebrant in the dashboard.
   MASS_INTENTIONS = 'mass_intentions',
+  // Lectures du jour: the texts the office gives members to read each day.
+  DAILY_READINGS = 'daily_readings',
 }

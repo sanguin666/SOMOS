@@ -439,6 +439,16 @@ export function ChaliceIcon({ size = 24, color = colors.text }: IconProps) {
   );
 }
 
+// Lectures du jour: an open book.
+export function BookIcon({ size = 24, color = colors.text }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 6.5C10 5 7 4.5 3 5v13c4-.5 7 0 9 1.5 2-1.5 5-2 9-1.5V5c-4-.5-7 0-9 1.5Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+      <Line x1={12} y1={6.5} x2={12} y2={19.5} stroke={color} strokeWidth={2} />
+    </Svg>
+  );
+}
+
 export function PaperclipIcon({ size = 24, color = colors.text }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

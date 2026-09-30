@@ -95,7 +95,8 @@ export type ModuleType =
   | 'livestreams'
   | 'community'
   | 'requests'
-  | 'mass_intentions';
+  | 'mass_intentions'
+  | 'daily_readings';
 
 export type ModuleStatus = 'trial' | 'active' | 'expired' | 'cancelled';
 

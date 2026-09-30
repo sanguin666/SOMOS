@@ -39,6 +39,7 @@ export function SettingsPage() {
     { type: 'community', label: t('moduleNames.community') },
     { type: 'requests', label: t('moduleNames.requests') },
     { type: 'mass_intentions', label: t('moduleNames.massIntentions') },
+    { type: 'daily_readings', label: t('moduleNames.readings') },
   ];
 
   function load() {

@@ -13,6 +13,7 @@ import { CalendarScreen } from './CalendarScreen';
 import { LivestreamScreen } from './LivestreamScreen';
 import { MassIntentionsScreen } from './MassIntentionsScreen';
 import { MoreScreen } from './MoreScreen';
+import { ReadingsScreen } from './ReadingsScreen';
 import { NotificationsScreen } from './NotificationsScreen';
 import { PoiHomeScreen } from './PoiHomeScreen';
 import { NewRequestScreen } from './NewRequestScreen';
@@ -94,6 +95,9 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
         break;
       case 'livestream':
         selectTab('livestreams');
+        break;
+      case 'readings':
+        selectTab('daily_readings');
         break;
       case 'announcement':
         // The news list first, so there is something on screen at once;
@@ -214,6 +218,8 @@ export function PoiHubScreen({ poi, onOpenPlaces, onAddPlace, onLeavePlace, onSi
         ))}
 
       {tab === 'mass_intentions' && <MassIntentionsScreen poi={poi} />}
+
+      {tab === 'daily_readings' && <ReadingsScreen poi={poi} />}
 
       {tab === 'events' &&
         (drilldown.kind === 'calendar' ? (

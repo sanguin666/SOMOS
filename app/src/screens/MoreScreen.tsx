@@ -7,6 +7,7 @@ import {
   CalendarIcon,
   CandleIcon,
   ChaliceIcon,
+  BookIcon,
   ChatBubbleIcon,
   CheckIcon,
   ChevronRightIcon,
@@ -442,6 +443,8 @@ function moduleLabel(type: ModuleType, t: ReturnType<typeof useI18n>['t']): stri
       return t('requests.title');
     case 'mass_intentions':
       return t('intentions.title');
+    case 'daily_readings':
+      return t('readings.title');
   }
 }
 
@@ -463,6 +466,8 @@ function moduleIcon(type: ModuleType): (color: string) => ReactNode {
       return (color) => <ClipboardIcon size={26} color={color} />;
     case 'mass_intentions':
       return (color) => <ChaliceIcon size={26} color={color} />;
+    case 'daily_readings':
+      return (color) => <BookIcon size={26} color={color} />;
   }
 }
 

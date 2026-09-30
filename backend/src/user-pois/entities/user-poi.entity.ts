@@ -52,6 +52,9 @@ export class UserPoi {
   @Column({ name: 'notify_live', default: true })
   notifyLive!: boolean;
 
+  @Column({ name: 'notify_readings', default: true })
+  notifyReadings!: boolean;
+
   @CreateDateColumn({ name: 'joined_at' })
   joinedAt!: Date;
 }
