@@ -131,30 +131,14 @@ async function seed() {
     console.log(`Seeded ${donations.length} demo donations for ${target.name}`);
   }
 
-  async function activateAllModules(target: Poi) {
-    for (const moduleType of [
-      ModuleType.DONATIONS,
-      ModuleType.EVENTS,
-      ModuleType.ANNOUNCEMENTS,
-      ModuleType.PRAYER_REQUESTS,
-      ModuleType.LIVESTREAMS,
-      ModuleType.COMMUNITY,
-      ModuleType.REQUESTS,
-      ModuleType.MASS_INTENTIONS,
-    ]) {
-      const existing = await activeModuleRepository.findOne({
-        where: { poi: { id: target.id }, moduleType },
-      });
-      if (!existing) {
-        await activeModuleRepository.save(
-          activeModuleRepository.create({
-            poi: target,
-            moduleType,
-            status: ModuleStatus.ACTIVE,
-          }),
-        );
-        console.log(`Activated ${moduleType} for ${target.name}`);
-      }
+  // The two older demos show the Modules page a paying community sees
+  // (Seb, 1 Oct 2026): only the free Événements is on, the rest is the
+  // office's to try. Carmen keeps everything ("Offert").
+  async function activateFreeModules(target: Poi) {
+    if (!(await activeModuleRepository.count({ where: { poi: { id: target.id }, moduleType: ModuleType.EVENTS } }))) {
+      await activeModuleRepository.save(
+        activeModuleRepository.create({ poi: target, moduleType: ModuleType.EVENTS, status: ModuleStatus.ACTIVE }),
+      );
     }
   }
 
@@ -175,7 +159,7 @@ async function seed() {
   } else {
     console.log(`Demo POI already exists: ${poi.id}`);
   }
-  await activateAllModules(poi);
+  await activateFreeModules(poi);
 
   // A second POI under the same admin's responsibility, to demo the
   // admin dashboard's POI switcher for someone managing several churches.
@@ -196,13 +180,7 @@ async function seed() {
   } else {
     console.log(`Demo POI already exists: ${poi2.id}`);
   }
-  // Holy Trinity shows the paying Modules page (Seb, 1 Oct 2026): only the
-  // free Événements is switched on here, the rest is the office's to try.
-  if (!(await activeModuleRepository.count({ where: { poi: { id: poi2.id }, moduleType: ModuleType.EVENTS } }))) {
-    await activeModuleRepository.save(
-      activeModuleRepository.create({ poi: poi2, moduleType: ModuleType.EVENTS, status: ModuleStatus.ACTIVE }),
-    );
-  }
+  await activateFreeModules(poi2);
 
   // Demonstrate the language feature: give the two demo POIs different
   // content languages. Unconditional (not gated by "just created") so it
@@ -464,17 +442,19 @@ async function seed() {
   // The default demo since 24 Sep 2026.
   const carmen = await seedCarmen(dataSource);
 
-  // Module billing (30 Sep 2026): St. Mary's and Carmen keep every module
-  // on at no charge ("Offert"). Holy Trinity pays like a real community
-  // (Seb, 1 Oct 2026); a database seeded before that loses its paid
-  // modules once, as the HolyTrinityPays migration does in production.
-  await poiRepository.update([poi.id, carmen.id], { billingComped: true });
-  if (poi2.billingComped) {
-    await poiRepository.update(poi2.id, { billingComped: false });
-    await dataSource.query(
-      `DELETE FROM active_modules WHERE poi_id = $1 AND module_type <> 'events'`,
-      [poi2.id],
-    );
+  // Module billing (30 Sep 2026): Carmen keeps every module on at no
+  // charge ("Offert"). St. Mary's and Holy Trinity pay like real
+  // communities (Seb, 1 Oct 2026); a database seeded before that loses
+  // their paid modules once, as the DemoCommunitiesPay migration does.
+  await poiRepository.update(carmen.id, { billingComped: true });
+  for (const target of [poi, poi2]) {
+    if (target.billingComped) {
+      await poiRepository.update(target.id, { billingComped: false });
+      await dataSource.query(
+        `DELETE FROM active_modules WHERE poi_id = $1 AND module_type <> 'events'`,
+        [target.id],
+      );
+    }
   }
 
   console.log('\nDemo POI ready:');
