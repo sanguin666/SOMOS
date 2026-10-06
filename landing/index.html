@@ -6,7 +6,7 @@
   <title>ANSAE — Una app para toda tu comunidad</title>
   <meta
     name="description"
-    content="ANSAE mantiene a tu comunidad conectada: donativos, eventos, anuncios, peticiones de oración, servicios en vivo y vida comunitaria — todo en una sola app accesible."
+    content="ANSAE reúne a tu comunidad en una app sencilla: horarios de misa, solicitudes, donativos, intenciones de misa, lecturas del día y noticias. Eventos es gratis; cada módulo, 10 €/mes con un mes de prueba."
   />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,6 +29,7 @@
       </a>
       <nav class="site-nav">
         <a href="#features" data-i18n="navFeatures"></a>
+        <a href="#app" data-i18n="navApp"></a>
         <a href="#for-churches" data-i18n="navChurches"></a>
         <a href="#for-congregants" data-i18n="navCongregants"></a>
         <a href="#pricing" data-i18n="navPricing"></a>
@@ -81,45 +82,7 @@
           </svg>
 
           <div class="phone">
-            <div class="phone-screen">
-              <div class="phone-topbar">
-                <svg class="mark" width="26" height="26" viewBox="0 0 100 100">
-                  <path d="M50 84 C22 62 9 42 9 27 C9 13 20 5 32 5 C43 5 49 13 50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 Z" fill="none" stroke="#F7F1E7" stroke-width="6"/>
-                  <path d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E1663F"/>
-                  <path d="M50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E0A458"/>
-                  <path d="M50 20 C34 35 34 52 50 52 C66 52 66 69 50 84" fill="none" stroke="#F7F1E7" stroke-width="6" stroke-linecap="round"/>
-                </svg>
-                <div class="phone-title">
-                  <div class="name">St. Mary's Community
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </div>
-                  <div class="city">Springfield</div>
-                </div>
-                <div class="phone-dot">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-              </div>
-              <div class="phone-body">
-                <div class="phone-event">
-                  <div class="date"><span class="month">SEP</span><span class="day">27</span></div>
-                  <div>
-                    <div class="label" data-i18n="phoneNextEvent"></div>
-                    <div class="title" data-i18n="phoneEventTitle"></div>
-                  </div>
-                </div>
-                <div class="phone-card">
-                  <div class="title" data-i18n="phoneBulletinTitle"></div>
-                  <div class="sub" data-i18n="phoneBulletinSub"></div>
-                </div>
-              </div>
-              <div class="phone-spacer"></div>
-              <div class="phone-tabbar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#E1663F"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#E1663F" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#E1663F" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="#E1663F" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="#E1663F" stroke-width="2"/></svg>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2c1.2 1.8 2.2 3 2.2 4.3a2.2 2.2 0 0 1-4.4 0C9.8 5 10.8 3.8 12 2Z" fill="#E1663F"/><rect x="9" y="9" width="6" height="12" rx="1" stroke="#E1663F" stroke-width="2"/></svg>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#E1663F" stroke-width="2"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="#E1663F"/></svg>
-              </div>
-            </div>
+            <div class="phone-screen"><img data-shot="home" data-i18n-alt="shotHome" src="assets/screens/es/home.webp" alt="" width="390" height="844" /></div>
           </div>
         </div>
       </div>
@@ -172,62 +135,128 @@
         </div>
         <div class="feature-grid">
           <div class="feature-card">
-            <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></div>
-            <h3 data-i18n="feat1Title"></h3>
-            <p data-i18n="feat1Desc"></p>
+            <div class="feature-top">
+              <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag free" data-i18n="priceFree"></span>
+            </div>
+            <h3 data-i18n="modEventsTitle"></h3>
+            <p data-i18n="modEventsDesc"></p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#FFFFFF" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="#FFFFFF" stroke-width="2"/></svg></div>
-            <h3 data-i18n="feat2Title"></h3>
-            <p data-i18n="feat2Desc"></p>
+            <div class="feature-top">
+              <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3h6v3H9zM9 12l2 2 4-4" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modRequestsTitle"></h3>
+            <p data-i18n="modRequestsDesc"></p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 4V5L6 9H4a1 1 0 0 0-1 1Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 8a5 5 0 0 1 0 8" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 5a9 9 0 0 1 0 14" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <h3 data-i18n="feat3Title"></h3>
-            <p data-i18n="feat3Desc"></p>
+            <div class="feature-top">
+              <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modDonationsTitle"></h3>
+            <p data-i18n="modDonationsDesc"></p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2c1.2 1.8 2.2 3 2.2 4.3a2.2 2.2 0 0 1-4.4 0C9.8 5 10.8 3.8 12 2Z" fill="#FFFFFF"/><rect x="9" y="9" width="6" height="12" rx="1" stroke="#FFFFFF" stroke-width="2"/></svg></div>
-            <h3 data-i18n="feat4Title"></h3>
-            <p data-i18n="feat4Desc"></p>
+            <div class="feature-top">
+              <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M7 8h10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modIntentionsTitle"></h3>
+            <p data-i18n="modIntentionsDesc"></p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#FFFFFF" stroke-width="2"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="#FFFFFF"/></svg></div>
-            <h3 data-i18n="feat5Title"></h3>
-            <p data-i18n="feat5Desc"></p>
+            <div class="feature-top">
+              <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 4V5L6 9H4a1 1 0 0 0-1 1Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 8a5 5 0 0 1 0 8M20 5a9 9 0 0 1 0 14" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modAnnouncementsTitle"></h3>
+            <p data-i18n="modAnnouncementsDesc"></p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H5a2 2 0 0 1-2-2V5Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <h3 data-i18n="feat6Title"></h3>
-            <p data-i18n="feat6Desc"></p>
+            <div class="feature-top">
+              <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2Zm0 0v14" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modReadingsTitle"></h3>
+            <p data-i18n="modReadingsDesc"></p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-top">
+              <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="#FFFFFF"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modLivestreamTitle"></h3>
+            <p data-i18n="modLivestreamDesc"></p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-top">
+              <div class="feature-icon tone-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2c1.2 1.8 2.2 3 2.2 4.3a2.2 2.2 0 0 1-4.4 0C9.8 5 10.8 3.8 12 2Z" fill="#FFFFFF"/><rect x="9" y="9" width="6" height="12" rx="1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modPrayerTitle"></h3>
+            <p data-i18n="modPrayerDesc"></p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-top">
+              <div class="feature-icon tone-a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H5a2 2 0 0 1-2-2V5Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="price-tag" data-i18n="pricePaid"></span>
+            </div>
+            <h3 data-i18n="modCommunityTitle"></h3>
+            <p data-i18n="modCommunityDesc"></p>
           </div>
         </div>
+        <p class="modules-more">
+          <span data-i18n="modulesMore"></span>
+          <a href="mailto:hello@ansae.app" data-i18n="modulesMoreLink"></a>
+        </p>
       </div>
     </section>
 
-    <section id="for-churches" class="bg-surface">
+    <section id="app" class="bg-surface">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow" data-i18n="appEyebrow"></span>
+          <h2 data-i18n="appHeading"></h2>
+          <p data-i18n="appSub"></p>
+        </div>
+      </div>
+      <div class="gallery" tabindex="0" data-i18n-label="appHeading">
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="home" src="assets/screens/es/home.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotHome"></figcaption>
+          </figure>
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="events" src="assets/screens/es/events.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotEvents"></figcaption>
+          </figure>
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="news" src="assets/screens/es/news.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotNews"></figcaption>
+          </figure>
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="donate" src="assets/screens/es/donate.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotDonate"></figcaption>
+          </figure>
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="requests" src="assets/screens/es/requests.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotRequests"></figcaption>
+          </figure>
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="intentions" src="assets/screens/es/intentions.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotIntentions"></figcaption>
+          </figure>
+          <figure class="shot">
+            <div class="phone phone-sm"><div class="phone-screen"><img data-shot="readings" src="assets/screens/es/readings.webp" alt="" loading="lazy" width="390" height="844" /></div></div>
+            <figcaption data-i18n="shotReadings"></figcaption>
+          </figure>
+      </div>
+    </section>
+
+    <section id="for-churches">
       <div class="container split">
         <div class="split-copy">
-          <div class="badge-circle" style="background: #FFFFFF;">
-            <svg width="76" height="76" viewBox="0 0 96 96">
-              <polygon points="22,44 48,20 74,44" fill="#E0A458"/>
-              <rect x="28" y="44" width="40" height="36" fill="#E1663F"/>
-              <circle cx="48" cy="34" r="8" fill="#F7F1E7"/>
-              <circle cx="48" cy="34" r="8" fill="none" stroke="#B8502E" stroke-width="1.2"/>
-              <line x1="48" y1="26" x2="48" y2="42" stroke="#B8502E" stroke-width="1"/>
-              <line x1="40" y1="34" x2="56" y2="34" stroke="#B8502E" stroke-width="1"/>
-              <line x1="43" y1="28" x2="53" y2="40" stroke="#B8502E" stroke-width="1"/>
-              <line x1="53" y1="28" x2="43" y2="40" stroke="#B8502E" stroke-width="1"/>
-              <rect x="42" y="62" width="12" height="18" rx="6" fill="#F7F1E7"/>
-              <line x1="48" y1="6" x2="48" y2="20" stroke="#16233A" stroke-width="2.5" stroke-linecap="round"/>
-              <line x1="43" y1="11" x2="53" y2="11" stroke="#16233A" stroke-width="2.5" stroke-linecap="round"/>
-              <circle cx="26" cy="84" r="5" fill="#E1663F"/>
-              <circle cx="37" cy="86" r="6" fill="#E0A458"/>
-              <circle cx="48" cy="87" r="6" fill="#E1663F"/>
-              <circle cx="59" cy="86" r="6" fill="#E0A458"/>
-              <circle cx="70" cy="84" r="5" fill="#E1663F"/>
-            </svg>
-          </div>
           <span class="eyebrow" data-i18n="churchEyebrow"></span>
           <h2 data-i18n="churchHeading"></h2>
           <p data-i18n="churchPara"></p>
@@ -235,73 +264,28 @@
             <li><span class="check">✓</span> <span data-i18n="churchBullet1"></span></li>
             <li><span class="check">✓</span> <span data-i18n="churchBullet2"></span></li>
             <li><span class="check">✓</span> <span data-i18n="churchBullet3"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="churchBullet4"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="churchBullet5"></span></li>
           </ul>
           <a class="btn btn-primary" href="#get-started" data-i18n="churchCta"></a>
         </div>
         <div class="split-media">
-          <div class="dashboard-preview">
-            <div class="dashboard-stats">
-              <div>
-                <div class="label" data-i18n="dashThisWeek"></div>
-                <div class="value">$728</div>
-              </div>
-              <div>
-                <div class="label" data-i18n="dashThisMonth"></div>
-                <div class="value">$1,803</div>
-              </div>
-            </div>
-            <div class="dashboard-chart">
-              <div class="label" data-i18n="dashDaily"></div>
-              <svg width="100%" height="80" viewBox="0 0 400 80" preserveAspectRatio="none">
-                <path d="M0 60 L40 20 L80 55 L120 60 L160 35 L200 58 L240 45 L280 52 L320 25 L360 55 L400 8" fill="none" stroke="#E1663F" stroke-width="3"/>
-              </svg>
-            </div>
+          <div class="browser">
+            <div class="browser-bar"><span></span><span></span><span></span></div>
+            <img data-shot="admin" data-i18n-alt="churchHeading" src="assets/screens/es/admin.webp" alt="" loading="lazy" width="1280" height="800" />
           </div>
         </div>
       </div>
     </section>
 
-    <section id="for-congregants">
+    <section id="for-congregants" class="bg-surface">
       <div class="container split split-reverse">
         <div class="split-media">
           <div class="phone">
-            <div class="phone-screen">
-              <div class="phone-home">
-                <div class="brand-row">
-                  <svg width="30" height="30" viewBox="0 0 100 100">
-                    <path d="M50 20 C49 13 43 5 32 5 C20 5 9 13 9 27 C9 42 22 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E1663F"/>
-                    <path d="M50 20 C51 13 57 5 68 5 C80 5 91 13 91 27 C91 42 78 62 50 84 C66 69 66 52 50 52 C34 52 34 35 50 20 Z" fill="#E0A458"/>
-                    <path d="M50 20 C34 35 34 52 50 52 C66 52 66 69 50 84" fill="none" stroke="#F7F1E7" stroke-width="6" stroke-linecap="round"/>
-                  </svg>
-                  <span>ANSAE</span>
-                </div>
-                <p data-i18n="miniWelcome"></p>
-                <div class="btn-fill" data-i18n="miniScan"></div>
-                <div class="btn-line" data-i18n="miniPlaces"></div>
-              </div>
-              <div class="phone-spacer"></div>
-            </div>
+            <div class="phone-screen"><img data-shot="readings" data-i18n-alt="congHeading" src="assets/screens/es/readings.webp" alt="" loading="lazy" width="390" height="844" /></div>
           </div>
         </div>
         <div class="split-copy">
-          <div class="badge-circle" style="background: var(--surface);">
-            <svg width="76" height="76" viewBox="0 0 96 96">
-              <g stroke="#F2C99A" stroke-width="3" stroke-linecap="round" opacity="0.9">
-                <line x1="48" y1="6" x2="48" y2="16"/>
-                <line x1="26" y1="12" x2="32" y2="20"/>
-                <line x1="70" y1="12" x2="64" y2="20"/>
-                <line x1="12" y1="28" x2="21" y2="31"/>
-                <line x1="84" y1="28" x2="75" y2="31"/>
-              </g>
-              <circle cx="30" cy="40" r="13" fill="#E0A458"/>
-              <circle cx="48" cy="36" r="14" fill="#E1663F"/>
-              <circle cx="66" cy="40" r="13" fill="#E0A458"/>
-              <circle cx="19" cy="60" r="10" fill="#F2C99A"/>
-              <circle cx="37" cy="62" r="11" fill="#E1663F"/>
-              <circle cx="55" cy="62" r="11" fill="#E0A458"/>
-              <circle cx="73" cy="60" r="10" fill="#F2C99A"/>
-            </svg>
-          </div>
           <span class="eyebrow" data-i18n="congEyebrow"></span>
           <h2 data-i18n="congHeading"></h2>
           <p data-i18n="congPara"></p>
@@ -309,31 +293,44 @@
             <li><span class="check">✓</span> <span data-i18n="congBullet1"></span></li>
             <li><span class="check">✓</span> <span data-i18n="congBullet2"></span></li>
             <li><span class="check">✓</span> <span data-i18n="congBullet3"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="congBullet4"></span></li>
           </ul>
         </div>
       </div>
     </section>
 
-    <section id="pricing" class="bg-surface">
+    <section id="pricing">
       <div class="container">
         <div class="section-header">
           <span class="eyebrow" data-i18n="pricingEyebrow"></span>
           <h2 data-i18n="pricingHeading"></h2>
           <p data-i18n="pricingSub"></p>
         </div>
-        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 780px; margin: 0 auto;">
-          <div class="feature-card" style="background: #FFFFFF;">
-            <h3 data-i18n="pricingBaseTitle"></h3>
-            <div style="font-size: 30px; font-weight: 900; color: var(--primary-dark); margin: 8px 0 12px;" data-i18n="pricingBasePrice"></div>
-            <p data-i18n="pricingBaseDesc"></p>
+        <div class="pricing-grid">
+          <div class="price-card">
+            <h3 data-i18n="pricingFreeTitle"></h3>
+            <div class="price"><span data-i18n="pricingFreePrice"></span></div>
+            <p class="price-note" data-i18n="pricingFreeNote"></p>
+            <ul>
+            <li><span class="check">✓</span> <span data-i18n="pricingFree1"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="pricingFree2"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="pricingFree3"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="pricingFree4"></span></li>
+            </ul>
           </div>
-          <div class="feature-card" style="background: #FFFFFF;">
-            <h3 data-i18n="pricingModulesTitle"></h3>
-            <div style="font-size: 18px; font-weight: 800; color: var(--primary-dark); margin: 8px 0 12px;" data-i18n="pricingModulesPrice"></div>
-            <p data-i18n="pricingModulesDesc"></p>
+          <div class="price-card">
+            <h3 data-i18n="pricingPaidTitle"></h3>
+            <div class="price"><span data-i18n="pricingPaidPrice"></span> <small data-i18n="pricingPaidPer"></small></div>
+            <p class="price-note" data-i18n="pricingPaidNote"></p>
+            <ul>
+            <li><span class="check">✓</span> <span data-i18n="pricingPaid1"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="pricingPaid2"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="pricingPaid3"></span></li>
+            <li><span class="check">✓</span> <span data-i18n="pricingPaid4"></span></li>
+            </ul>
           </div>
         </div>
-        <p style="text-align: center; color: var(--text-muted); font-size: 14px; max-width: 560px; margin: 28px auto 0;" data-i18n="pricingComingSoon"></p>
+        <p class="pricing-example" data-i18n="pricingExample"></p>
       </div>
     </section>
 
@@ -376,6 +373,7 @@
       </a>
       <div class="footer-links">
         <a href="#features" data-i18n="navFeatures"></a>
+        <a href="#app" data-i18n="navApp"></a>
         <a href="#for-churches" data-i18n="navChurches"></a>
         <a href="#join" data-i18n="footerJoinLink"></a>
         <a href="#pricing" data-i18n="navPricing"></a>
