@@ -111,10 +111,11 @@ img {
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 24px;
 }
 
 .site-nav a {
+  white-space: nowrap;
   text-decoration: none;
   color: var(--text-muted);
   font-weight: 700;
@@ -201,7 +202,7 @@ section[id] {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: 0.9fr 1.1fr;
   gap: 48px;
   align-items: center;
   padding-bottom: 56px;
@@ -258,6 +259,51 @@ section[id] {
   position: relative;
   display: flex;
   justify-content: center;
+}
+
+/* Hero: the team's dashboard with a member's phone in front of it */
+.hero-visual {
+  padding: 0 0 40px 70px;
+}
+
+.hero-browser {
+  width: 100%;
+  align-self: flex-start;
+}
+
+.header-actions .btn {
+  white-space: nowrap;
+}
+
+/* The QR link is for members; it gives way first when the header is tight
+   (it stays in the footer). */
+.site-header .container {
+  max-width: 1240px;
+}
+
+@media (max-width: 1320px) {
+  .site-nav .nav-qr {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .site-nav {
+    display: none;
+  }
+}
+
+.hero-visual .hero-phone {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 170px;
+  border-radius: 26px;
+  padding: 6px;
+}
+
+.hero-phone .phone-screen {
+  border-radius: 21px;
 }
 
 .sunburst {
@@ -550,6 +596,134 @@ section {
   background: var(--surface);
 }
 
+/* ---------- Benefits, steps, dashboard rows ---------- */
+
+.why-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  counter-reset: none;
+}
+
+.steps li {
+  text-align: center;
+  padding: 0 8px;
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+
+.steps h3 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.steps p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.dash-row + .dash-row {
+  margin-top: 64px;
+}
+
+.dash-row {
+  grid-template-columns: 0.8fr 1.2fr;
+}
+
+.dash-row.split-reverse {
+  grid-template-columns: 1.2fr 0.8fr;
+}
+
+.dash-row h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.app-note {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+  max-width: 640px;
+  margin: 40px auto 0;
+}
+
+/* ---------- FAQ: one white box, one row per question ---------- */
+
+.faq {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 4px 28px;
+}
+
+.faq details + details {
+  border-top: 1px solid var(--border);
+}
+
+.faq summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 20px 32px 20px 0;
+  position: relative;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-dark);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.faq details[open] summary::after {
+  content: "–";
+}
+
+.faq details p {
+  margin: -6px 0 20px;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 /* ---------- Pricing ---------- */
 
 .pricing-grid {
@@ -776,15 +950,37 @@ section {
   }
 
   .hero-visual {
-    order: -1;
+    padding-left: 48px;
   }
 
-  .hero .phone {
-    width: 250px;
+  .hero-visual .hero-phone {
+    width: 130px;
   }
 }
 
 @media (max-width: 960px) {
+  .why-grid,
+  .steps {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .dash-row,
+  .dash-row.split-reverse {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .dash-row.split-reverse .split-media {
+    order: 2;
+  }
+
+  .dash-row.split-reverse .split-copy {
+    order: 1;
+  }
+
   .gallery {
     grid-template-columns: 236px;
   }
@@ -819,8 +1015,27 @@ section {
     grid-template-columns: 1fr;
   }
 
+  .faq {
+    padding: 4px 18px;
+  }
+
   .cta-band {
     margin: 0 16px;
     padding: 40px 24px;
   }
+}
+
+/* Feature cards on a beige section turn white, keeping one box on the beige. */
+.bg-surface .feature-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+}
+
+.bg-surface .price-tag:not(.free) {
+  background: var(--tint);
+}
+
+.bg-surface .price-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
 }
