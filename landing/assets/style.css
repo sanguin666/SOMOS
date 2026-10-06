@@ -335,19 +335,14 @@ section[id] {
 /* ---------- App gallery ---------- */
 
 .gallery {
-  display: flex;
-  gap: 28px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 8px max(24px, calc((100vw - 1032px) / 2)) 24px;
-  scrollbar-width: thin;
+  display: grid;
+  grid-template-columns: repeat(3, 236px);
+  justify-content: center;
+  gap: 48px;
 }
 
 .shot {
   margin: 0;
-  flex: none;
-  width: 236px;
-  scroll-snap-align: center;
 }
 
 .shot figcaption {
@@ -790,6 +785,10 @@ section {
 }
 
 @media (max-width: 960px) {
+  .gallery {
+    grid-template-columns: 236px;
+  }
+
   #features .feature-grid {
     grid-template-columns: repeat(2, 1fr);
   }
