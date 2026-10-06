@@ -1,9 +1,17 @@
 // Page behavior for the one-page landing site: smooth same-page scrolling
 // (with a nav "scrollspy" that highlights the section you're in), and
-// revealing a scanned parish token in the #join section — replaces the old
+// revealing a scanned community token in the #join section — replaces the old
 // standalone join.html now that everything lives on this one page.
 (function () {
   var HEADER_OFFSET = 128; // matches section[id] { scroll-margin-top } in style.css
+
+  // The "you're almost there" section is only for members arriving from a
+  // QR flyer (?token=...) or the "I have a QR code" link; community teams
+  // never see it otherwise.
+  function revealJoin() {
+    var join = document.getElementById("join");
+    if (join) join.hidden = false;
+  }
 
   function smoothScrollTo(target) {
     var top = target.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
@@ -18,6 +26,7 @@
       if (!target) return;
       link.addEventListener("click", function (event) {
         event.preventDefault();
+        if (hash === "#join") revealJoin();
         smoothScrollTo(target);
         history.pushState(null, "", hash);
       });
@@ -54,6 +63,7 @@
   function initJoinToken() {
     var token = new URLSearchParams(window.location.search).get("token");
     if (!token) return;
+    revealJoin();
     var wrap = document.getElementById("join-token-wrap");
     var box = document.getElementById("join-token-box");
     if (!wrap || !box) return;
@@ -68,6 +78,7 @@
 
     // A link straight to a hash (e.g. from the QR flyer, ?token=...#join)
     // needs the same header-offset correction the click handler applies.
+    if (window.location.hash === "#join") revealJoin();
     if (window.location.hash) {
       var initialTarget = document.querySelector(window.location.hash);
       if (initialTarget) {
